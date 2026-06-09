@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import CanvasDots from './CanvasDots';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -112,8 +113,10 @@ function App() {
   }, {}) : {};
 
   return (
-    <div className="container">
-      <header className="header">
+    <>
+      <CanvasDots />
+      <div className="container">
+        <header className="header">
         <h1>Review Analyzer</h1>
         <p>AI-powered insights from public App Store and Google Play reviews.</p>
       </header>
@@ -247,6 +250,7 @@ function App() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

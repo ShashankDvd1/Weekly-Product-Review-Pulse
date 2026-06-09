@@ -1,12 +1,12 @@
 :root {
-  --bg-color: #f8fafc;
-  --text-main: #0f172a;
-  --text-muted: #475569;
+  --bg-color: #0b0f19;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
   --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --success: #10b981;
+  --primary-hover: #60a5fa;
+  --success: #34d399;
   --danger: #ef4444;
-  --border: rgba(0, 0, 0, 0.1);
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 @keyframes gradientBG {
@@ -19,27 +19,16 @@ body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text-main);
+  background-color: transparent;
   min-height: 100vh;
-  
-  /* Vector Space Background */
-  background: 
-    linear-gradient(rgba(240, 249, 255, 0.93), rgba(224, 231, 255, 0.93)),
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(59, 130, 246, 0.1) 39px, rgba(59, 130, 246, 0.1) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(59, 130, 246, 0.1) 39px, rgba(59, 130, 246, 0.1) 40px);
-  background-color: #f8fafc;
-  background-size: 100% 100%, 40px 40px, 40px 40px;
-  animation: gridFloat 30s linear infinite;
-}
-
-@keyframes gridFloat {
-  0% { background-position: 0 0, 0 0, 0 0; }
-  100% { background-position: 0 0, 40px 40px, 40px 40px; }
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 4rem 2rem;
+  position: relative;
+  z-index: 10;
 }
 
 .header {
@@ -65,13 +54,13 @@ body {
 
 /* Glassmorphism cards */
 .form-card, .report-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-radius: 24px;
   padding: 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
   margin-bottom: 3rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -102,19 +91,18 @@ body {
 .input-group input, .input-group select {
   padding: 0.85rem 1.2rem;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
   font-size: 1rem;
   transition: all 0.2s;
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
 }
 
 .input-group input:focus, .input-group select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  background: transparent;
 }
 
 .checkbox-group {
@@ -143,12 +131,13 @@ body {
 
 .stat-box {
   flex: 1;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: none;
   padding: 2rem 1.5rem;
   border-radius: 20px;
   text-align: center;
-  box-shadow: 0 4px 15px -3px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px -3px rgba(0,0,0,0.3);
   transition: transform 0.2s ease;
 }
 .stat-box:hover {
@@ -216,13 +205,14 @@ body {
 
 /* Themes */
 .theme-card {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: none;
   border-radius: 16px;
   padding: 2.5rem;
   margin-bottom: 2rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .theme-card:hover {
@@ -246,18 +236,19 @@ body {
 }
 
 .team-badge {
-  background: #eff6ff;
-  color: #2563eb;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
   padding: 0.4rem 1.2rem;
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .quote-box {
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.04);
   border-left: 4px solid var(--primary);
   padding: 1.5rem;
   border-radius: 0 12px 12px 0;
@@ -313,13 +304,13 @@ body {
 }
 
 .alert-warning {
-  background-color: #fefce8;
+  background-color: rgba(234, 179, 8, 0.1);
   border-left: 4px solid #eab308;
   padding: 1.5rem;
   margin-bottom: 3rem;
   border-radius: 12px;
-  color: #854d0e;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  color: #fde047;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   font-size: 1.05rem;
   line-height: 1.5;
 }
