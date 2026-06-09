@@ -71,6 +71,11 @@ def generate_report(request: ReportRequest):
         if df.empty:
             return {"status": "empty", "message": "No reviews found for this period."}
             
+        # Save raw reviews for debugging
+        import os
+        os.makedirs("output", exist_ok=True)
+        df.to_json("output/raw_reviews.json", orient="records", indent=2)
+        
         raw_count = len(df)
         
         warning_msg = None
@@ -91,9 +96,16 @@ def generate_report(request: ReportRequest):
         df = scrub_pii(df)
 
         # 4. Clustering (Find Centroids)
-        df = cluster_reviews(df)
+        df, fallback_used = cluster_reviews(df)
         centroids = df[df['is_centroid'] == True]
         llm_count = len(centroids)
+        
+        if fallback_used:
+            fallback_msg = "Low review volume. Clustering couldn't find dense topics, so we randomly sampled a few reviews instead. Try expanding your Date Range or lowering the Minimum Word Count."
+            warning_msg = f"{warning_msg} | {fallback_msg}" if warning_msg else fallback_msg
+        
+        # Save filtered/scrubbed/clustered reviews to be fed to LLM
+        centroids.to_json("output/llm_input.json", orient="records", indent=2)
 
         # 5. LLM Reasoning
         themes = extract_insights(centroids)
@@ -113,12 +125,11 @@ def generate_report(request: ReportRequest):
 @app.post("/api/mcp-push")
 async def mcp_push(request: McpPushRequest):
     try:
+        from output.mcp_client import push_via_mcp
         result = await push_via_mcp(request.app_name, request.report_data, request.team_category)
-        return {
-            "status": "success", 
-            "message": "Pushed to MCP servers successfully",
-            "mcp_response": result
-        }
+        if result and isinstance(result, dict) and result.get("status") == "error":
+            raise HTTPException(status_code=500, detail=result.get("detail"))
+        return {"status": "success", "docs_response": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

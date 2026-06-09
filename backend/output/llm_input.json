@@ -1,0 +1,29 @@
+[
+  {
+    "userName":"David Heil",
+    "content":"I got robbed, I filled my <ORGANIZATION> and paid for it to break expecting to have four more thousand in coins when I came back to it and there was nothing there and my piggy bank was dry. up until now I've never had any bad experiences in game. This is a great game , i love playing it. Been playing for quite some time",
+    "score":3,
+    "at":1736331507000,
+    "source":"Play Store",
+    "cluster":-1,
+    "is_centroid":true
+  },
+  {
+    "userName":"Chitraksh luthra",
+    "content":"I am really fan of this game, their boosters , and also powerups are fabulous, love to experience its gaming. It's an addiction ... Just wowwwww",
+    "score":5,
+    "at":1711630533000,
+    "source":"Play Store",
+    "cluster":-1,
+    "is_centroid":true
+  },
+  {
+    "userName":"Kevin O'Dea",
+    "content":"It's a good entertaining game, it keeps da mind active.",
+    "score":4,
+    "at":1708743923000,
+    "source":"Play Store",
+    "cluster":-1,
+    "is_centroid":true
+  }
+]

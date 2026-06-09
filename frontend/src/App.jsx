@@ -15,6 +15,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);
   const [error, setError] = useState('');
+  const [errorFields, setErrorFields] = useState([]);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -26,12 +33,21 @@ function App() {
 
   const generateReport = async (e) => {
     e.preventDefault();
+    
+    // Validation check
+    if (!formData.play_store_package.trim() && !formData.app_store_id.trim()) {
+      setErrorFields(['play_store_package', 'app_store_id']);
+      showToast('Please provide either a Play Store Package or an App Store ID to fetch reviews!', 'error');
+      return;
+    }
+    setErrorFields([]);
+
     setLoading(true);
     setError('');
     setReport(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/generate-report', {
+      const response = await fetch('http://127.0.0.1:8000/api/generate-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -64,13 +80,15 @@ function App() {
       alert(`Pushing ${target} report to Google Docs and Gmail MCP...`);
       
       const appName = formData.play_store_package || formData.app_store_id || 'Unknown App';
-      const response = await fetch('http://localhost:8000/api/mcp-push', {
+      const formattedTeam = teamCategory ? teamCategory.toLowerCase().replace(' team', '') : null;
+      
+      const response = await fetch('http://127.0.0.1:8000/api/mcp-push', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           app_name: appName,
           report_data: report.themes,
-          team_category: teamCategory
+          team_category: formattedTeam
         })
       });
       
@@ -106,11 +124,11 @@ function App() {
             <div className="form-grid">
               <div className="input-group">
                 <label>Play Store Package Name (e.g., com.groww.app)</label>
-                <input type="text" name="play_store_package" value={formData.play_store_package} onChange={handleInputChange} placeholder="com.example.app" />
+                <input type="text" name="play_store_package" value={formData.play_store_package} onChange={handleInputChange} placeholder="com.example.app" className={errorFields.includes('play_store_package') ? 'input-error' : ''} />
               </div>
               <div className="input-group">
                 <label>App Store ID (e.g., 123456789)</label>
-                <input type="text" name="app_store_id" value={formData.app_store_id} onChange={handleInputChange} placeholder="123456789" />
+                <input type="text" name="app_store_id" value={formData.app_store_id} onChange={handleInputChange} placeholder="123456789" className={errorFields.includes('app_store_id') ? 'input-error' : ''} />
               </div>
               
               <div className="input-group">
@@ -221,6 +239,13 @@ function App() {
           </div>
         )}
       </main>
+
+      {toast && (
+        <div className={`toast-container ${toast.type}`}>
+          <div className="toast-icon">⚠️</div>
+          <div className="toast-message">{toast.message}</div>
+        </div>
+      )}
     </div>
   );
 }

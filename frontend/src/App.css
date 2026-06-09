@@ -18,11 +18,22 @@
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(-45deg, #f0f9ff, #e0e7ff, #f3e8ff, #f8fafc);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
   color: var(--text-main);
   min-height: 100vh;
+  
+  /* Vector Space Background */
+  background: 
+    linear-gradient(rgba(240, 249, 255, 0.93), rgba(224, 231, 255, 0.93)),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(59, 130, 246, 0.1) 39px, rgba(59, 130, 246, 0.1) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(59, 130, 246, 0.1) 39px, rgba(59, 130, 246, 0.1) 40px);
+  background-color: #f8fafc;
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  animation: gridFloat 30s linear infinite;
+}
+
+@keyframes gridFloat {
+  0% { background-position: 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 40px 40px, 40px 40px; }
 }
 
 .container {
@@ -311,4 +322,49 @@ body {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   font-size: 1.05rem;
   line-height: 1.5;
+}
+
+/* Toast and Error Highlighting Styles */
+.input-error {
+  border: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--text-main);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  animation: slideInBottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-container.error {
+  background-color: var(--danger);
+  border-left: 6px solid #b91c1c;
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+}
+
+@keyframes slideInBottom {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

@@ -59,4 +59,12 @@ def cluster_reviews(df: pd.DataFrame, min_cluster_size: int = 5) -> pd.DataFrame
         # Mark as centroid using integer location
         df.iloc[closest_index, df.columns.get_loc('is_centroid')] = True
 
-    return df
+    fallback_used = False
+    # Fallback: if no clusters were found (all noise), randomly sample a few reviews
+    if df['is_centroid'].sum() == 0 and len(df) > 0:
+        fallback_count = min(3, len(df))
+        fallback_indices = np.random.choice(len(df), fallback_count, replace=False)
+        df.iloc[fallback_indices, df.columns.get_loc('is_centroid')] = True
+        fallback_used = True
+
+    return df, fallback_used

@@ -34,10 +34,21 @@ async def push_via_mcp(app_name: str, report_data: list, team_category: str = No
     content = format_report_data(app_name, report_data)
     title = f"Weekly Product Review Pulse - {app_name}"
 
+    env_vars = os.environ.copy()
+    env_path = r"e:\PM_Portfolio_Projects\MCP-Server-For-Reviews-Analyzer\.ENV"
+    if os.path.exists(env_path):
+        with open(env_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    env_vars[k.strip()] = v.strip().strip("'").strip('"')
+
     # 2. Setup Stdio MCP Client
     server_params = StdioServerParameters(
         command="node",
-        args=[MCP_SERVER_PATH]
+        args=[MCP_SERVER_PATH],
+        env=env_vars
     )
 
     result_data = None
@@ -60,7 +71,8 @@ async def push_via_mcp(app_name: str, report_data: list, team_category: str = No
                 
                 # Check for errors
                 if mcp_result.isError:
-                    raise Exception(f"MCP Tool Error: {mcp_result.content}")
+                    error_text = mcp_result.content[0].text if mcp_result.content else "Unknown Error"
+                    return {"status": "error", "detail": error_text}
                 
                 # Try parsing the result content
                 if mcp_result.content and len(mcp_result.content) > 0:
@@ -72,7 +84,10 @@ async def push_via_mcp(app_name: str, report_data: list, team_category: str = No
                 else:
                     result_data = {"status": "success", "message": "No output returned"}
                     
-            except Exception as e:
-                raise Exception(f"Failed to execute send_report via MCP: {str(e)}")
+            except BaseException as e:
+                err_msg = str(e)
+                if hasattr(e, 'exceptions'):
+                    err_msg = " | ".join([str(inner) for inner in e.exceptions])
+                return {"status": "error", "detail": f"Exception: {err_msg}"}
 
     return result_data
