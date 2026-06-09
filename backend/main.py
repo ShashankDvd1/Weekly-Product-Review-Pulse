@@ -15,7 +15,7 @@ from processing.filtering import filter_reviews
 from processing.pii_scrubber import scrub_pii
 from processing.clustering import cluster_reviews
 from reasoning.summarizer import extract_insights
-from output.mcp_client_stub import push_to_google_docs, push_to_gmail
+from output.mcp_client import push_via_mcp
 
 app = FastAPI(title="Weekly Product Review Pulse API")
 
@@ -111,15 +111,13 @@ def generate_report(request: ReportRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/mcp-push")
-def mcp_push(request: McpPushRequest):
+async def mcp_push(request: McpPushRequest):
     try:
-        docs_res = push_to_google_docs(request.app_name, request.report_data)
-        gmail_res = push_to_gmail(request.app_name, request.report_data, request.team_category)
+        result = await push_via_mcp(request.app_name, request.report_data, request.team_category)
         return {
             "status": "success", 
             "message": "Pushed to MCP servers successfully",
-            "docs_response": docs_res,
-            "gmail_response": gmail_res
+            "mcp_response": result
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
