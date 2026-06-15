@@ -16,13 +16,18 @@ anonymizer = AnonymizerEngine()
 
 def scrub_pii_from_text(text: str) -> str:
     """
-    Scrubs PII (names, emails, phones, etc.) from a single text string.
+    Scrubs PII (names, emails, phones) from a single text string.
+    Limited to the most critical PII types for speed.
     """
     if not isinstance(text, str) or not text.strip():
         return text
         
-    # Analyze text for PII entities
-    results = analyzer.analyze(text=text, entities=[], language='en')
+    # Only scan for the most important PII types (much faster than scanning all)
+    results = analyzer.analyze(
+        text=text,
+        entities=["PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER"],
+        language='en'
+    )
     
     # Anonymize findings
     anonymized_result = anonymizer.anonymize(text=text, analyzer_results=results)

@@ -1,6 +1,41 @@
 # Weekly Product Review Pulse
 
-An automated weekly “pulse” that turns public App Store and Google Play reviews for selected fintech products into a one-page insight report and delivers it to stakeholders through Google Workspace, using MCP (Model Context Protocol) to push writes to Google Docs and Gmail.
+An automated weekly "pulse" that turns public App Store and Google Play reviews for selected products into a one-page insight report and delivers it to stakeholders through Google Workspace, using MCP (Model Context Protocol) to push writes to Google Docs and Gmail.
+
+---
+
+## Architecture & Pipeline
+
+The report generation pipeline processes reviews through 5 optimized stages:
+
+| Stage | Technology | Description |
+|-------|-----------|-------------|
+| **1. Ingestion** | `google-play-scraper`, iTunes RSS | Fetches up to 500 most recent reviews in parallel (Play Store + App Store concurrently via `ThreadPoolExecutor`) |
+| **2. Filtering** | Pandas | Filters by minimum word count and emoji presence |
+| **3. Clustering** | `scikit-learn` (TF-IDF + MiniBatchKMeans) | Groups reviews into 5–15 topic clusters and selects the most representative review (centroid) from each |
+| **4. PII Scrubbing** | `Presidio` + `spaCy` | Anonymizes names, emails, and phone numbers in centroid reviews only |
+| **5. LLM Reasoning** | `Groq` (Llama 3.1 8B) | Extracts themes, quotes, action items, and team assignments from centroids |
+
+**Performance:** Full report generation completes in **~10 seconds** for most apps.
+
+---
+
+## Tech Stack
+
+### Backend
+- **Framework:** FastAPI + Uvicorn
+- **ML/NLP:** scikit-learn (TF-IDF vectorization + MiniBatchKMeans clustering)
+- **PII Detection:** Microsoft Presidio + spaCy (`en_core_web_sm`)
+- **LLM:** Groq API (Llama 3.1 8B Instant)
+- **Data:** Pandas, NumPy
+
+### Frontend
+- **Framework:** React 18 + Vite
+- **Language:** JavaScript/JSX
+
+### MCP Integration
+- **Protocol:** Model Context Protocol (MCP) via `mcp` Python SDK
+- **Server:** Custom Node.js MCP server for Google Docs & Gmail
 
 ---
 
@@ -15,7 +50,7 @@ An automated weekly “pulse” that turns public App Store and Google Play revi
 #### Step-by-Step Setup
 1. **Open your Terminal/Command Prompt** and navigate to the project root directory:
    ```bash
-   cd e:/PM_Portfolio_Projects/Weekly-Product-Review-Pulse
+   cd Weekly-Product-Review-Pulse
    ```
 2. **Navigate to the Backend Folder**:
    ```bash
@@ -41,14 +76,14 @@ An automated weekly “pulse” that turns public App Store and Google Play revi
      ```
    *(You should see `(venv)` prepended to your command line prompt).*
 5. **Install Dependencies**:
-   Install all the packages listed in `requirements.txt` (FastAPI, Uvicorn, Pandas, google-play-scraper, etc.):
+   Install all the packages listed in `requirements.txt` (FastAPI, Uvicorn, Pandas, scikit-learn, etc.):
    ```bash
    pip install -r requirements.txt
    ```
 6. **Download Language Models**:
    The application uses `spaCy` and `Presidio` for identifying and scrubbing PII (Personally Identifiable Information). Download the required English model:
    ```bash
-   python -m spacy download en_core_web_lg
+   python -m spacy download en_core_web_sm
    ```
 7. **Configure Environment Variables**:
    - Create a file named `.env` in the `backend/` directory.
@@ -72,20 +107,16 @@ An automated weekly “pulse” that turns public App Store and Google Play revi
 #### Step-by-Step Setup
 1. **Open a new terminal window** and navigate to the frontend directory:
    ```bash
-   cd e:/PM_Portfolio_Projects/Weekly-Product-Review-Pulse/frontend
+   cd Weekly-Product-Review-Pulse/frontend
    ```
 2. **Install Node Packages**:
-   Install all required frontend libraries (React, Vite, ESLint, etc.):
+   Install all required frontend libraries (React, Vite, etc.):
    ```bash
    npm install
    ```
 3. **Start the Development Server**:
    ```bash
    npm run dev
-   ```
-   Or if script policies prevent running `.ps1` files on Windows:
-   ```powershell
-   npm.cmd run dev
    ```
 4. **Access the App**:
    Once started, open `http://localhost:5173/` in your web browser to view the application interface.
@@ -111,13 +142,13 @@ Render hosts Python FastAPI applications as Web Services. Follow these steps to 
    - **Branch**: `main`
    - **Build Command**:
      ```bash
-     pip install -r requirements.txt && python -m spacy download en_core_web_lg
+     pip install -r requirements.txt && python -m spacy download en_core_web_sm
      ```
    - **Start Command**:
      ```bash
      uvicorn main:app --host 0.0.0.0 --port 10000
      ```
-   - **Plan**: Select **Free** (or **Starter** to prevent Out Of Memory crashes due to model size).
+   - **Plan**: Select **Free** or **Starter**.
 5. **Add Environment Variables**:
    - Under the **Environment** tab, click **Add Environment Variable**.
    - Key: `GROQ_API_KEY`
@@ -136,10 +167,6 @@ Vercel is optimized for building and serving Vite-based React frontends.
      ```javascript
      const response = await fetch('https://review-pulse-backend.onrender.com/api/generate-report', ...
      ```
-     and
-     ```javascript
-     const response = await fetch('https://review-pulse-backend.onrender.com/api/mcp-push', ...
-     ```
 2. **Push Changes**: Commit and push the updated `App.jsx` to GitHub.
 3. **Log in to Vercel**: Sign in at [Vercel.com](https://vercel.com/) with GitHub.
 4. **Import Project**:
@@ -156,21 +183,84 @@ Vercel is optimized for building and serving Vite-based React frontends.
 
 ## MCP (Model Context Protocol) Integration
 
-The project currently uses **stubs** to simulate MCP interactions (creating/updating Google Docs and drafting emails via Gmail).
+The project uses a **custom MCP server** (`MCP-Server-For-Reviews-Analyzer`) to push reports to Google Docs and draft notification emails via Gmail. The MCP server stores team members and their email addresses in a local SQLite database.
 
-### Customizing Google Doc Links & Gmail Details
-If you want to configure specific links or modify the simulation behavior:
-1. Open the [mcp_client_stub.py](file:///e:/PM_Portfolio_Projects/Weekly-Product-Review-Pulse/backend/output/mcp_client_stub.py) file.
-2. **Google Docs**: Update the returned URL string in the `push_to_google_docs` function:
-   ```python
-   def push_to_google_docs(app_name: str, report_data: list):
-       # Replace the mock link with your team's actual Google Doc URL:
-       return {"status": "success", "doc_url": "https://docs.google.com/document/d/your-actual-doc-id-here"}
-   ```
-3. **Gmail**: Modify the `push_to_gmail` function to update the recipient lists or structure.
+### How It Works
+1. The backend's `mcp_client.py` connects to the Node.js MCP server via `stdio_client`.
+2. It calls the `send_report` tool, passing the formatted report content and a `team_name`.
+3. The MCP server looks up the team's member emails from its SQLite database (`data/mcp_distribution.db`).
+4. It creates a Google Doc with the report and drafts a Gmail notification to all team members.
 
-### Connecting to Real MCP Servers
-To transition from the stubs to production MCP servers (e.g., the official `@modelcontextprotocol/server-google-drive` or custom mail tools):
-1. Configure the respective Google Drive/Docs/Gmail MCP servers in your host configuration file (e.g., `claude_desktop_config.json` or equivalent).
-2. Update `mcp_client_stub.py` to use an MCP Python client SDK (like `mcp`) to dynamically execute tool calls on those registered servers.
+---
+
+### Configuring Recipient Email Addresses
+
+The LLM assigns each theme to one of 4 teams. You **must** add real email addresses for each team so reports get delivered to the right people.
+
+#### Team Categories
+
+| Team Category | Who Should Receive | Example |
+|---|---|---|
+| `Product Team` | Product Managers, Product Owners | `pm@yourcompany.com` |
+| `Engineer Team` | Engineering Leads, Backend/Frontend Devs | `eng-lead@yourcompany.com` |
+| `Art Team` | UI/UX Designers, Visual Designers | `designer@yourcompany.com` |
+| `CEO Team` | C-Suite, Leadership, Strategy | `ceo@yourcompany.com` |
+
+#### Where to Add Emails
+
+Navigate to the **MCP Server directory** and use the `manage_team.ts` CLI script:
+
+```bash
+cd e:/PM_Portfolio_Projects/MCP-Server-For-Reviews-Analyzer
+```
+
+#### Add Members to Teams
+
+```bash
+# Product Team
+npx ts-node manage_team.ts add "Product Team" pm@yourcompany.com
+npx ts-node manage_team.ts add "Product Team" product-owner@yourcompany.com
+
+# Engineer Team
+npx ts-node manage_team.ts add "Engineer Team" eng-lead@yourcompany.com
+npx ts-node manage_team.ts add "Engineer Team" backend-dev@yourcompany.com
+
+# Art Team
+npx ts-node manage_team.ts add "Art Team" ux-designer@yourcompany.com
+npx ts-node manage_team.ts add "Art Team" ui-lead@yourcompany.com
+
+# CEO Team
+npx ts-node manage_team.ts add "CEO Team" ceo@yourcompany.com
+npx ts-node manage_team.ts add "CEO Team" vp-product@yourcompany.com
+```
+
+#### View All Teams & Members
+
+```bash
+npx ts-node manage_team.ts list
+```
+
+#### Remove a Member
+
+```bash
+npx ts-node manage_team.ts remove "Engineer Team" old-dev@yourcompany.com
+```
+
+> **Note:** The team names used here (`Product Team`, `Engineer Team`, `Art Team`, `CEO Team`) must match exactly what the LLM outputs in the `team_category` field of each theme. The MCP server uses a fuzzy `LIKE` match, so partial matches will also work (e.g., `product` matches `Product Team`).
+
+### Connecting Your Own MCP Server
+1. Update the `MCP_SERVER_PATH` in `backend/output/mcp_client.py` to point to your MCP server's entry point.
+2. Configure the required environment variables for Google API credentials in your MCP server's `.env` file.
+3. Ensure the MCP server exposes a `send_report` tool that accepts `title`, `content`, and optional `team_category` arguments.
+
+---
+
+## Performance Optimizations
+
+The pipeline has been heavily optimized for speed:
+
+- **Parallel Ingestion**: Play Store and App Store reviews are fetched concurrently using `ThreadPoolExecutor`
+- **Lightweight Clustering**: Uses TF-IDF + MiniBatchKMeans instead of heavy neural embeddings, completing in <1 second
+- **Smart PII Scrubbing**: Only scrubs centroid reviews (10-15) instead of all reviews (500+), and targets only critical PII types (names, emails, phones)
+- **Volume Capping**: Limits to 500 most recent reviews — statistically sufficient for theme extraction without the computational overhead of processing thousands
 

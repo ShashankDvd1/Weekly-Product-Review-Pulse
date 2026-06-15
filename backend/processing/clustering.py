@@ -1,68 +1,75 @@
-from fastembed import TextEmbedding
-import umap
-import hdbscan
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import MiniBatchKMeans
 import pandas as pd
 import numpy as np
 
-# Load the BGE model using fastembed (no PyTorch required)
-try:
-    model = TextEmbedding("BAAI/bge-small-en-v1.5")
-except Exception as e:
-    print("Warning: Could not load TextEmbedding locally.")
-    model = None
-
-def cluster_reviews(df: pd.DataFrame, min_cluster_size: int = 5) -> pd.DataFrame:
+def cluster_reviews(df: pd.DataFrame, min_cluster_size: int = 5) -> tuple:
     """
-    Generates embeddings, reduces dimensionality with UMAP, and clusters with HDBSCAN.
+    Clusters reviews using TF-IDF vectorization + MiniBatchKMeans.
     Identifies centroid reviews for each cluster to minimize LLM token usage.
+    
+    Uses a lightweight sklearn pipeline (TF-IDF + KMeans) for fast, reliable
+    clustering that works well inside synchronous web server contexts.
     """
-    if df.empty or 'content' not in df.columns or model is None:
-        return df
-
-    texts = df['content'].tolist()
-    
-    # Generate embeddings (returns a generator, convert to list of numpy arrays)
-    embeddings = list(model.embed(texts))
-    
-    # UMAP dimensionality reduction
-    n_neighbors = min(15, len(texts) - 1) if len(texts) > 2 else 2
-    if n_neighbors < 2:
+    if df.empty or 'content' not in df.columns:
         df['cluster'] = 0
         df['is_centroid'] = True
-        return df
-        
-    reducer = umap.UMAP(n_neighbors=n_neighbors, n_components=5, metric='cosine', random_state=42)
-    reduced_embeddings = reducer.fit_transform(embeddings)
+        return df, True
+
+    texts = df['content'].astype(str).tolist()
+    n_reviews = len(texts)
     
-    # HDBSCAN clustering
-    # min_cluster_size handles how big a cluster needs to be
-    cluster_size = min(min_cluster_size, len(texts))
-    clusterer = hdbscan.HDBSCAN(min_cluster_size=cluster_size, metric='euclidean', cluster_selection_method='eom')
-    cluster_labels = clusterer.fit_predict(reduced_embeddings)
-    
+    # If there are very few reviews, skip clustering and just use all of them
+    if n_reviews <= 15:
+        df['cluster'] = 0
+        df['is_centroid'] = True
+        return df, False
+
+    # Step 1: TF-IDF vectorization
+    vectorizer = TfidfVectorizer(
+        max_features=5000,
+        stop_words='english',
+        min_df=2,
+        max_df=0.95,
+        ngram_range=(1, 2)
+    )
+    tfidf_matrix = vectorizer.fit_transform(texts)
+
+    # Step 2: MiniBatchKMeans clustering (~10-15 clusters depending on volume)
+    n_clusters = min(max(5, n_reviews // 50), 15)
+    kmeans = MiniBatchKMeans(
+        n_clusters=n_clusters,
+        random_state=42,
+        batch_size=512,
+        n_init=1
+    )
+    cluster_labels = kmeans.fit_predict(tfidf_matrix)
+
     df['cluster'] = cluster_labels
     df['is_centroid'] = False
-    
-    # Find centroids
-    unique_clusters = set(cluster_labels)
-    for cluster_id in unique_clusters:
-        if cluster_id == -1:
-            continue # Skip noise points
-            
-        cluster_indices = np.where(cluster_labels == cluster_id)[0]
-        cluster_center = np.mean(reduced_embeddings[cluster_indices], axis=0)
+
+    # Step 3: Find centroids (review closest to each cluster center)
+    for cluster_id in range(n_clusters):
+        cluster_mask = cluster_labels == cluster_id
+        cluster_indices = np.where(cluster_mask)[0]
         
-        # Point closest to the center
-        distances = np.linalg.norm(reduced_embeddings[cluster_indices] - cluster_center, axis=1)
-        closest_index = cluster_indices[np.argmin(distances)]
+        if len(cluster_indices) == 0:
+            continue
         
-        # Mark as centroid using integer location
-        df.iloc[closest_index, df.columns.get_loc('is_centroid')] = True
+        # Get cluster center from KMeans
+        center = kmeans.cluster_centers_[cluster_id]
+        
+        # Find the review closest to the center via dot-product similarity
+        cluster_vectors = tfidf_matrix[cluster_indices]
+        similarities = cluster_vectors.dot(center)
+        closest_idx = cluster_indices[np.argmax(similarities)]
+        
+        df.iloc[closest_idx, df.columns.get_loc('is_centroid')] = True
 
     fallback_used = False
-    # Fallback: if no clusters were found (all noise), randomly sample a few reviews
+    # Fallback: if somehow no centroids were found, randomly sample
     if df['is_centroid'].sum() == 0 and len(df) > 0:
-        fallback_count = min(3, len(df))
+        fallback_count = min(5, len(df))
         fallback_indices = np.random.choice(len(df), fallback_count, replace=False)
         df.iloc[fallback_indices, df.columns.get_loc('is_centroid')] = True
         fallback_used = True

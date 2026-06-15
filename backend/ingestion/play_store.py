@@ -2,7 +2,7 @@ from google_play_scraper import Sort, reviews
 import pandas as pd
 from datetime import datetime
 
-def fetch_play_store_reviews(package_name: str, from_date: str, to_date: str, lang: str = 'en', max_reviews: int = 5000) -> pd.DataFrame:
+def fetch_play_store_reviews(package_name: str, from_date: str, to_date: str, lang: str = 'en', max_reviews: int = 500) -> pd.DataFrame:
     """
     Fetches reviews from the Google Play Store for a given package name.
     Dates should be in 'YYYY-MM-DD' format.
