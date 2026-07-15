@@ -44,3 +44,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Database & generated JSON outputs
+backend/data/
+backend/output/*.json
+backend/output/*.csv

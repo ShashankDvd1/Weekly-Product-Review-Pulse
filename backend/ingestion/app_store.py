@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, max_pages: int = 10) -> pd.DataFrame:
+def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: str = 'in', max_pages: int = 10) -> pd.DataFrame:
     """
     Fetches reviews from the Apple App Store using the iTunes RSS feed.
     max_pages: iTunes RSS only allows up to 10 pages (500 reviews total).
@@ -16,7 +16,7 @@ def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, max_pages
     all_reviews = []
 
     for page in range(1, max_pages + 1):
-        url = f"https://itunes.apple.com/us/rss/customerreviews/id={app_id}/sortBy=mostRecent/page={page}/json"
+        url = f"https://itunes.apple.com/{country}/rss/customerreviews/id={app_id}/sortBy=mostRecent/page={page}/json"
         response = requests.get(url)
         if response.status_code != 200:
             break

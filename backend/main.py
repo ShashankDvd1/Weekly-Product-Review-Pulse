@@ -1,5 +1,14 @@
+"""
+Pulse Intelligence — FastAPI Application
+
+Evolves the original Weekly Product Review Pulse into an AI Consumer
+Intelligence Platform with v2 endpoints for multi-source analysis.
+
+Preserves all original /api/* endpoints for backward compatibility.
+"""
+
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -7,139 +16,273 @@ import os
 import logging
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
 
 from ingestion.play_store import fetch_play_store_reviews
 from ingestion.app_store import fetch_app_store_reviews
-from processing.filtering import filter_reviews
-from processing.pii_scrubber import scrub_pii
-from processing.clustering import cluster_reviews
-from reasoning.summarizer import extract_insights
-from output.mcp_client import push_via_mcp
 
+# v2 imports
+from core.schemas import (
+    FullPipelineRequest, CollectRequest, AnalyzeRequest,
+)
+from agents.orchestrator import get_orchestrator, reset_orchestrator
+from reasoning.prompt_parser import parse_ingestion_prompt
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Weekly Product Review Pulse API")
+app = FastAPI(
+    title="Pulse Intelligence API",
+    description="AI Consumer Intelligence Platform — Evolved from Weekly Product Review Pulse",
+    version="2.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-class ReportRequest(BaseModel):
-    app_store_id: str | None = None
-    play_store_package: str | None = None
-    from_date: str
-    to_date: str
-    lang: str = "en"
-    min_word_count: int = 0
-    include_emojis: bool = True
 
-class McpPushRequest(BaseModel):
-    app_name: str
-    report_data: list
-    team_category: str | None = None
+# ═══════════════════════════════════════════════
+#  ORIGINAL v1 ENDPOINTS (preserved)
+# ═══════════════════════════════════════════════
+
+class ParsePromptRequest(BaseModel):
+    prompt: str
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "message": "Backend is running and awake"}
+    return {
+        "status": "ok",
+        "message": "Pulse Intelligence is running",
+        "version": "2.0.0",
+        "features": ["category_discovery", "behavioral_analysis"],
+    }
 
-@app.post("/api/generate-report")
-def generate_report(request: ReportRequest):
+
+# ═══════════════════════════════════════════════
+#  v2 ENDPOINTS — Pulse Intelligence Platform
+# ═══════════════════════════════════════════════
+
+# ── Full Pipeline ────────────────────────────
+
+@app.post("/api/v2/pipeline/parse-prompt")
+def parse_prompt(request: ParsePromptRequest):
+    """Parse a natural language pipeline configuration prompt."""
     try:
-        # 1. Ingestion (parallel fetch for Play Store + App Store)
-        df_play = pd.DataFrame()
-        df_app = pd.DataFrame()
-        
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            futures = {}
-            if request.play_store_package:
-                futures['play'] = executor.submit(
-                    fetch_play_store_reviews,
-                    request.play_store_package, request.from_date, request.to_date, request.lang
-                )
-            if request.app_store_id:
-                futures['app'] = executor.submit(
-                    fetch_app_store_reviews,
-                    request.app_store_id, request.from_date, request.to_date
-                )
-            for key, future in futures.items():
-                result_df = future.result()
-                if not result_df.empty:
-                    result_df['source'] = 'Play Store' if key == 'play' else 'App Store'
-                    if key == 'play':
-                        df_play = result_df
-                    else:
-                        df_app = result_df
-                
-        df = pd.concat([df_play, df_app], ignore_index=True) if not df_play.empty or not df_app.empty else pd.DataFrame()
-        
-        if df.empty:
-            return {"status": "empty", "message": "No reviews found for this period."}
-        
-        raw_count = len(df)
-        
-        warning_msg = None
-        if raw_count >= 450:
-            oldest_date = df['at'].min()
-            to_dt = pd.to_datetime(request.to_date)
-            if oldest_date > to_dt:
-                warning_msg = "Max Volume Limit Reached! The app has extreme volume, so we capped at the 500 most recent reviews. Please try a more recent Date Range."
+        config = parse_ingestion_prompt(request.prompt)
+        return config
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-        # 2. Filtering
-        df = filter_reviews(df, request.min_word_count, request.include_emojis)
-        
-        if df.empty:
-            return {"status": "empty", "message": f"Found {raw_count} raw reviews, but none met the filtering criteria (min {request.min_word_count} words)."}
-            
-        filtered_count = len(df)
 
-        # 3. Clustering (TF-IDF + KMeans to find representative centroids)
-        df, fallback_used = cluster_reviews(df)
-        centroids = df[df['is_centroid'] == True].copy()
-        llm_count = len(centroids)
+@app.post("/api/v2/pipeline/run")
+def run_full_pipeline(request: FullPipelineRequest):
+    """
+    Run the complete intelligence pipeline:
+    collect from all sources → analyze → generate insights.
 
-        # 4. PII Scrubbing (only on centroids for speed)
-        centroids = scrub_pii(centroids)
-        
-        if fallback_used:
-            fallback_msg = "Low review volume. Clustering couldn't find dense topics, so we randomly sampled a few reviews instead. Try expanding your Date Range or lowering the Minimum Word Count."
-            warning_msg = f"{warning_msg} | {fallback_msg}" if warning_msg else fallback_msg
-        
-        # Save centroids to be fed to LLM
-        os.makedirs("output", exist_ok=True)
-        centroids.to_json("output/llm_input.json", orient="records", indent=2)
+    This is the primary endpoint for the platform.
+    """
+    try:
+        reset_orchestrator()
+        orchestrator = get_orchestrator()
+        results = orchestrator.run_full_pipeline(request)
+        return {"status": "success", **results}
+    except Exception as e:
+        logger.exception("Pipeline failed")
+        raise HTTPException(status_code=500, detail=str(e))
 
-        # 5. LLM Reasoning
-        themes = extract_insights(centroids)
 
+@app.get("/api/v2/pipeline/status")
+def get_pipeline_status():
+    """Get the current status of the pipeline."""
+    orchestrator = get_orchestrator()
+    return {
+        "status": orchestrator.status,
+        "progress": orchestrator.progress,
+    }
+
+
+# ── Collection Endpoints ─────────────────────
+
+@app.post("/api/v2/collect/all")
+def collect_all_sources(request: CollectRequest):
+    """Collect data from all specified sources."""
+    try:
+        orchestrator = get_orchestrator()
+        signals = orchestrator.collect_all(
+            apps=request.apps,
+            from_date=request.from_date,
+            to_date=request.to_date,
+        )
         return {
-            "status": "success", 
-            "data": themes, 
-            "raw_count": raw_count,
-            "filtered_count": filtered_count,
-            "llm_count": llm_count,
-            "warning": warning_msg
+            "status": "success",
+            "signals_collected": len(signals),
+            "progress": orchestrator.progress,
+            "collection_results": [c.model_dump() for c in orchestrator.collection_results],
         }
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/mcp-push")
-async def mcp_push(request: McpPushRequest):
+
+# ── Analysis Endpoints ────────────────────────
+
+@app.post("/api/v2/analyze/full")
+def analyze_all():
+    """Run the complete analysis pipeline on collected data."""
     try:
-        from output.mcp_client import push_via_mcp
-        result = await push_via_mcp(request.app_name, request.report_data, request.team_category)
-        if result and isinstance(result, dict) and result.get("status") == "error":
-            raise HTTPException(status_code=500, detail=result.get("detail"))
-        return {"status": "success", "docs_response": result}
+        orchestrator = get_orchestrator()
+        if not orchestrator.signals:
+            raise HTTPException(status_code=400, detail="No data collected yet. Call /api/v2/collect/all first.")
+        results = orchestrator.analyze_all()
+        return {"status": "success", **results}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/v2/analyze/themes")
+def get_themes():
+    """Get detected themes."""
+    orchestrator = get_orchestrator()
+    return {
+        "themes": [t.model_dump() for t in orchestrator.themes],
+        "count": len(orchestrator.themes),
+    }
+
+
+@app.get("/api/v2/analyze/barriers")
+def get_barriers():
+    """Get detected category exploration barriers."""
+    orchestrator = get_orchestrator()
+    return {
+        "barriers": [b.model_dump() for b in orchestrator.barriers],
+        "count": len(orchestrator.barriers),
+    }
+
+
+@app.get("/api/v2/analyze/personas")
+def get_personas():
+    """Get generated personas."""
+    orchestrator = get_orchestrator()
+    return {
+        "personas": [p.model_dump() for p in orchestrator.personas],
+        "count": len(orchestrator.personas),
+    }
+
+
+@app.get("/api/v2/analyze/jtbd")
+def get_jtbd():
+    """Get Jobs-To-Be-Done analysis."""
+    orchestrator = get_orchestrator()
+    return {
+        "jobs": [j.model_dump() for j in orchestrator.jobs],
+        "count": len(orchestrator.jobs),
+    }
+
+
+@app.get("/api/v2/analyze/opportunities")
+def get_opportunities():
+    """Get growth opportunities."""
+    orchestrator = get_orchestrator()
+    return {
+        "opportunities": [o.model_dump() for o in orchestrator.opportunities],
+        "count": len(orchestrator.opportunities),
+    }
+
+
+# ── Research Copilot ─────────────────────────
+
+@app.get("/api/v2/research/hypotheses")
+def get_hypotheses():
+    """Get research hypotheses."""
+    orchestrator = get_orchestrator()
+    return {
+        "hypotheses": [h.model_dump() for h in orchestrator.hypotheses],
+        "count": len(orchestrator.hypotheses),
+    }
+
+
+@app.get("/api/v2/research/questions")
+def get_interview_questions():
+    """Get generated interview questions."""
+    orchestrator = get_orchestrator()
+    return {
+        "questions": [q.model_dump() for q in orchestrator.interview_questions],
+        "count": len(orchestrator.interview_questions),
+    }
+
+
+# ── Reports ──────────────────────────────────
+
+@app.get("/api/v2/reports/executive")
+def get_executive_summary():
+    """Get the executive summary."""
+    orchestrator = get_orchestrator()
+    if orchestrator.executive_summary:
+        return orchestrator.executive_summary.model_dump()
+    return {"error": "No executive summary generated yet. Run the full pipeline first."}
+
+
+@app.get("/api/v2/reports/category-discovery")
+def get_category_discovery_report():
+    """
+    Get the Category Discovery Report —
+    the primary deliverable for the graduation assignment.
+    """
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        return {"error": "No data available. Run the full pipeline first."}
+
+    from output.report_generator import generate_category_discovery_report
+    report = generate_category_discovery_report(
+        orchestrator.signals,
+        orchestrator.barriers,
+        orchestrator.personas,
+        orchestrator.opportunities,
+        orchestrator.hypotheses,
+    )
+    return report
+
+
+# ── Dashboard ─────────────────────────────────
+
+@app.get("/api/v2/dashboard/overview")
+def get_dashboard_overview():
+    """Get aggregated data for the dashboard overview page."""
+    orchestrator = get_orchestrator()
+    return orchestrator.get_dashboard_overview()
+
+
+@app.get("/api/v2/dashboard/results")
+def get_full_results():
+    """Get all analysis results."""
+    orchestrator = get_orchestrator()
+    return orchestrator.get_full_results()
+
+
+# ── Search ────────────────────────────────────
+
+@app.post("/api/v2/search/semantic")
+def semantic_search_endpoint(query: str, top_k: int = 10):
+    """Semantic search across all collected signals."""
+    try:
+        from core.vector_store import semantic_search
+        results = semantic_search(query, top_k=top_k)
+        return {"results": results, "query": query}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
