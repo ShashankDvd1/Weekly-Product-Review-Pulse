@@ -108,6 +108,24 @@ Return JSON: {{"opportunities": [...]}}"""
 
     result = llm.generate(OPPORTUNITY_SYSTEM_PROMPT, prompt, creative=False)
 
+    def ensure_list(val) -> list[str]:
+        if not val:
+            return []
+        if isinstance(val, list):
+            return [str(x) for x in val if x]
+        if isinstance(val, str):
+            stripped = val.strip()
+            if stripped.startswith('[') and stripped.endswith(']'):
+                try:
+                    import json
+                    parsed = json.loads(stripped)
+                    if isinstance(parsed, list):
+                        return [str(x) for x in parsed if x]
+                except Exception:
+                    pass
+            return [x.strip() for x in val.split(",") if x.strip()]
+        return [str(val)]
+
     opportunities = []
     for o_data in result.get("opportunities", []):
         opp = GrowthOpportunity(
@@ -120,7 +138,7 @@ Return JSON: {{"opportunities": [...]}}"""
             confidence=max(0.0, min(1.0, o_data.get("confidence", 0.5))),
             target_persona=o_data.get("target_persona"),
             recommended_experiment=o_data.get("recommended_experiment", ""),
-            apps_affected=o_data.get("apps_affected", []),
+            apps_affected=ensure_list(o_data.get("apps_affected", [])),
         )
         opportunities.append(opp)
 

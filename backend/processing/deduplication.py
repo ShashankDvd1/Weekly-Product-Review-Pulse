@@ -6,12 +6,11 @@ signals (e.g., users expressing the exact same thought in slightly different wor
 """
 
 import logging
-from typing import Optional
-
+import numpy as np
 from core.schemas import UnifiedSignal
 from core.vector_store import (
+    get_embedding_model,
     store_signals,
-    find_similar,
     clear_collection,
 )
 from core.config import DEDUP_SIMILARITY_THRESHOLD
@@ -24,55 +23,68 @@ def semantic_deduplicate(
     similarity_threshold: float = DEDUP_SIMILARITY_THRESHOLD,
 ) -> list[UnifiedSignal]:
     """
-    Remove semantically duplicate signals using vector embeddings.
-
-    This is more aggressive than the exact deduplication in the normalizer.
-    If two users say "The milk was expired", we keep both if they are distinct
-    events, but if a single user spams the same review across platforms,
-    this catches it.
+    Remove semantically duplicate signals using vector embeddings in batch.
     """
     if not signals:
         return []
 
-    # Ensure a clean slate for this run
-    clear_collection("signals")
+    logger.info(f"Starting batch semantic deduplication of {len(signals)} signals...")
 
-    unique_signals = []
-    texts_to_store = []
-    metadatas_to_store = []
-    ids_to_store = []
+    # 1. Deduplicate exact IDs first to minimize embeddings workload
     seen_ids = set()
+    unique_candidates = []
+    for s in signals:
+        if s.unified_id not in seen_ids:
+            seen_ids.add(s.unified_id)
+            unique_candidates.append(s)
 
-    for signal in signals:
-        # Prevent exact duplicates from entering the batch storage arrays
-        if signal.unified_id in seen_ids:
-            continue
-        seen_ids.add(signal.unified_id)
+    if not unique_candidates:
+        return []
 
-        # Check if we already have something very similar
-        similar = find_similar(signal.content, top_k=1, threshold=similarity_threshold)
+    # 2. Batch generate embeddings for all unique candidates
+    try:
+        model = get_embedding_model()
+        contents = [s.content for s in unique_candidates]
+        logger.info(f"Generating embeddings for {len(contents)} signals...")
+        embeddings = model.encode(contents, show_progress_bar=False, normalize_embeddings=True)
+    except Exception as e:
+        logger.exception("Failed to generate embeddings in batch, falling back to original signals")
+        return unique_candidates
 
-        if similar:
-            logger.debug(f"Dropped duplicate signal: {signal.unified_id}")
-            continue
+    # 3. Perform cosine similarity checks in a fast NumPy matrix loop
+    unique_signals = []
+    unique_indices = []
 
-        unique_signals.append(signal)
+    for i, signal in enumerate(unique_candidates):
+        is_dup = False
+        for u_idx in unique_indices:
+            sim = float(np.dot(embeddings[i], embeddings[u_idx]))
+            if sim >= similarity_threshold:
+                is_dup = True
+                break
+        
+        if not is_dup:
+            unique_signals.append(signal)
+            unique_indices.append(i)
 
-        # We must store it so subsequent checks can find it
-        # But doing this 1 by 1 is slow, so we batch it every 50
-        texts_to_store.append(signal.content)
-        metadatas_to_store.append({"app": signal.app_name, "source": signal.source.value})
-        ids_to_store.append(signal.unified_id)
+    # 4. Batch store the final unique signals in ChromaDB for search compatibility
+    try:
+        clear_collection("signals")
+        if unique_signals:
+            texts = [s.content for s in unique_signals]
+            metadatas = [{"app": s.app_name, "source": s.source.value} for s in unique_signals]
+            ids = [s.unified_id for s in unique_signals]
+            
+            chunk_size = 100
+            for offset in range(0, len(unique_signals), chunk_size):
+                store_signals(
+                    texts[offset:offset+chunk_size],
+                    metadatas[offset:offset+chunk_size],
+                    ids[offset:offset+chunk_size],
+                )
+            logger.info(f"Stored {len(unique_signals)} unique signals in ChromaDB")
+    except Exception as e:
+        logger.error(f"Failed to save unique signals to ChromaDB: {e}")
 
-        if len(texts_to_store) >= 50:
-            store_signals(texts_to_store, metadatas_to_store, ids_to_store)
-            texts_to_store.clear()
-            metadatas_to_store.clear()
-            ids_to_store.clear()
-
-    # Store any remaining
-    if texts_to_store:
-        store_signals(texts_to_store, metadatas_to_store, ids_to_store)
-
-    logger.info(f"Semantic dedup: {len(signals)} -> {len(unique_signals)} signals (threshold {similarity_threshold})")
+    logger.info(f"Semantic dedup complete: {len(signals)} -> {len(unique_signals)} signals (threshold {similarity_threshold})")
     return unique_signals

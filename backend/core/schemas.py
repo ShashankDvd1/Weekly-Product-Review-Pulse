@@ -274,3 +274,55 @@ class DashboardOverview(BaseModel):
     top_personas: list[dict] = Field(default_factory=list)
     collection_status: dict = Field(default_factory=dict)
     last_updated: Optional[datetime] = None
+
+
+# ── Review Board Models ─────────────────────────────────
+
+class ScorecardItem(BaseModel):
+    """A scored sub-category in a reviewer scorecard."""
+    category: str
+    score: float
+    reason: str
+    strengths: list[str] = Field(default_factory=list)
+    weaknesses: list[str] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list)
+
+
+class ReviewerScorecard(BaseModel):
+    """An evaluator scorecard representing one reviewer profile."""
+    reviewer_name: str
+    focus: str
+    scores: list[ScorecardItem] = Field(default_factory=list)
+    overall_reviewer_feedback: str
+
+
+class BoardEvaluation(BaseModel):
+    """Full product board evaluation package."""
+    professor_scorecard: ReviewerScorecard
+    pm_scorecard: ReviewerScorecard
+    founder_scorecard: ReviewerScorecard
+    improvement_report: list[str] = Field(default_factory=list)
+    visual_assets: dict = Field(default_factory=dict)
+
+
+class VivaQuestion(BaseModel):
+    """A question presented in the interactive viva session."""
+    question_id: str
+    question: str
+    purpose: str
+    expected_direction: str
+    difficulty: str  # easy, medium, hard
+
+
+class VivaAnswerEvaluation(BaseModel):
+    """Evaluation output for a single user Viva response."""
+    score: float
+    confidence: str
+    communication_score: float
+    logic_score: float
+    product_thinking_score: float
+    business_thinking_score: float
+    clarity: str
+    suggestions: list[str] = Field(default_factory=list)
+    follow_up_question: Optional[str] = None
+

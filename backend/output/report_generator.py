@@ -185,3 +185,92 @@ def generate_category_discovery_report(
     }
 
     return report
+
+
+def generate_executive_deck(
+    signals: list[UnifiedSignal],
+    themes: list[Theme],
+    barriers: list[CategoryBarrier],
+    personas: list[Persona],
+    jobs: list[JTBD],
+    opportunities: list[GrowthOpportunity],
+) -> dict:
+    """
+    Automatically generate a concise executive presentation (3-4 slides)
+    that tells a compelling story and helps stakeholders understand the findings.
+    """
+    llm = get_llm_client()
+
+    # Build data context
+    source_dist = compute_source_distribution(signals)
+    sentiment = compute_sentiment_summary(signals)
+    category_counts = compute_category_mention_counts(signals)
+    behavioral_counts = compute_behavioral_signal_counts(signals)
+
+    context = f"""## DATA COVERAGE
+- Total signals analyzed: {len(signals)}
+- Sources: {source_dist}
+- Sentiment: {sentiment}
+
+## TOP THEMES ({len(themes)} detected)
+{chr(10).join(f'- {t.title} ({t.sentiment.value}, confidence: {t.confidence:.2f}): {t.summary}' for t in themes[:5])}
+
+## CATEGORY BARRIERS ({len(barriers)} detected)
+{chr(10).join(f'- {b.category} → {b.barrier_type.value}: {b.description}' for b in barriers[:5])}
+
+## PERSONAS ({len(personas)} generated)
+{chr(10).join(f'- {p.name}: {p.description[:150]}' for p in personas)}
+
+## TOP JOBS-TO-BE-DONE
+{chr(10).join(f'- (score: {j.opportunity_score:.1f}) {j.job_statement}' for j in jobs[:4])}
+
+## TOP OPPORTUNITIES
+{chr(10).join(f'- [{o.impact} impact, {o.effort} effort] {o.title}: {o.description[:100]}' for o in opportunities[:5])}
+"""
+
+    prompt = f"""You are a McKinsey-style Product Consultant. Generate a concise, consulting-style executive presentation slide deck of exactly 4 slides based on the following consumer behavioral analysis.
+
+{context}
+
+Format your response as a single, valid JSON object with a single root key "slides" containing a list of exactly 4 slide objects matching the following slide structure:
+
+### Slide 1: Executive Summary & Problem Discovery
+- `slide_number`: 1
+- `title`: "Executive Summary & Problem Discovery"
+- `headline`: Strong headline summarizing the key findings and the core problem (e.g. "Category discovery is bottlenecked by trust and search discovery barriers rather than delivery speed")
+- `key_metrics`: 2-3 key metrics (e.g. total signals, top themes count, etc.)
+- `content`: Clean, high-impact bullet points detailing dataset overview, top insights, and a generated Problem Statement explaining what the problem is, who is affected, why it exists, and its severity.
+- `visualization`: {{"type": "distribution", "data": {source_dist}}}
+- `speaker_notes`: {{"what_to_say": "...", "why_it_matters": "...", "audience_question": "...", "suggested_answer": "..."}}
+
+### Slide 2: Evidence & Supporting Analysis
+- `slide_number`: 2
+- `title`: "Evidence & Supporting Analysis"
+- `headline`: An insight-driven headline summarizing what the data shows (e.g. "Beauty and Electronics suffer from quality and trust concerns while Grocery remains the habit anchor")
+- `key_metrics`: 2-3 category metrics from category mentions (e.g. percentage of grocery mentions vs beauty)
+- `content`: McKinsey-style analysis answering "So what?", detailing highest and poorest performing categories, and why users stick to familiar categories (awareness, trust, habit barriers).
+- `visualization`: {{"type": "barriers_chart", "data": {category_counts}}}
+- `speaker_notes`: {{"what_to_say": "...", "why_it_matters": "...", "audience_question": "...", "suggested_answer": "..."}}
+
+### Slide 3: Product Opportunity & MVP Recommendation
+- `slide_number`: 3
+- `title`: "Product Opportunity & MVP Recommendation"
+- `headline`: Headline describing the primary proposed solution
+- `key_metrics`: RICE / ICE prioritization scores
+- `mvp_details`: {{"target_users": "...", "pain_points": "...", "root_cause": "...", "proposed_solution": "...", "core_features": ["feature 1", "feature 2"], "success_metrics": ["metric 1"], "roadmap": {{"now": ["item 1"], "next": ["item 2"], "later": ["item 3"]}}}}
+- `visualization`: {{"type": "rice_matrix", "data": [{{"opportunity": o.title, "impact": o.impact, "effort": o.effort, "confidence": o.confidence}} for o in opportunities[:4]]}}
+- `speaker_notes`: {{"what_to_say": "...", "why_it_matters": "...", "audience_question": "...", "suggested_answer": "..."}}
+
+### Slide 4: Final Recommendation & Next Steps
+- `slide_number`: 4
+- `title`: "Final Recommendation & Next Steps"
+- `headline`: One-sentence executive recommendation
+- `key_metrics`: Expected KPI improvements
+- `content`: Summary of what should be built, why now, expected value, future enhancements, and next experiments to validate the MVP.
+- `visualization`: {{"type": "roadmap", "data": ["Build MVP Feed", "Pilot and A/B Test", "Expand Category Catalog"]}}
+- `speaker_notes`: {{"what_to_say": "...", "why_it_matters": "...", "audience_question": "...", "suggested_answer": "..."}}
+
+Ensure all fields are fully populated and relevant. Keep text concise, using consulting bullet style."""
+
+    result = llm.generate(REPORT_SYSTEM_PROMPT, prompt, creative=False)
+    return result

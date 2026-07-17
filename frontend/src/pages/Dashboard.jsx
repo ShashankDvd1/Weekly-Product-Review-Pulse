@@ -7,6 +7,34 @@ const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pipelineRunning, setPipelineRunning] = useState(false);
+  const [pipelineLogs, setPipelineLogs] = useState([]);
+  const [pipelineStatus, setPipelineStatus] = useState(null);
+
+  // Poll pipeline status if running
+  useEffect(() => {
+    let intervalId;
+    if (pipelineRunning) {
+      intervalId = setInterval(async () => {
+        try {
+          const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+          const statusData = await res.json();
+          setPipelineStatus(statusData.status);
+          setPipelineLogs(statusData.progress || []);
+          
+          if (statusData.status === 'complete' || statusData.status === 'idle') {
+            setPipelineRunning(false);
+            clearInterval(intervalId);
+            await fetchDashboardData();
+            alert("Intelligence Pipeline Run Complete!");
+          }
+        } catch (err) {
+          console.error("Error fetching pipeline status", err);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(intervalId);
+  }, [pipelineRunning]);
 
   // Default to 30 days ago to keep pipeline executions fast and clean
   const thirtyDaysAgo = new Date();
@@ -72,7 +100,8 @@ const Dashboard = () => {
     if (!confirm) return;
     
     try {
-      setLoading(true);
+      setPipelineRunning(true);
+      setPipelineLogs(["[SYSTEM] Initiating intelligence run..."]);
       const response = await fetch(`${getBackendUrl()}/api/v2/pipeline/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,12 +112,10 @@ const Dashboard = () => {
           include_reddit: true
         })
       });
-      if (!response.ok) throw new Error('Pipeline failed');
-      await fetchDashboardData();
-      alert("Pipeline completed successfully!");
+      if (!response.ok) throw new Error('Pipeline failed to initiate');
     } catch (err) {
       alert("Error: " + err.message);
-      setLoading(false);
+      setPipelineRunning(false);
     }
   };
 
@@ -189,12 +216,69 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <button className="btn-primary" onClick={handleRunPipeline} disabled={loading}>
-            {loading ? <div className="loader"></div> : <RefreshCw size={18} />}
-            {loading ? 'Running...' : 'Run Pipeline'}
+          <button className="btn-primary" onClick={handleRunPipeline} disabled={loading || pipelineRunning}>
+            {pipelineRunning ? <div className="loader" style={{ width: '16px', height: '16px', borderTopColor: '#fff', marginRight: '8px' }}></div> : <RefreshCw size={18} />}
+            {pipelineRunning ? 'Running...' : 'Run Pipeline'}
           </button>
         </div>
       </div>
+
+      {/* Real-time Pipeline Console */}
+      {(pipelineRunning || pipelineLogs.length > 0) && (
+        <div className="glass-card" style={{ 
+          marginBottom: '2rem', 
+          background: '#07070a', 
+          border: '1px solid #1f1f2e', 
+          fontFamily: 'monospace',
+          padding: '1.25rem',
+          borderRadius: '8px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            borderBottom: '1px solid #1f1f2e', 
+            paddingBottom: '0.75rem', 
+            marginBottom: '1rem' 
+          }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: pipelineRunning ? 'var(--accent-primary)' : 'var(--success)' }}></span>
+              Pipeline Console Logs
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {pipelineRunning && <span style={{ color: '#cbd5e1', fontSize: '0.85rem', animation: 'pulse 1.5s infinite' }}>Analyzing signals in real-time...</span>}
+              {pipelineLogs.length > 0 && (
+                <button 
+                  onClick={() => setPipelineLogs([])} 
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+                >
+                  Clear Console
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div style={{ 
+            maxHeight: '200px', 
+            overflowY: 'auto', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.4rem', 
+            fontSize: '0.85rem', 
+            color: '#38bdf8',
+            textAlign: 'left'
+          }}>
+            {pipelineLogs.map((log, index) => (
+              <div key={index} style={{ 
+                color: log.includes('❌') ? 'var(--danger)' : log.includes('✅') ? 'var(--success)' : '#cbd5e1' 
+              }}>
+                {log}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* KPI Stats */}
       <div className="grid-4" style={{ marginBottom: '2rem' }}>

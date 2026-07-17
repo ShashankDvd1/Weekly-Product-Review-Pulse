@@ -25,6 +25,25 @@ from core.config import GROQ_MAX_TPM, CATEGORY_BARRIER_TYPES
 logger = logging.getLogger(__name__)
 
 
+def ensure_list(val) -> list[str]:
+    if not val:
+        return []
+    if isinstance(val, list):
+        return [str(x) for x in val if x]
+    if isinstance(val, str):
+        stripped = val.strip()
+        if stripped.startswith('[') and stripped.endswith(']'):
+            try:
+                import json
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    return [str(x) for x in parsed if x]
+            except Exception:
+                pass
+        return [x.strip() for x in val.split(",") if x.strip()]
+    return [str(val)]
+
+
 BEHAVIOR_SYSTEM_PROMPT = """You are a Senior Product Manager at a Quick Commerce company (like Zepto, Blinkit, or Swiggy Instamart).
 
 Your expertise is in understanding consumer behavior — specifically WHY users behave the way they do when using quick commerce apps.
@@ -169,8 +188,8 @@ SIGNALS:
                 mention_count=theme_data.get("mention_count", 0),
                 confidence=conf,
                 confidence_level=conf_level,
-                supporting_quotes=theme_data.get("supporting_quotes", []),
-                apps_affected=theme_data.get("apps_affected", []),
+                supporting_quotes=ensure_list(theme_data.get("supporting_quotes", [])),
+                apps_affected=ensure_list(theme_data.get("apps_affected", [])),
                 first_seen=datetime.utcnow(),
             )
             all_themes.append(theme)
@@ -241,7 +260,7 @@ CONSUMER SIGNALS:
 
             # Build evidence items from quotes
             evidence = []
-            for quote in barrier_data.get("supporting_quotes", []):
+            for quote in ensure_list(barrier_data.get("supporting_quotes", [])):
                 evidence.append(EvidenceItem(
                     source=DataSource.PLAY_STORE,  # Will be refined with actual source
                     text=quote,
@@ -261,7 +280,7 @@ CONSUMER SIGNALS:
                 ),
                 supporting_evidence=evidence,
                 recommended_intervention=barrier_data.get("recommended_intervention", ""),
-                apps_affected=barrier_data.get("apps_affected", []),
+                apps_affected=ensure_list(barrier_data.get("apps_affected", [])),
             )
             all_barriers.append(barrier)
 

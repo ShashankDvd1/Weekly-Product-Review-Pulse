@@ -83,9 +83,9 @@ def parse_prompt(request: ParsePromptRequest):
 
 
 @app.post("/api/v2/pipeline/run")
-def run_full_pipeline(request: FullPipelineRequest):
+def run_full_pipeline(request: FullPipelineRequest, background_tasks: BackgroundTasks):
     """
-    Run the complete intelligence pipeline:
+    Run the complete intelligence pipeline asynchronously:
     collect from all sources → analyze → generate insights.
 
     This is the primary endpoint for the platform.
@@ -93,10 +93,14 @@ def run_full_pipeline(request: FullPipelineRequest):
     try:
         reset_orchestrator()
         orchestrator = get_orchestrator()
-        results = orchestrator.run_full_pipeline(request)
-        return {"status": "success", **results}
+        background_tasks.add_task(orchestrator.run_full_pipeline, request)
+        return {
+            "status": "started",
+            "message": "Intelligence pipeline started in background",
+            "progress": ["Pipeline execution initialized..."]
+        }
     except Exception as e:
-        logger.exception("Pipeline failed")
+        logger.exception("Pipeline failed to start")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -267,6 +271,157 @@ def get_full_results():
     """Get all analysis results."""
     orchestrator = get_orchestrator()
     return orchestrator.get_full_results()
+
+
+@app.get("/api/v2/signals")
+def get_all_signals():
+    """Get all collected unified signals (reviews, comments)."""
+    orchestrator = get_orchestrator()
+    return {
+        "signals": [s.model_dump() for s in orchestrator.signals],
+        "count": len(orchestrator.signals),
+    }
+
+
+@app.get("/api/v2/reports/executive-deck")
+def get_executive_deck_report():
+    """Generate the AI Executive Insight presentation deck data."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        return {"error": "No data available. Run the full pipeline first."}
+
+    from output.report_generator import generate_executive_deck
+    try:
+        deck = generate_executive_deck(
+            orchestrator.signals,
+            orchestrator.themes,
+            orchestrator.barriers,
+            orchestrator.personas,
+            orchestrator.jobs,
+            orchestrator.opportunities,
+        )
+        return deck
+    except Exception as e:
+        logger.exception("Failed to generate executive deck")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Review Board ──────────────────────────────
+
+class VivaStartRequest(BaseModel):
+    length: int = 10  # 5, 10, or 15 questions
+
+
+class VivaAnswerRequest(BaseModel):
+    answer: str
+
+
+@app.get("/api/v2/review-board/evaluation")
+def get_review_board_evaluation():
+    """Get or compile scorecards, dynamic metrics, and visual assets."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        return {"error": "No data available. Run the full pipeline first."}
+
+    if orchestrator.board_evaluation is None:
+        from reasoning.review_board import generate_board_evaluation
+        orchestrator.board_evaluation = generate_board_evaluation(
+            orchestrator.signals,
+            orchestrator.themes,
+            orchestrator.barriers,
+            orchestrator.personas,
+            orchestrator.jobs,
+            orchestrator.opportunities,
+            orchestrator.hypotheses,
+        )
+
+    return orchestrator.board_evaluation
+
+
+@app.post("/api/v2/review-board/viva/start")
+def start_viva_defense(req: VivaStartRequest):
+    """Start an interactive Viva Defense session."""
+    orchestrator = get_orchestrator()
+    
+    # Pre-generate questions if empty
+    from reasoning.review_board import generate_viva_questions
+    if not orchestrator.viva_questions:
+        orchestrator.viva_questions = generate_viva_questions(orchestrator.opportunities)
+
+    # Slice questions based on length
+    length = min(max(req.length, 5), len(orchestrator.viva_questions))
+    selected_questions = orchestrator.viva_questions[:length]
+
+    # Initialize session
+    orchestrator.viva_session = {
+        "active": True,
+        "current_question_index": 0,
+        "questions": selected_questions,
+        "answers": [],
+        "evaluations": []
+    }
+
+    first_q = selected_questions[0]
+    return {
+        "question": first_q,
+        "current_index": 0,
+        "total_questions": length,
+        "active": True
+    }
+
+
+@app.post("/api/v2/review-board/viva/answer")
+def submit_viva_answer(req: VivaAnswerRequest):
+    """Submit user's Viva response, evaluate, and return progress status."""
+    orchestrator = get_orchestrator()
+    session = orchestrator.viva_session
+
+    if not session or not session.get("active"):
+        raise HTTPException(status_code=400, detail="No active Viva session. Call /viva/start first.")
+
+    current_idx = session["current_question_index"]
+    questions = session["questions"]
+    current_q = questions[current_idx]
+
+    # Evaluate answer
+    from reasoning.review_board import evaluate_viva_answer
+    eval_result = evaluate_viva_answer(
+        current_q["question"],
+        current_q["expected_direction"],
+        req.answer
+    )
+
+    # Store user response and evaluation
+    session["answers"].append(req.answer)
+    session["evaluations"].append(eval_result)
+
+    # Check if this was the last question
+    completed = current_idx >= len(questions) - 1
+    next_q = None
+
+    if not completed:
+        session["current_question_index"] += 1
+        next_q = questions[session["current_question_index"]]
+    else:
+        # End session
+        session["active"] = False
+        # Calculate final viva aggregate score
+        scores = [e["score"] for e in session["evaluations"]]
+        avg_score = sum(scores) / len(scores) if scores else 0.0
+        
+        # Build portfolio readiness indicator
+        eval_result["viva_summary"] = {
+            "average_score": avg_score,
+            "total_questions": len(questions),
+            "evaluations": session["evaluations"]
+        }
+
+    return {
+        "evaluation": eval_result,
+        "next_question": next_q,
+        "current_index": session["current_question_index"],
+        "completed": completed
+    }
 
 
 # ── Search ────────────────────────────────────

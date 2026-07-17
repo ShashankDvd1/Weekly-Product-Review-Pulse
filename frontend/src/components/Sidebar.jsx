@@ -8,7 +8,11 @@ import {
   Microscope, 
   FileText,
   BarChart3,
-  Terminal
+  Terminal,
+  Table,
+  Presentation,
+  Award,
+  Compass
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -21,6 +25,10 @@ const Sidebar = () => {
     { path: '/opportunities', label: 'Growth Opportunities', icon: <Lightbulb size={20} /> },
     { path: '/research-copilot', label: 'Research Copilot', icon: <Microscope size={20} /> },
     { path: '/evidence', label: 'Evidence Explorer', icon: <FileText size={20} /> },
+    { path: '/sheets', label: 'Data Sheets', icon: <Table size={20} /> },
+    { path: '/deck', label: 'Executive Deck', icon: <Presentation size={20} /> },
+    { path: '/review-board', label: 'Review Board', icon: <Award size={20} /> },
+    { path: '/viva-defense', label: 'Viva Defense', icon: <Compass size={20} /> },
   ];
 
   return (

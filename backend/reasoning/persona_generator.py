@@ -15,6 +15,25 @@ from core.schemas import UnifiedSignal, Persona
 logger = logging.getLogger(__name__)
 
 
+def ensure_list(val) -> list[str]:
+    if not val:
+        return []
+    if isinstance(val, list):
+        return [str(x) for x in val if x]
+    if isinstance(val, str):
+        stripped = val.strip()
+        if stripped.startswith('[') and stripped.endswith(']'):
+            try:
+                import json
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    return [str(x) for x in parsed if x]
+            except Exception:
+                pass
+        return [x.strip() for x in val.split(",") if x.strip()]
+    return [str(val)]
+
+
 PERSONA_SYSTEM_PROMPT = """You are a Senior UX Researcher specializing in Quick Commerce consumer behavior.
 
 You create rich, evidence-based user personas from customer signals (app reviews, Reddit discussions).
@@ -123,13 +142,13 @@ CONSUMER SIGNALS:
             name=p_data.get("name", "Unknown Persona"),
             description=description,
             shopping_habits=shopping_habits,
-            motivations=p_data.get("motivations", []),
-            barriers=p_data.get("barriers", []),
-            preferred_categories=p_data.get("preferred_categories", []),
-            avoided_categories=p_data.get("avoided_categories", []),
-            apps_used=p_data.get("apps_used", []),
+            motivations=ensure_list(p_data.get("motivations", [])),
+            barriers=ensure_list(p_data.get("barriers", [])),
+            preferred_categories=ensure_list(p_data.get("preferred_categories", [])),
+            avoided_categories=ensure_list(p_data.get("avoided_categories", []),),
+            apps_used=ensure_list(p_data.get("apps_used", [])),
             signal_count=p_data.get("signal_count", 0),
-            representative_quotes=p_data.get("representative_quotes", []),
+            representative_quotes=ensure_list(p_data.get("representative_quotes", [])),
             confidence=max(0.0, min(1.0, p_data.get("confidence", 0.5))),
         )
         personas.append(persona)

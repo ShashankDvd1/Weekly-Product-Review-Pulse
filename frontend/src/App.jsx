@@ -12,6 +12,10 @@ import Personas from './pages/Personas';
 import Opportunities from './pages/Opportunities';
 import ResearchCopilot from './pages/ResearchCopilot';
 import EvidenceExplorer from './pages/EvidenceExplorer';
+import DataSheets from './pages/DataSheets';
+import ExecutiveDeck from './pages/ExecutiveDeck';
+import ReviewBoard from './pages/ReviewBoard';
+import VivaDefense from './pages/VivaDefense';
 
 function App() {
   return (
@@ -25,6 +29,10 @@ function App() {
           <Route path="opportunities" element={<Opportunities />} />
           <Route path="research-copilot" element={<ResearchCopilot />} />
           <Route path="evidence" element={<EvidenceExplorer />} />
+          <Route path="sheets" element={<DataSheets />} />
+          <Route path="deck" element={<ExecutiveDeck />} />
+          <Route path="review-board" element={<ReviewBoard />} />
+          <Route path="viva-defense" element={<VivaDefense />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

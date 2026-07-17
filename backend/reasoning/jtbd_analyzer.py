@@ -15,6 +15,25 @@ from core.schemas import UnifiedSignal, JTBD, JTBDCategory
 logger = logging.getLogger(__name__)
 
 
+def ensure_list(val) -> list[str]:
+    if not val:
+        return []
+    if isinstance(val, list):
+        return [str(x) for x in val if x]
+    if isinstance(val, str):
+        stripped = val.strip()
+        if stripped.startswith('[') and stripped.endswith(']'):
+            try:
+                import json
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    return [str(x) for x in parsed if x]
+            except Exception:
+                pass
+        return [x.strip() for x in val.split(",") if x.strip()]
+    return [str(val)]
+
+
 JTBD_SYSTEM_PROMPT = """You are an expert in the Jobs-To-Be-Done (JTBD) framework, specifically applied to Quick Commerce (10-minute delivery apps like Zepto, Blinkit, Swiggy Instamart).
 
 You analyze consumer signals to extract the real JOBS users are trying to get done — not features they want, but outcomes they desire.
@@ -102,10 +121,10 @@ CONSUMER SIGNALS:
             job_statement=j_data.get("job_statement", ""),
             category=category,
             current_solution=j_data.get("current_solution", ""),
-            gaps=j_data.get("gaps", []),
+            gaps=ensure_list(j_data.get("gaps", [])),
             opportunity_score=max(0.0, min(10.0, j_data.get("opportunity_score", 0.0))),
             signal_count=j_data.get("signal_count", 0),
-            supporting_quotes=j_data.get("supporting_quotes", []),
+            supporting_quotes=ensure_list(j_data.get("supporting_quotes", [])),
         )
         jobs.append(job)
 

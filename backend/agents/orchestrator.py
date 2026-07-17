@@ -64,6 +64,15 @@ class PipelineOrchestrator:
         self.interview_questions: list[InterviewQuestion] = []
         self.executive_summary: Optional[ExecutiveSummary] = None
         self.collection_results: list[CollectionResult] = []
+        self.board_evaluation = None
+        self.viva_questions = []
+        self.viva_session = {
+            "active": False,
+            "current_question_index": 0,
+            "questions": [],
+            "answers": [],
+            "evaluations": []
+        }
         self._status = "idle"
         self._progress = []
 
