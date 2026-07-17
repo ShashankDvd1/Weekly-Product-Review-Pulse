@@ -7,6 +7,7 @@ const ResearchCopilot = () => {
   const [questions, setQuestions] = useState(null);
   const [loading, setLoading] = useState(true);
   const [scriptCopied, setScriptCopied] = useState(false);
+  const [generatedScript, setGeneratedScript] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,6 +83,7 @@ ${formQuestions}
   Logger.log('Editor URL: ' + form.getEditUrl());
 }`;
 
+    setGeneratedScript(script);
     navigator.clipboard.writeText(script);
     setScriptCopied(true);
   };
@@ -129,7 +131,7 @@ ${formQuestions}
           </h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
             <strong>How to create your Google Form:</strong>
-            <ol style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <ol style={{ margin: '0.5rem 0 0.5rem 0', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <li>Go to <a href="https://script.google.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>script.google.com</a> and sign in.</li>
               <li>Click <strong>New Project</strong>.</li>
               <li>Select all default code in the editor, delete it, and paste (Ctrl+V) the copied script.</li>
@@ -137,6 +139,24 @@ ${formQuestions}
               <li>Authorize permissions when prompted. The form will be created in your Google Drive!</li>
             </ol>
           </p>
+
+          <div style={{ marginTop: '1.25rem' }}>
+            <strong style={{ color: '#fff', display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem' }}>Copied Google Apps Script:</strong>
+            <pre style={{ 
+              background: '#070a13', 
+              color: '#a5b4fc', 
+              padding: '1rem', 
+              borderRadius: '6px', 
+              fontSize: '0.8rem', 
+              overflowX: 'auto',
+              maxHeight: '180px',
+              border: '1px solid rgba(255,255,255,0.05)',
+              fontFamily: 'Consolas, Monaco, Courier New, monospace'
+            }}>
+              {generatedScript}
+            </pre>
+          </div>
+
           <button className="btn-secondary" onClick={() => setScriptCopied(false)} style={{ marginTop: '1rem', padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
             Close Instructions
           </button>
