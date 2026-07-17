@@ -12,6 +12,7 @@ import uuid
 from core.llm_client import get_llm_client
 from core.schemas import UnifiedSignal, JTBD, JTBDCategory
 
+from reasoning.behavior_analyzer import validate_quotes
 logger = logging.getLogger(__name__)
 
 
@@ -124,7 +125,7 @@ CONSUMER SIGNALS:
             gaps=ensure_list(j_data.get("gaps", [])),
             opportunity_score=max(0.0, min(10.0, j_data.get("opportunity_score", 0.0))),
             signal_count=j_data.get("signal_count", 0),
-            supporting_quotes=ensure_list(j_data.get("supporting_quotes", [])),
+            supporting_quotes=validate_quotes(ensure_list(j_data.get("supporting_quotes", [])), signals),
         )
         jobs.append(job)
 

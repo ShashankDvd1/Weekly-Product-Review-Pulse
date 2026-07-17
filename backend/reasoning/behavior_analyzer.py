@@ -44,6 +44,38 @@ def ensure_list(val) -> list[str]:
     return [str(val)]
 
 
+def validate_quotes(quotes: list[str], signals: list[UnifiedSignal]) -> list[str]:
+    """
+    Filter the list of quotes to keep only those that exist as a substring
+    (case-insensitive, ignoring spacing/punctuation) of at least one scraped signal's content.
+    """
+    valid_quotes = []
+
+    def normalize(text: str) -> str:
+        return "".join(c.lower() for c in text if c.isalnum())
+
+    normalized_signals = [normalize(s.content) for s in signals]
+
+    for quote in quotes:
+        norm_quote = normalize(quote)
+        if not norm_quote:
+            continue
+
+        matched = False
+        for norm_signal in normalized_signals:
+            if norm_quote in norm_signal:
+                matched = True
+                break
+
+        if matched:
+            valid_quotes.append(quote)
+        else:
+            logger.warning(f"Hallucinated quote rejected by guardrails: '{quote}'")
+
+    return valid_quotes
+
+
+
 BEHAVIOR_SYSTEM_PROMPT = """You are a Senior Product Manager at a Quick Commerce company (like Zepto, Blinkit, or Swiggy Instamart).
 
 Your expertise is in understanding consumer behavior — specifically WHY users behave the way they do when using quick commerce apps.
@@ -188,7 +220,7 @@ SIGNALS:
                 mention_count=theme_data.get("mention_count", 0),
                 confidence=conf,
                 confidence_level=conf_level,
-                supporting_quotes=ensure_list(theme_data.get("supporting_quotes", [])),
+                supporting_quotes=validate_quotes(ensure_list(theme_data.get("supporting_quotes", [])), signals),
                 apps_affected=ensure_list(theme_data.get("apps_affected", [])),
                 first_seen=datetime.utcnow(),
             )
@@ -259,8 +291,9 @@ CONSUMER SIGNALS:
                 barrier_type = BarrierType.AWARENESS
 
             # Build evidence items from quotes
+            valid_quotes = validate_quotes(ensure_list(barrier_data.get("supporting_quotes", [])), signals)
             evidence = []
-            for quote in ensure_list(barrier_data.get("supporting_quotes", [])):
+            for quote in valid_quotes:
                 evidence.append(EvidenceItem(
                     source=DataSource.PLAY_STORE,  # Will be refined with actual source
                     text=quote,
