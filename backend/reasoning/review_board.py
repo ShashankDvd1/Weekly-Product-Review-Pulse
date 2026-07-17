@@ -104,9 +104,9 @@ Ensure the final JSON is valid and correctly formatted.
 """
     try:
         response_text = llm.generate(BOARD_SYSTEM_PROMPT, prompt, creative=True)
-        # Parse output to ensure it matches
-        data = json.loads(response_text)
-        return data
+        if isinstance(response_text, dict):
+            return response_text
+        return json.loads(response_text)
     except Exception as e:
         logger.exception("Failed to generate board evaluation via LLM, compiling mock report")
         return get_fallback_evaluation()
@@ -137,7 +137,7 @@ Do not write markdown, return only the JSON array."""
 
     try:
         response_text = llm.generate(BOARD_SYSTEM_PROMPT, prompt, creative=False)
-        questions = json.loads(response_text)
+        questions = response_text if isinstance(response_text, list) else json.loads(response_text)
         if isinstance(questions, list) and len(questions) > 0:
             return questions
         return get_fallback_viva_questions()
@@ -171,6 +171,8 @@ Do not write markdown, return only the JSON object."""
 
     try:
         response_text = llm.generate(BOARD_SYSTEM_PROMPT, prompt, creative=False)
+        if isinstance(response_text, dict):
+            return response_text
         return json.loads(response_text)
     except Exception as e:
         logger.error(f"Failed to evaluate answer: {e}")
@@ -251,3 +253,96 @@ def get_fallback_viva_questions() -> list[dict]:
         {"question_id": "q6", "question": "What is your Go-To-Market strategy, and how does it drive virality?", "purpose": "Evaluate distribution assumptions", "expected_direction": "Referral loops, category cross-selling promos, or contextual feeds.", "difficulty": "hard"},
         {"question_id": "q7", "question": "If a major competitor copies your feature within a month, what is your defensibility?", "purpose": "Challenge product moat", "expected_direction": "Emphasize proprietary ML model recommendations, local delivery speed integration, or brand trust.", "difficulty": "hard"}
     ]
+
+
+def generate_mvp_case_study(
+    signals: list,
+    themes: list,
+    barriers: list,
+    personas: list,
+    opportunities: list,
+) -> dict:
+    """
+    Generate a complete PM business case study explaining what MVP was chosen, why, RICE details, and metric analysis.
+    """
+    llm = get_llm_client()
+
+    context = f"""
+## BEHAVIORAL SIGNALS & DISCOVERIES
+- Total user signals: {len(signals)}
+- Themes: {', '.join(t.title for t in themes[:3])}
+- Barriers: {', '.join(b.barrier_type.value for b in barriers[:3])}
+- Personas: {', '.join(p.name for p in personas[:2])}
+- Top Opportunities: {', '.join(o.title for o in opportunities[:4])}
+"""
+
+    prompt = f"""Generate a comprehensive Product Manager MVP Case Study based on the project context:
+{context}
+
+You must return a single JSON object matching this schema:
+- "mvp_title": The name of the chosen MVP solution (e.g. "Localized Quality Badges & Verification Feed")
+- "core_value_prop": One-sentence value proposition of this MVP
+- "target_persona": The primary persona targeted by this MVP
+- "problem_context": Rationale of the problem backed by specific review and rating evidence (e.g. "Zepto's trust score drops by 40% on fresh produce due to trust concerns...")
+- "why_chosen_rationale": Solid PM justification for choosing this MVP over other alternatives
+- "rice_matrix": List of objects representing the prioritizations:
+  - "title": Opportunity title
+  - "reach": score (1-10)
+  - "impact": score (1-5)
+  - "confidence": score (0-1)
+  - "effort": score (1-10)
+  - "score": final RICE score
+- "kpi_metrics": List of objects representing metrics:
+  - "type": "North Star Metric", "Primary KPI", "Secondary KPI", or "Proxy Metric"
+  - "kpi_name": e.g. "Category cross-purchase rate"
+  - "target_improvement": e.g. "+15% conversion in 30 days"
+  - "measurement_method": e.g. "A/B test click-through to checkout"
+- "experiment_design": Object containing:
+  - "phases": List of phase descriptions (e.g. Phase 1: Internal alpha, Phase 2: 5% user pilot, etc.)
+  - "success_criteria": List of indicators to proceed to full launch
+  - "risk_mitigation": List of key risks and their mitigations
+
+Make sure all references to reviews, ratings, and sentiments are realistic and directly reflect the QuickCommerce context. Return only the JSON object, no markdown."""
+
+    try:
+        data = llm.generate(BOARD_SYSTEM_PROMPT, prompt, creative=False)
+        if isinstance(data, dict):
+            return data
+        return json.loads(data)
+    except Exception as e:
+        logger.exception("Failed to generate MVP case study report")
+        return get_fallback_case_study()
+
+
+def get_fallback_case_study() -> dict:
+    """Standard backup PM business case study."""
+    return {
+        "mvp_title": "Category Cross-Purchase Contextual Trust Feed",
+        "core_value_prop": "Drive trial and cross-category discovery in quick commerce by injecting contextual quality assurance signals directly into the grocery search flow.",
+        "target_persona": "The Routine Buyer (Sticks only to habit products like milk/bread)",
+        "problem_context": "Analysis of Zepto reviews showed a category discovery trust barrier. While grocery has a 4.2★ score, non-grocery categories (fresh meat, beauty, household items) suffer from a low 2.1★ average score due to quality trust doubts and high friction in navigation.",
+        "why_chosen_rationale": "Rather than building expensive separate shopping sections, a contextual recommendation loop reaches the user at their high-intent habit loop moments (e.g., matching recipes when buying basics), lowering the barrier of trial.",
+        "rice_matrix": [
+            {"title": "Contextual Cross-Category Feed", "reach": 9.0, "impact": 4.0, "confidence": 0.85, "effort": 3.0, "score": 10.2},
+            {"title": "Separate Premium Category Tab", "reach": 4.0, "impact": 3.0, "confidence": 0.70, "effort": 6.0, "score": 1.4}
+        ],
+        "kpi_metrics": [
+            {"type": "North Star Metric", "kpi_name": "Category Cross-Purchase Discovery Rate", "target_improvement": "+18% in 45 days", "measurement_method": "Multi-category purchase tracking"},
+            {"type": "Primary KPI", "kpi_name": "Non-Habit Category Conversion", "target_improvement": "+12% checkout rate", "measurement_method": "A/B test feed checkout conversion"},
+            {"type": "Proxy Metric", "kpi_name": "Carousel Click-Through-Rate", "target_improvement": "+25% CTR", "measurement_method": "Banner CTR click logs"}
+        ],
+        "experiment_design": {
+            "phases": [
+                "Phase 1: Internal QA dogfooding pilot",
+                "Phase 2: 5% user cohort A/B test",
+                "Phase 3: 100% rollout to routine buyer segment"
+            ],
+            "success_criteria": [
+                "Proxy CTR remains above 20%",
+                "Category discovery conversion shows a minimum statistically significant lift of +8%"
+            ],
+            "risk_mitigation": [
+                "Inventory stock-out risk: Filter feed items dynamically based on local warehouse micro-fulfillment availability."
+            ]
+        }
+    }

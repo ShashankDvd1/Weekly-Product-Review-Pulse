@@ -73,6 +73,7 @@ class PipelineOrchestrator:
             "answers": [],
             "evaluations": []
         }
+        self.mvp_case_study = None
         self._status = "idle"
         self._progress = []
 

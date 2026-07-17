@@ -12,7 +12,8 @@ import {
   Table,
   Presentation,
   Award,
-  Compass
+  Compass,
+  Briefcase
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -29,6 +30,7 @@ const Sidebar = () => {
     { path: '/deck', label: 'Executive Deck', icon: <Presentation size={20} /> },
     { path: '/review-board', label: 'Review Board', icon: <Award size={20} /> },
     { path: '/viva-defense', label: 'Viva Defense', icon: <Compass size={20} /> },
+    { path: '/mvp-case', label: 'MVP Case Study', icon: <Briefcase size={20} /> },
   ];
 
   return (

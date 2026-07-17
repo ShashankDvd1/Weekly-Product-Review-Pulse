@@ -16,6 +16,7 @@ import DataSheets from './pages/DataSheets';
 import ExecutiveDeck from './pages/ExecutiveDeck';
 import ReviewBoard from './pages/ReviewBoard';
 import VivaDefense from './pages/VivaDefense';
+import MvpCaseStudy from './pages/MvpCaseStudy';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="deck" element={<ExecutiveDeck />} />
           <Route path="review-board" element={<ReviewBoard />} />
           <Route path="viva-defense" element={<VivaDefense />} />
+          <Route path="mvp-case" element={<MvpCaseStudy />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

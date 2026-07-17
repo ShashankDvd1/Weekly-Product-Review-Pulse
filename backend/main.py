@@ -338,6 +338,26 @@ def get_review_board_evaluation():
     return orchestrator.board_evaluation
 
 
+@app.get("/api/v2/reports/mvp-case")
+def get_mvp_case_study_endpoint():
+    """Get the PM business case study explaining what MVP was chosen, why, and metric analysis."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        return {"error": "No data available. Run the full pipeline first."}
+
+    if orchestrator.mvp_case_study is None:
+        from reasoning.review_board import generate_mvp_case_study
+        orchestrator.mvp_case_study = generate_mvp_case_study(
+            orchestrator.signals,
+            orchestrator.themes,
+            orchestrator.barriers,
+            orchestrator.personas,
+            orchestrator.opportunities,
+        )
+
+    return orchestrator.mvp_case_study
+
+
 @app.post("/api/v2/review-board/viva/start")
 def start_viva_defense(req: VivaStartRequest):
     """Start an interactive Viva Defense session."""
