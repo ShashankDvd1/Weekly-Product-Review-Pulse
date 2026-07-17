@@ -127,7 +127,7 @@ class PipelineOrchestrator:
             if play_store_package:
                 try:
                     self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                    df_play = fetch_play_store_reviews(play_store_package, from_date, to_date, max_reviews=30)
+                    df_play = fetch_play_store_reviews(play_store_package, from_date, to_date, max_reviews=300)
                     if not df_play.empty:
                         df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                         normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
@@ -145,7 +145,7 @@ class PipelineOrchestrator:
             if app_store_id:
                 try:
                     self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                    df_app = fetch_app_store_reviews(app_store_id, from_date, to_date, max_pages=1)
+                    df_app = fetch_app_store_reviews(app_store_id, from_date, to_date, max_pages=4)
                     if not df_app.empty:
                         df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                         normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
@@ -174,7 +174,7 @@ class PipelineOrchestrator:
                 # Play Store
                 try:
                     self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                    df_play = fetch_play_store_reviews(package, from_date, to_date, max_reviews=30)
+                    df_play = fetch_play_store_reviews(package, from_date, to_date, max_reviews=300)
                     if not df_play.empty:
                         df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                         normalized = normalize_play_store_reviews(df_play, app_name, package)
@@ -192,7 +192,7 @@ class PipelineOrchestrator:
                 # App Store
                 try:
                     self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                    df_app = fetch_app_store_reviews(app_store_id_reg, from_date, to_date, max_pages=1)
+                    df_app = fetch_app_store_reviews(app_store_id_reg, from_date, to_date, max_pages=4)
                     if not df_app.empty:
                         df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                         normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
