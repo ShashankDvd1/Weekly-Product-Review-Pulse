@@ -103,7 +103,7 @@ def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 400
     Chunk signals into batches. If there are too many signals, downsample them 
     using stratified sampling to avoid hitting LLM token rate limits.
     """
-    MAX_SIGNALS = 120
+    MAX_SIGNALS = 200
     if len(signals) > MAX_SIGNALS:
         logger.info(f"Downsampling signals count from {len(signals)} to {MAX_SIGNALS} for LLM analysis.")
         # Stratified sampling by app and rating
