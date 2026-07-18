@@ -108,6 +108,10 @@ class LLMClient:
             except Exception as e:
                 err_str = str(e)
                 if "429" in err_str:
+                    if "tpd" in err_str.lower() or "tokens per day" in err_str.lower():
+                        logger.error(f"Groq Daily Token Limit (TPD) Exceeded: {err_str}")
+                        raise RuntimeError(f"Groq Daily Token Limit Exceeded. You have run out of API tokens for today: {err_str}")
+                    
                     if attempt == retries - 1:
                         logger.error(f"Rate limited on final attempt {attempt + 1}: {err_str}")
                         raise

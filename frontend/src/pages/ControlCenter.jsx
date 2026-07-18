@@ -22,10 +22,12 @@ const ControlCenter = () => {
           setPipelineStatus(statusData.status);
           setLogs(statusData.progress || []);
           
-          if (statusData.status === 'complete' || statusData.status === 'idle') {
+          if (statusData.status === 'complete' || statusData.status === 'idle' || statusData.status === 'error') {
             setRunning(false);
             clearInterval(intervalId);
-            alert("Intelligence Pipeline Run Complete!");
+            if (statusData.status === 'complete') {
+              alert("Intelligence Pipeline Run Complete!");
+            }
           }
         } catch (err) {
           console.error("Error fetching pipeline status", err);

@@ -362,7 +362,7 @@ class PipelineOrchestrator:
         except Exception as e:
             logger.exception("Pipeline crashed")
             self._log_progress(f"❌ CRITICAL ERROR: {str(e)}")
-            self._status = "idle" # Return to idle so frontend stops polling
+            self._status = "error"
             return {"status": "error", "message": str(e)}
 
     # ── Results ──────────────────────────────
