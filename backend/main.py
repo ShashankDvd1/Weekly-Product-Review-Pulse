@@ -358,6 +358,26 @@ def get_mvp_case_study_endpoint():
     return orchestrator.mvp_case_study
 
 
+@app.get("/api/v2/reports/strategy-deep-dive")
+def get_strategy_deep_dive():
+    """Run or return the 16-step Strategy Deep Dive analysis."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        return {"error": "No data available. Run the full pipeline first."}
+
+    if orchestrator.strategy_deep_dive is None:
+        from reasoning.strategy_deep_dive import run_strategy_deep_dive
+        orchestrator.strategy_deep_dive = run_strategy_deep_dive(
+            orchestrator.signals,
+            orchestrator.themes,
+            orchestrator.barriers,
+            orchestrator.personas,
+            orchestrator.opportunities,
+        )
+
+    return orchestrator.strategy_deep_dive
+
+
 @app.post("/api/v2/review-board/viva/start")
 def start_viva_defense(req: VivaStartRequest):
     """Start an interactive Viva Defense session."""

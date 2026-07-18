@@ -17,6 +17,7 @@ import ExecutiveDeck from './pages/ExecutiveDeck';
 import ReviewBoard from './pages/ReviewBoard';
 import VivaDefense from './pages/VivaDefense';
 import MvpCaseStudy from './pages/MvpCaseStudy';
+import StrategyDeepDive from './pages/StrategyDeepDive';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="review-board" element={<ReviewBoard />} />
           <Route path="viva-defense" element={<VivaDefense />} />
           <Route path="mvp-case" element={<MvpCaseStudy />} />
+          <Route path="strategy-deep-dive" element={<StrategyDeepDive />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

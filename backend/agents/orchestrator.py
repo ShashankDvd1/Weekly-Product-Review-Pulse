@@ -74,6 +74,7 @@ class PipelineOrchestrator:
             "evaluations": []
         }
         self.mvp_case_study = None
+        self.strategy_deep_dive = None
         self._status = "idle"
         self._progress = []
 
