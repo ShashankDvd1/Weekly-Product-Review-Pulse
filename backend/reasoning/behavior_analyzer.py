@@ -98,12 +98,12 @@ CRITICAL RULES:
 """
 
 
-def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 4000) -> list[str]:
+def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 2500) -> list[str]:
     """
     Chunk signals into batches. If there are too many signals, downsample them 
     using stratified sampling to avoid hitting LLM token rate limits.
     """
-    MAX_SIGNALS = 150
+    MAX_SIGNALS = 60
     if len(signals) > MAX_SIGNALS:
         logger.info(f"Downsampling signals count from {len(signals)} to {MAX_SIGNALS} for LLM analysis.")
         # Stratified sampling by app and rating

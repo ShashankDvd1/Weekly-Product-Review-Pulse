@@ -50,8 +50,28 @@ class LLMClient:
         self._client = Groq(api_key=api_key)
         self._last_call_time = 0.0
         self._force_fast_model = False
+        self._token_window_start = time.time()
+        self._tokens_used_in_window = 0
 
     # ── internal ────────────────────────────────
+    def _enforce_token_limit(self, estimated_tokens: int):
+        """Wait if needed to respect Groq's TPM limits."""
+        now = time.time()
+        # Reset window if > 60s has passed
+        if now - self._token_window_start > 60:
+            self._token_window_start = now
+            self._tokens_used_in_window = 0
+            
+        if self._tokens_used_in_window + estimated_tokens > GROQ_MAX_TPM - 500:
+            sleep_time = 60.0 - (now - self._token_window_start)
+            if sleep_time > 0:
+                logger.warning(f"Token limit approaching ({self._tokens_used_in_window}/{GROQ_MAX_TPM}). Pausing pipeline for {sleep_time:.1f}s...")
+                time.sleep(sleep_time)
+            
+            # Reset window after sleep
+            self._token_window_start = time.time()
+            self._tokens_used_in_window = 0
+
     def _enforce_rate_limit(self):
         """Wait if needed to respect Groq's RPM limits."""
         elapsed = time.time() - self._last_call_time
@@ -63,8 +83,13 @@ class LLMClient:
 
     def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5) -> str:
         """Make a single LLM call with retries."""
+        # Estimate input tokens + 1000 for output
+        estimated_input = sum(count_tokens(m.get("content", "")) for m in messages)
+        estimated_total = estimated_input + 1000
+
         for attempt in range(retries):
             self._enforce_rate_limit()
+            self._enforce_token_limit(estimated_tokens=estimated_total)
             try:
                 response = self._client.chat.completions.create(
                     messages=messages,
@@ -72,6 +97,13 @@ class LLMClient:
                     temperature=temperature,
                     response_format={"type": "json_object"},
                 )
+                
+                # Accurately track tokens used
+                if hasattr(response, 'usage') and response.usage:
+                    self._tokens_used_in_window += response.usage.total_tokens
+                else:
+                    self._tokens_used_in_window += estimated_total
+
                 return response.choices[0].message.content
             except Exception as e:
                 err_str = str(e)

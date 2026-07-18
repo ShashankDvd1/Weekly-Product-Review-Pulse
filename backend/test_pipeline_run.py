@@ -14,7 +14,7 @@ def test_run():
     today = "2026-07-15"
     
     req = FullPipelineRequest(
-        apps=["zepto"],
+        apps=["blinkit"],
         from_date=yesterday,
         to_date=today,
         include_reddit=False

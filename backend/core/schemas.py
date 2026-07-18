@@ -52,6 +52,20 @@ class JTBDCategory(str, Enum):
     SOCIAL = "social"
 
 
+class ThemeStatus(str, Enum):
+    EMERGING = "emerging"
+    STEADY = "steady"
+    DECLINING = "declining"
+
+
+class QualityCategory(str, Enum):
+    DISCARD = "Discard"
+    LOW_SIGNAL = "Low Signal"
+    MEDIUM_SIGNAL = "Medium Signal"
+    HIGH_SIGNAL = "High Signal"
+    GOLD_INSIGHT = "Gold Insight"
+
+
 # ─────────────────────────────────────────────
 # Data Collection Models
 # ─────────────────────────────────────────────
@@ -72,6 +86,11 @@ class UnifiedSignal(BaseModel):
     word_count: int = 0
     url: Optional[str] = None
     metadata: dict = Field(default_factory=dict)
+
+    # Quality Filter fields populated after ingestion
+    quality_score: Optional[int] = None
+    quality_category: Optional[QualityCategory] = None
+    extracted_insights: Optional[dict] = None
 
 
 class RedditPost(BaseModel):
@@ -206,13 +225,44 @@ class Hypothesis(BaseModel):
     related_opportunity: Optional[str] = None
 
 
-class InterviewQuestion(BaseModel):
-    """A generated user interview question."""
-    question: str
-    purpose: str
-    target_persona: Optional[str] = None
-    related_hypothesis: Optional[str] = None
-    question_type: str = "open"  # open / probing / behavioral / scaling
+class OptimizedInterviewQuestion(BaseModel):
+    """A heavily optimized question following The Mom Test."""
+    original_question: str
+    issues: list[str] = Field(default_factory=list)
+    optimized_question: str
+    validated_hypothesis: str
+    decision_supported: str
+
+
+class InterviewScriptOutput(BaseModel):
+    """The final strict Mom Test validated output."""
+    optimized_script: list[OptimizedInterviewQuestion] = Field(default_factory=list)
+    removed_questions: list[dict] = Field(default_factory=list)
+    missing_questions: list[str] = Field(default_factory=list)
+    estimated_duration: str = "15-20 minutes"
+    quality_score: int = 0
+    recommendations: list[str] = Field(default_factory=list)
+
+
+class ReviewQualityAssessment(BaseModel):
+    """The output of Phase 2 Quality Filter."""
+    information_density: int
+    specificity: int
+    actionability: int
+    root_cause_potential: int
+    evidence_strength: int
+    credibility: int
+    final_score: int
+    category: QualityCategory
+    user_goal: Optional[str] = None
+    pain_point: Optional[str] = None
+    trigger: Optional[str] = None
+    context: Optional[str] = None
+    root_cause: Optional[str] = None
+    emotional_impact: Optional[str] = None
+    current_workaround: Optional[str] = None
+    desired_outcome: Optional[str] = None
+    feature_mentioned: Optional[str] = None
 
 
 # ─────────────────────────────────────────────

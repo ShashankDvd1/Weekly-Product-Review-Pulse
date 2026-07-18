@@ -290,11 +290,11 @@ def _execute_tool(name: str, arguments: dict) -> dict:
         if not orchestrator.personas:
             return {"error": "No personas generated. Run analysis first."}
         from reasoning.research_copilot import generate_interview_questions
-        orchestrator.interview_questions = generate_interview_questions(
+        orchestrator.interview_script = generate_interview_questions(
             orchestrator.personas, orchestrator.barriers, orchestrator.hypotheses,
             num_questions=arguments.get("num_questions", 15),
         )
-        return {"questions": [q.model_dump() for q in orchestrator.interview_questions]}
+        return orchestrator.interview_script.model_dump() if orchestrator.interview_script else {}
 
     # ── Reports ──
     elif name == "generate_executive_summary":

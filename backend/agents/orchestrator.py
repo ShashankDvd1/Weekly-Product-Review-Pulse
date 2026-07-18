@@ -17,8 +17,8 @@ from core.llm_client import get_llm_client
 from core.schemas import (
     DataSource, UnifiedSignal, CollectionResult,
     Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity,
-    Hypothesis, InterviewQuestion, ExecutiveSummary,
-    FullPipelineRequest,
+    Hypothesis, OptimizedInterviewQuestion, InterviewScriptOutput, ExecutiveSummary,
+    FullPipelineRequest, QualityCategory
 )
 from ingestion.play_store import fetch_play_store_reviews
 from ingestion.app_store import fetch_app_store_reviews
@@ -61,7 +61,7 @@ class PipelineOrchestrator:
         self.jobs: list[JTBD] = []
         self.opportunities: list[GrowthOpportunity] = []
         self.hypotheses: list[Hypothesis] = []
-        self.interview_questions: list[InterviewQuestion] = []
+        self.interview_script = None
         self.executive_summary: Optional[ExecutiveSummary] = None
         self.collection_results: list[CollectionResult] = []
         self.board_evaluation = None
@@ -88,157 +88,172 @@ class PipelineOrchestrator:
 
     def _log_progress(self, message: str):
         """Log and track pipeline progress."""
-        self._progress.append(f"[{datetime.utcnow().strftime('%H:%M:%S')}] {message}")
+        self._progress.append(f"[{datetime.now().strftime('%H:%M:%S')}] {message}")
         logger.info(message)
 
     # ── Collection Phase ─────────────────────────
     def collect_all(
         self,
-        apps: Optional[list[str]] = None,
-        from_date: str = "",
-        to_date: str = "",
+        apps: list[str] = None,
+        play_store_package: str = None,
+        app_store_id: str = None,
+        from_date: str = None,
+        to_date: str = None,
         include_reddit: bool = True,
-        play_store_package: Optional[str] = None,
-        app_store_id: Optional[str] = None,
-        reddit_subreddits: Optional[list[str]] = None,
-        reddit_search_terms: Optional[list[str]] = None,
+        reddit_subreddits: list[str] = None,
+        reddit_search_terms: list[str] = None,
     ) -> list[UnifiedSignal]:
         """
-        Collect data from all configured or custom sources.
+        Collect data, deduplicate, and run the Intelligent Review Quality Filter.
+        If valid genuine reviews < target, dynamically expand the date range and retry.
         """
-        self._status = "collecting"
-        self._progress = []
+        if apps is None:
+            apps = ["zepto", "blinkit", "swiggy_instamart"]
 
-        all_signals = []
-
-        # If a custom app target is provided, ignore the default catalog apps list
-        # to ensure the pipeline runs only for the user's specific request.
         if (play_store_package or app_store_id) and apps == ["zepto", "blinkit", "swiggy_instamart"]:
             apps = []
 
-        # Set default dates if not provided
         if not from_date or not to_date:
+            from datetime import datetime
             from_date = "2024-01-01"
             to_date = datetime.now().strftime("%Y-%m-%d")
 
-        # 1. Custom app targets
-        if play_store_package or app_store_id:
-            app_name = "Custom Target"
+        TARGET_GENUINE_REVIEWS = 150
+        MAX_RETRIES = 2
+        
+        current_from_date = from_date
+        current_to_date = to_date
+        
+        self.collection_results = []
+        self._progress = []
+        all_signals = []
+        
+        from core.schemas import QualityCategory
+        
+        for attempt in range(MAX_RETRIES + 1):
+            self._log_progress(f"\n🚀 Collection Attempt {attempt + 1}/{MAX_RETRIES + 1} (From: {current_from_date} To: {current_to_date})")
+            batch_signals = []
             
-            if play_store_package:
+            # 1. Custom app targets
+            if play_store_package or app_store_id:
+                app_name = "Custom Target"
+                if play_store_package:
+                    try:
+                        self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
+                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=300)
+                        if not df_play.empty:
+                            df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
+                            normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
+                            batch_signals.extend(normalized)
+                            self._log_progress(f"  ✅ {len(normalized)} custom Play Store reviews")
+                    except Exception as e:
+                        self._log_progress(f"  ❌ Play Store error for {play_store_package}: {str(e)[:100]}")
+
+                if app_store_id:
+                    try:
+                        self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=4)
+                        if not df_app.empty:
+                            df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
+                            normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
+                            batch_signals.extend(normalized)
+                            self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
+                    except Exception as e:
+                        self._log_progress(f"  ❌ App Store error for {app_store_id}: {str(e)[:100]}")
+
+            # 2. Registered catalog apps
+            if apps:
+                for app_key in apps:
+                    app_config = QUICK_COMMERCE_APPS.get(app_key)
+                    if not app_config:
+                        continue
+                    app_name = app_config["name"]
+                    package = app_config["play_store_package"]
+                    app_store_id_reg = app_config["app_store_id"]
+
+                    try:
+                        self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
+                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=300)
+                        if not df_play.empty:
+                            df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
+                            normalized = normalize_play_store_reviews(df_play, app_name, package)
+                            batch_signals.extend(normalized)
+                            self._log_progress(f"  ✅ {len(normalized)} Play Store reviews for {app_name}")
+                    except Exception as e:
+                        self._log_progress(f"  ❌ Play Store error for {app_name}: {str(e)[:100]}")
+
+                    try:
+                        self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
+                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=4)
+                        if not df_app.empty:
+                            df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
+                            normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
+                            batch_signals.extend(normalized)
+                            self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
+                    except Exception as e:
+                        self._log_progress(f"  ❌ App Store error for {app_name}: {str(e)[:100]}")
+
+            # 3. Reddit Ingestion
+            if include_reddit:
                 try:
-                    self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                    df_play = fetch_play_store_reviews(play_store_package, from_date, to_date, max_reviews=300)
-                    if not df_play.empty:
-                        df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
-                        normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
-                        all_signals.extend(normalized)
-                        self._log_progress(f"  ✅ {len(normalized)} custom Play Store reviews")
-                        self.collection_results.append(CollectionResult(
-                            source=DataSource.PLAY_STORE,
-                            app_name=app_name,
-                            signals_collected=len(df_play),
-                            signals_after_filtering=len(normalized),
-                        ))
+                    self._log_progress(f"🔴 Collecting Reddit discussions...")
+                    reddit_signals = collect_reddit_data(
+                        subreddits=reddit_subreddits,
+                        search_terms=reddit_search_terms,
+                    )
+                    if reddit_signals:
+                        for sig in reddit_signals:
+                            sig["content"] = scrub_pii_from_text(sig["content"])
+                        normalized = normalize_reddit_data(reddit_signals)
+                        batch_signals.extend(normalized)
+                        self._log_progress(f"  ✅ {len(normalized)} Reddit signals collected")
                 except Exception as e:
-                    self._log_progress(f"  ❌ Play Store error for {play_store_package}: {str(e)[:100]}")
-
-            if app_store_id:
+                    self._log_progress(f"  ❌ Reddit error: {str(e)[:100]}")
+            
+            all_signals.extend(batch_signals)
+            
+            self._log_progress(f"🔄 Deduplicating {len(all_signals)} cumulative signals...")
+            from processing.deduplication import semantic_deduplicate
+            unique_signals = semantic_deduplicate(all_signals)
+            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
+            
+            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(unique_signals)} reviews...")
+            from reasoning.quality_filter import assess_review_quality_batch
+            assessed_signals = assess_review_quality_batch(unique_signals)
+            
+            accepted_signals = [
+                s for s in assessed_signals 
+                if getattr(s, 'quality_category', QualityCategory.DISCARD) in [
+                    QualityCategory.MEDIUM_SIGNAL, 
+                    QualityCategory.HIGH_SIGNAL, 
+                    QualityCategory.GOLD_INSIGHT
+                ]
+            ]
+            
+            self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals)}")
+            
+            if len(accepted_signals) >= TARGET_GENUINE_REVIEWS:
+                self.signals = accepted_signals
+                self._log_progress(f"✅ Reached target of {TARGET_GENUINE_REVIEWS} genuine reviews. Proceeding to analysis.")
+                break
+            elif attempt < MAX_RETRIES:
+                self._log_progress(f"⚠️ Only {len(accepted_signals)} valid reviews found (Target: {TARGET_GENUINE_REVIEWS}). Expanding date range backward...")
                 try:
-                    self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                    df_app = fetch_app_store_reviews(app_store_id, from_date, to_date, max_pages=4)
-                    if not df_app.empty:
-                        df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
-                        normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
-                        all_signals.extend(normalized)
-                        self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
-                        self.collection_results.append(CollectionResult(
-                            source=DataSource.APP_STORE,
-                            app_name=app_name,
-                            signals_collected=len(df_app),
-                            signals_after_filtering=len(normalized),
-                        ))
+                    from datetime import datetime
+                    import datetime as dt
+                    from_dt = datetime.strptime(current_from_date, "%Y-%m-%d")
+                    new_to_dt = from_dt
+                    new_from_dt = from_dt - dt.timedelta(days=90)
+                    current_to_date = new_to_dt.strftime("%Y-%m-%d")
+                    current_from_date = new_from_dt.strftime("%Y-%m-%d")
                 except Exception as e:
-                    self._log_progress(f"  ❌ App Store error for {app_store_id}: {str(e)[:100]}")
-
-        # 2. Registered catalog apps (if specified)
-        if apps:
-            for app_key in apps:
-                app_config = QUICK_COMMERCE_APPS.get(app_key)
-                if not app_config:
-                    continue
-
-                app_name = app_config["name"]
-                package = app_config["play_store_package"]
-                app_store_id_reg = app_config["app_store_id"]
-
-                # Play Store
-                try:
-                    self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                    df_play = fetch_play_store_reviews(package, from_date, to_date, max_reviews=300)
-                    if not df_play.empty:
-                        df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
-                        normalized = normalize_play_store_reviews(df_play, app_name, package)
-                        all_signals.extend(normalized)
-                        self._log_progress(f"  ✅ {len(normalized)} Play Store reviews for {app_name}")
-                        self.collection_results.append(CollectionResult(
-                            source=DataSource.PLAY_STORE,
-                            app_name=app_name,
-                            signals_collected=len(df_play),
-                            signals_after_filtering=len(normalized),
-                        ))
-                except Exception as e:
-                    self._log_progress(f"  ❌ Play Store error for {app_name}: {str(e)[:100]}")
-
-                # App Store
-                try:
-                    self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                    df_app = fetch_app_store_reviews(app_store_id_reg, from_date, to_date, max_pages=4)
-                    if not df_app.empty:
-                        df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
-                        normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
-                        all_signals.extend(normalized)
-                        self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
-                        self.collection_results.append(CollectionResult(
-                            source=DataSource.APP_STORE,
-                            app_name=app_name,
-                            signals_collected=len(df_app),
-                            signals_after_filtering=len(normalized),
-                        ))
-                except Exception as e:
-                    self._log_progress(f"  ❌ App Store error for {app_name}: {str(e)[:100]}")
-
-        # 3. Reddit Ingestion
-        if include_reddit:
-            try:
-                self._log_progress(f"🔴 Collecting Reddit discussions...")
-                reddit_signals = collect_reddit_data(
-                    subreddits=reddit_subreddits,
-                    search_terms=reddit_search_terms,
-                )
-                if reddit_signals:
-                    for sig in reddit_signals:
-                        sig["content"] = scrub_pii_from_text(sig["content"])
-                    normalized = normalize_reddit_data(reddit_signals)
-                    all_signals.extend(normalized)
-                    self._log_progress(f"  ✅ {len(normalized)} Reddit signals collected")
-                    self.collection_results.append(CollectionResult(
-                        source=DataSource.REDDIT,
-                        app_name="all",
-                        signals_collected=len(reddit_signals),
-                        signals_after_filtering=len(normalized),
-                    ))
-                else:
-                    self._log_progress(f"  ⚠️ No Reddit signals found")
-            except Exception as e:
-                self._log_progress(f"  ❌ Reddit error: {str(e)[:100]}")
-
-        # Deduplicate
-        self._log_progress(f"🔄 Deduplicating {len(all_signals)} signals...")
-        from processing.deduplication import semantic_deduplicate
-        self.signals = semantic_deduplicate(all_signals)
-        self._log_progress(f"✅ Final dataset: {len(self.signals)} unique signals")
-
+                    self._log_progress("❌ Could not expand dates. Aborting retries.")
+                    self.signals = accepted_signals
+                    break
+            else:
+                self._log_progress(f"⚠️ Reached max retries. Proceeding with {len(accepted_signals)} valid reviews.")
+                self.signals = accepted_signals
+                
         return self.signals
 
     # ── Analysis Phase ─────────────────────────
@@ -289,10 +304,10 @@ class PipelineOrchestrator:
         self._log_progress(f"  ✅ {len(self.hypotheses)} hypotheses generated")
 
         self._log_progress(f"📋 Generating interview questions...")
-        self.interview_questions = generate_interview_questions(
+        self.interview_script = generate_interview_questions(
             self.personas, self.barriers, self.hypotheses
         )
-        self._log_progress(f"  ✅ {len(self.interview_questions)} interview questions generated")
+        self._log_progress(f"  ✅ {len(self.interview_script.optimized_script) if self.interview_script else 0} optimized questions generated")
 
         # 8. Executive Summary
         self._log_progress(f"📊 Generating executive summary...")
@@ -321,25 +336,34 @@ class PipelineOrchestrator:
         except Exception:
             pass
 
-        # Collect
-        self.collect_all(
-            apps=request.apps,
-            from_date=request.from_date,
-            to_date=request.to_date,
-            include_reddit=request.include_reddit,
-            play_store_package=request.play_store_package,
-            app_store_id=request.app_store_id,
-            reddit_subreddits=request.reddit_subreddits,
-            reddit_search_terms=request.reddit_search_terms,
-        )
+        self._status = "collecting"
+        try:
+            # Collect
+            self.collect_all(
+                apps=request.apps,
+                from_date=request.from_date,
+                to_date=request.to_date,
+                include_reddit=request.include_reddit,
+                play_store_package=request.play_store_package,
+                app_store_id=request.app_store_id,
+                reddit_subreddits=request.reddit_subreddits,
+                reddit_search_terms=request.reddit_search_terms,
+            )
 
-        if not self.signals:
-            return {"status": "error", "message": "No data collected from any source"}
+            if not self.signals:
+                self._status = "idle"
+                return {"status": "error", "message": "No data collected from any source"}
 
-        # Analyze
-        results = self.analyze_all()
+            # Analyze
+            results = self.analyze_all()
+            self._status = "complete"
 
-        return results
+            return results
+        except Exception as e:
+            logger.exception("Pipeline crashed")
+            self._log_progress(f"❌ CRITICAL ERROR: {str(e)}")
+            self._status = "idle" # Return to idle so frontend stops polling
+            return {"status": "error", "message": str(e)}
 
     # ── Results ──────────────────────────────
     def get_full_results(self) -> dict:
@@ -360,7 +384,7 @@ class PipelineOrchestrator:
             "jobs": [j.model_dump() for j in self.jobs],
             "opportunities": [o.model_dump() for o in self.opportunities],
             "hypotheses": [h.model_dump() for h in self.hypotheses],
-            "interview_questions": [q.model_dump() for q in self.interview_questions],
+            "interview_script": self.interview_script.model_dump() if self.interview_script else None,
             "executive_summary": self.executive_summary.model_dump() if self.executive_summary else None,
             "collection_results": [c.model_dump() for c in self.collection_results],
         }
@@ -403,7 +427,7 @@ class PipelineOrchestrator:
             "opportunities_count": len(self.opportunities),
             "date_range": {"from_date": min_date, "to_date": max_date},
             "status": self._status,
-            "last_updated": datetime.utcnow().isoformat(),
+            "last_updated": datetime.now().isoformat(),
         }
 
 

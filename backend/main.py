@@ -219,9 +219,15 @@ def get_hypotheses():
 def get_interview_questions():
     """Get generated interview questions."""
     orchestrator = get_orchestrator()
+    if orchestrator.interview_script:
+        return orchestrator.interview_script.model_dump()
     return {
-        "questions": [q.model_dump() for q in orchestrator.interview_questions],
-        "count": len(orchestrator.interview_questions),
+        "optimized_script": [],
+        "removed_questions": [],
+        "missing_questions": [],
+        "estimated_duration": "15-20 minutes",
+        "quality_score": 0,
+        "recommendations": []
     }
 
 

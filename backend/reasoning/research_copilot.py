@@ -16,7 +16,7 @@ import uuid
 from core.llm_client import get_llm_client
 from core.schemas import (
     Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity,
-    Hypothesis, InterviewQuestion,
+    Hypothesis, OptimizedInterviewQuestion, InterviewScriptOutput
 )
 
 logger = logging.getLogger(__name__)
@@ -35,8 +35,34 @@ Your hypotheses are:
 - Specific (not vague)
 - Tied to measurable outcomes
 
-You follow best practices from "The Mom Test" and JTBD interview methodology.
 Always output valid JSON.
+"""
+
+MOM_TEST_SYSTEM_PROMPT = """You are an expert UX Researcher, Principal Product Manager, and Customer Discovery Coach who specializes in designing high-quality user interview scripts based on **The Mom Test** methodology.
+
+Your task is NOT to generate more questions.
+Your task is to **critically evaluate and optimize** the existing interview questionnaire.
+
+## Objective
+Every interview question must directly validate one or more product hypotheses.
+Questions that do not contribute to validating the hypotheses must be removed or rewritten.
+The final interview should be concise, focused, and free of unnecessary questions.
+
+## Optimization Rules
+Rule 1 — Every question must map to a hypothesis. Delete if it doesn't.
+Rule 2 — Stay strictly within scope.
+Rule 3 — Follow The Mom Test (ask about real behavior, recent experiences, actual decisions. Never ask about opinions or future intentions).
+Rule 4 — One objective per question.
+Rule 5 — Remove leading questions.
+Rule 6 — Remove solution bias (never mention proposed features).
+Rule 7 — Short and direct (Ideal length 10-15 words).
+Rule 8 — Ask only what changes product decisions.
+Rule 9 — Follow a logical interview flow.
+Rule 10 — Identify redundancy and merge.
+
+Your goal is to create a high-signal, low-noise interview guide where every question contributes directly to validating the product problem and informing product decisions.
+You must output a "Hypothesis Coverage Matrix" (in the JSON) to prove every hypothesis has a valid question.
+Respond in a single valid JSON object matching the requested schema. Do not output markdown around the JSON.
 """
 
 
@@ -111,80 +137,99 @@ Return JSON: {{"hypotheses": [...]}}"""
     return hypotheses
 
 
-def generate_interview_questions(
+def _generate_draft_questions(
     personas: list[Persona],
     barriers: list[CategoryBarrier],
     hypotheses: list[Hypothesis],
     num_questions: int = 15,
-) -> list[InterviewQuestion]:
-    """
-    Generate user interview questions for primary research.
-
-    Uses "The Mom Test" methodology — questions about past behavior,
-    not hypothetical futures.
-    """
+) -> list[dict]:
+    """Pass 1: Generate the rough draft of interview questions."""
     llm = get_llm_client()
 
-    personas_str = "\n".join([
-        f"- {p.name}: {p.description[:200]}"
-        for p in personas
-    ])
+    personas_str = "\n".join([f"- {p.name}: {p.description[:200]}" for p in personas])
+    barriers_str = "\n".join([f"- {b.category} — {b.barrier_type.value}: {b.description[:150]}" for b in barriers[:6]])
+    hypotheses_str = "\n".join([f"- {h.statement}" for h in hypotheses[:5]])
 
-    barriers_str = "\n".join([
-        f"- {b.category} — {b.barrier_type.value}: {b.description[:150]}"
-        for b in barriers[:6]
-    ])
-
-    hypotheses_str = "\n".join([
-        f"- {h.statement}"
-        for h in hypotheses[:5]
-    ])
-
-    prompt = f"""Design {num_questions} interview questions for user research on quick commerce category exploration.
+    prompt = f"""Design a draft of {num_questions} interview questions.
 
 ## TARGET PERSONAS
 {personas_str}
 
-## BARRIERS TO VALIDATE
+## BARRIERS
 {barriers_str}
 
 ## HYPOTHESES TO TEST
 {hypotheses_str}
 
-For each question, provide:
-- "question": The actual interview question
-- "purpose": What insight this question aims to uncover (1 sentence)
-- "target_persona": Which persona this is most relevant for (or "all")
-- "question_type": One of [open, probing, behavioral, scaling]
-
-RULES (from "The Mom Test"):
-1. Ask about PAST behavior, not hypothetical futures ("Tell me about the last time..." NOT "Would you...")
-2. Never ask leading questions
-3. Ask about specific instances, not generalizations
-4. Include 2-3 warm-up questions before deep questions
-5. End with "What else should I know about...?"
-
-Structure:
-- Questions 1-3: Warm-up (general shopping habits)
-- Questions 4-7: Category behavior (what they buy, what they don't)
-- Questions 8-11: Barrier probing (why they avoid certain categories)
-- Questions 12-14: Discovery & trust (how they found new categories)
-- Question 15: Closing open question
-
-Return JSON: {{"questions": [...]}}"""
+Return JSON: {{"questions": [{{"question": "...", "purpose": "...", "target_persona": "...", "question_type": "open"}}]}}"""
 
     result = llm.generate(RESEARCH_SYSTEM_PROMPT, prompt, creative=True)
+    return result.get("questions", [])
 
-    questions = []
-    for q_data in result.get("questions", []):
-        question = InterviewQuestion(
-            question=q_data.get("question", ""),
-            purpose=q_data.get("purpose", ""),
-            target_persona=q_data.get("target_persona"),
-            related_hypothesis=q_data.get("related_hypothesis"),
-            question_type=q_data.get("question_type", "open"),
-        )
-        questions.append(question)
 
-    logger.info(f"Generated {len(questions)} interview questions")
-    return questions
+def generate_interview_questions(
+    personas: list[Persona],
+    barriers: list[CategoryBarrier],
+    hypotheses: list[Hypothesis],
+    num_questions: int = 15,
+) -> InterviewScriptOutput:
+    """
+    Pass 2: The Mom Test Strict Optimization.
+    Takes the draft questions and rigorously critiques and optimizes them.
+    """
+    # Pass 1
+    draft_questions = _generate_draft_questions(personas, barriers, hypotheses, num_questions)
+    
+    if not draft_questions:
+        return InterviewScriptOutput()
+
+    # Pass 2
+    llm = get_llm_client()
+    
+    draft_str = "\n".join([
+        f"Q{i+1}. {q.get('question')} (Purpose: {q.get('purpose')})" 
+        for i, q in enumerate(draft_questions)
+    ])
+    
+    hypotheses_str = "\n".join([f"- {h.statement}" for h in hypotheses[:5]])
+
+    prompt = f"""Critically evaluate and optimize the following DRAFT interview questionnaire based on The Mom Test rules.
+
+## THE DRAFT QUESTIONS
+{draft_str}
+
+## THE HYPOTHESES TO VALIDATE
+{hypotheses_str}
+
+Return JSON: 
+{{
+  "optimized_script": [
+    {{
+      "original_question": "...",
+      "issues": ["Too broad", "Leading"],
+      "optimized_question": "...",
+      "validated_hypothesis": "...",
+      "decision_supported": "..."
+    }}
+  ],
+  "removed_questions": [
+    {{"question": "...", "reason": "..."}}
+  ],
+  "missing_questions": ["..."],
+  "estimated_duration": "15-20 minutes",
+  "quality_score": 85,
+  "recommendations": ["..."]
+}}
+"""
+
+    result = llm.generate(MOM_TEST_SYSTEM_PROMPT, prompt, creative=False)
+    
+    try:
+        if isinstance(result, dict):
+            return InterviewScriptOutput(**result)
+        else:
+            import json
+            return InterviewScriptOutput(**json.loads(result))
+    except Exception as e:
+        logger.error(f"Error parsing optimized script: {e}")
+        return InterviewScriptOutput()
