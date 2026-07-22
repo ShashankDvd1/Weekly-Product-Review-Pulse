@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Send, CheckCircle, Award, Compass, AlertCircle, RefreshCw, Star, BarChart3, HelpCircle } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Target, AlertCircle, TrendingDown, EyeOff, ShieldAlert, Clock, IndianRupee, MapPin } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

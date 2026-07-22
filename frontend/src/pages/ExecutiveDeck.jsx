@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Presentation, Download, ArrowLeft, ArrowRight, Play, CheckSquare, ListTodo, AlertTriangle, TrendingUp, Landmark } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Presentation, Download, ArrowLeft, ArrowRight, Play, CheckSquare, ListTodo, AlertTriangle, TrendingUp, Landmark, Loader2 } from 'lucide-react';
 import { getBackendUrl } from '../config';
-import pptxgen from 'pptxgenjs';
 
 const ExecutiveDeck = () => {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
+  const [exportSlidesLoading, setExportSlidesLoading] = useState(false);
+  const [exportSlidesUrl, setExportSlidesUrl] = useState(null);
+
+  // Fetch overview to detect brand
+  const [brand, setBrand] = useState('default');
+
   useEffect(() => {
     const fetchDeckData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${getBackendUrl()}/api/v2/reports/executive-deck`);
-        const data = await res.json();
-        setSlides(data.slides || []);
+        const [deckRes, overviewRes] = await Promise.all([
+          fetch(`${getBackendUrl()}/api/v2/reports/executive-deck`),
+          fetch(`${getBackendUrl()}/api/v2/dashboard/overview`)
+        ]);
+        
+        const deckData = await deckRes.json();
+        setSlides(deckData.slides || []);
+        
+        const overviewData = await overviewRes.json();
+        if (overviewData.app_name) {
+          setBrand(overviewData.app_name.toLowerCase());
+        }
       } catch (err) {
-        console.error('Error fetching executive deck', err);
+        console.error('Error fetching deck or overview data', err);
       } finally {
         setLoading(false);
       }
@@ -36,89 +50,70 @@ const ExecutiveDeck = () => {
     }
   };
 
-  // PPTX Export using pptxgenjs
-  const exportPPTX = () => {
-    if (slides.length === 0) return;
-    const pptx = new pptxgen();
+  const getBrandColors = (brandName) => {
+    const b = brandName.toLowerCase();
+    if (b.includes('blinkit')) {
+      return {
+        primary: '#FAD02C', // Yellow
+        accent: '#10b981', // Emerald
+        bg: 'linear-gradient(135deg, #0e1208, #18220f)',
+        cardBg: 'rgba(250, 208, 44, 0.04)',
+        border: 'rgba(250, 208, 44, 0.15)',
+        text: '#ffffff',
+        brandLabel: 'Blinkit Yellow-Green Theme'
+      };
+    }
+    if (b.includes('zepto')) {
+      return {
+        primary: '#8A3FFC', // Purple
+        accent: '#ff7eb6', // Pink
+        bg: 'linear-gradient(135deg, #100b1e, #1c1236)',
+        cardBg: 'rgba(138, 63, 252, 0.04)',
+        border: 'rgba(138, 63, 252, 0.15)',
+        text: '#ffffff',
+        brandLabel: 'Zepto Purple-Pink Theme'
+      };
+    }
+    if (b.includes('swiggy') || b.includes('instamart')) {
+      return {
+        primary: '#FC8019', // Orange
+        accent: '#06b6d4', // Cyan
+        bg: 'linear-gradient(135deg, #1b0e06, #2d180b)',
+        cardBg: 'rgba(252, 128, 25, 0.04)',
+        border: 'rgba(252, 128, 25, 0.15)',
+        text: '#ffffff',
+        brandLabel: 'Swiggy Orange Theme'
+      };
+    }
+    return {
+      primary: '#3b82f6', // McKinsey Corporate Blue
+      accent: '#60a5fa',
+      bg: 'linear-gradient(135deg, #0b1329, #14213d)',
+      cardBg: 'rgba(59, 130, 246, 0.04)',
+      border: 'rgba(59, 130, 246, 0.15)',
+      text: '#ffffff',
+      brandLabel: 'Pulse Corporate Theme'
+    };
+  };
 
-    pptx.defineLayout({ name: 'custom', width: 13.33, height: 7.5 });
-    pptx.layout = 'custom';
-
-    slides.forEach((slide) => {
-      let pptxSlide = pptx.addSlide();
-      
-      // Theme colors
-      const PRIMARY_NAVY = '0B1E36';
-      const SECONDARY_BLUE = '1E3A8A';
-      const WHITE = 'FFFFFF';
-      const GRAY_TEXT = '4B5563';
-      const LIGHT_BG = 'F8FAFC';
-
-      // Background color
-      pptxSlide.background = { color: LIGHT_BG };
-
-      // Header Banner
-      pptxSlide.addShape(pptx.shapes.RECTANGLE, { x: 0, y: 0, w: 13.33, h: 1.0, fill: { color: PRIMARY_NAVY } });
-      
-      // Title
-      pptxSlide.addText(slide.title.toUpperCase(), { 
-        x: 0.5, y: 0.2, w: 12.33, h: 0.6, 
-        fontSize: 22, bold: true, color: WHITE, valign: 'middle' 
+  // Google Slides Export
+  const handleExportSlides = async () => {
+    try {
+      setExportSlidesLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/executive-deck/export-slides`, {
+        method: 'POST'
       });
-
-      // Subtitle / Headline
-      pptxSlide.addText(slide.headline, { 
-        x: 0.5, y: 1.2, w: 12.33, h: 0.5, 
-        fontSize: 16, italic: true, color: SECONDARY_BLUE, bold: true 
-      });
-
-      // Key Metrics (as callout boxes on the left)
-      if (slide.key_metrics && slide.key_metrics.length > 0) {
-        slide.key_metrics.forEach((metric, index) => {
-          const yPos = 1.9 + (index * 1.6);
-          // Metric Box Background
-          pptxSlide.addShape(pptx.shapes.RECTANGLE, { 
-            x: 0.5, y: yPos, w: 3.2, h: 1.3, 
-            fill: { color: 'E2E8F0' }, line: { color: 'CBD5E1', width: 1 } 
-          });
-          // Value
-          pptxSlide.addText(String(metric.value), { 
-            x: 0.6, y: yPos + 0.1, w: 3.0, h: 0.5, 
-            fontSize: 28, bold: true, color: PRIMARY_NAVY, align: 'center' 
-          });
-          // Label
-          pptxSlide.addText(metric.label, { 
-            x: 0.6, y: yPos + 0.65, w: 3.0, h: 0.5, 
-            fontSize: 11, color: GRAY_TEXT, align: 'center' 
-          });
-        });
+      const resData = await res.json();
+      if (resData.presentation_url) {
+        setExportSlidesUrl(resData.presentation_url);
+      } else {
+        alert(resData.detail || "Could not export presentation.");
       }
-
-      // Slide content text / details
-      let contentString = '';
-      if (slide.slide_number === 3 && slide.mvp_details) {
-        const details = slide.mvp_details;
-        contentString = `• TARGET USERS: ${details.target_users}\n• PAIN POINTS: ${details.pain_points}\n• PROPOSED SOLUTION: ${details.proposed_solution}\n• CORE FEATURES: ${(details.core_features || []).join(', ')}\n• METRICS: ${(details.success_metrics || []).join(', ')}`;
-      } else if (Array.isArray(slide.content)) {
-        contentString = slide.content.map(p => `• ${p}`).join('\n\n');
-      } else if (typeof slide.content === 'string') {
-        contentString = slide.content;
-      }
-
-      pptxSlide.addText(contentString, { 
-        x: 4.2, y: 1.9, w: 8.5, h: 4.8, 
-        fontSize: 13, color: '1E293B', fontFace: 'Calibri', valign: 'top', lineSpacing: 22 
-      });
-
-      // Speaker Notes
-      let speakerText = '';
-      if (slide.speaker_notes) {
-        speakerText = `TALK TRACK:\n${slide.speaker_notes.what_to_say || ''}\n\nSTRATEGIC CONTEXT:\n${slide.speaker_notes.why_it_matters || ''}\n\nEXPECTED QUESTIONS & ANSWERS:\nQ: ${slide.speaker_notes.audience_question || ''}\nA: ${slide.speaker_notes.suggested_answer || ''}`;
-      }
-      pptxSlide.notes = speakerText;
-    });
-
-    pptx.writeFile({ fileName: 'AI_Executive_Insight_Deck.pptx' });
+    } catch (err) {
+      alert("Error exporting presentation: " + err.message);
+    } finally {
+      setExportSlidesLoading(false);
+    }
   };
 
   // Marp Markdown Export
@@ -190,6 +185,167 @@ ${contentText}
   );
 
   const activeSlide = slides[currentSlideIndex];
+  const theme = getBrandColors(brand);
+
+  const renderSlideContent = () => {
+    // Slide 1: Opportunity/Title
+    if (activeSlide.slide_number === 1) {
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
+            <span style={{ fontSize: '0.85rem', color: theme.primary, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Strategic Opportunity Identification
+            </span>
+            <h1 style={{ fontSize: '2rem', color: '#fff', margin: 0, lineHeight: '1.2', fontWeight: '800' }}>
+              {activeSlide.title}
+            </h1>
+            <p style={{ fontSize: '1rem', color: '#94a3b8', margin: 0, lineHeight: '1.6' }}>
+              {activeSlide.headline}
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem' }}>
+            {activeSlide.key_metrics?.map((m, i) => (
+              <div key={i} style={{ 
+                background: theme.cardBg, 
+                padding: '1.25rem', 
+                borderRadius: '12px', 
+                border: `1px solid ${theme.border}`,
+                borderLeft: `5px solid ${theme.primary}`
+              }}>
+                <div style={{ fontSize: '2.25rem', fontWeight: '800', color: theme.primary }}>{m.value}</div>
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '0.25rem', fontWeight: '600' }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Slide 2: Evidence & Insights
+    if (activeSlide.slide_number === 2) {
+      const quotes = Array.isArray(activeSlide.content) ? activeSlide.content : [];
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', height: '100%', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.8rem', color: theme.primary, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Voice of the Customer (VoC) Evidence
+            </span>
+            <p style={{ fontSize: '1.05rem', color: '#94a3b8', fontStyle: 'italic', margin: '0 0 0.5rem 0' }}>
+              "{activeSlide.headline}"
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            {quotes.slice(0, 4).map((q, i) => (
+              <div key={i} style={{ 
+                background: theme.cardBg, 
+                padding: '1rem', 
+                borderRadius: '10px', 
+                border: `1px solid ${theme.border}`,
+                fontSize: '0.85rem',
+                color: '#cbd5e1',
+                lineHeight: '1.4',
+                position: 'relative'
+              }}>
+                <span style={{ position: 'absolute', top: '8px', right: '12px', fontSize: '1.5rem', color: theme.primary, opacity: 0.3, fontFamily: 'serif' }}>”</span>
+                {q}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Slide 3: MVP Solution
+    if (activeSlide.slide_number === 3 && activeSlide.mvp_details) {
+      const details = activeSlide.mvp_details;
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
+          <span style={{ fontSize: '0.8rem', color: theme.primary, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+            Proposed MVP Strategy
+          </span>
+          <h3 style={{ fontSize: '1.25rem', color: '#fff', margin: 0 }}>
+            {activeSlide.headline}
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ background: theme.cardBg, padding: '0.75rem 1rem', borderRadius: '8px', border: `1px solid ${theme.border}` }}>
+                <strong style={{ color: theme.primary, fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Target User Segment</strong>
+                <span style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{details.target_users}</span>
+              </div>
+              <div style={{ background: theme.cardBg, padding: '0.75rem 1rem', borderRadius: '8px', border: `1px solid ${theme.border}` }}>
+                <strong style={{ color: theme.primary, fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Core Pain Points Solved</strong>
+                <span style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{details.pain_points}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '8px', border: `1px solid ${theme.border}`, borderLeft: `4px solid ${theme.accent}` }}>
+                <strong style={{ color: theme.accent, fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Proposed MVP</strong>
+                <span style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 'bold' }}>{details.proposed_solution}</span>
+              </div>
+              <div>
+                <strong style={{ color: '#94a3b8', fontSize: '0.75rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>Key Features</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {(details.core_features || []).map(f => (
+                    <span key={f} style={{ 
+                      background: theme.primary, 
+                      color: '#000', 
+                      fontWeight: 'bold', 
+                      fontSize: '0.75rem', 
+                      padding: '0.25rem 0.6rem', 
+                      borderRadius: '4px' 
+                    }}>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Slide 4: KPIs & Launch Metrics
+    if (activeSlide.slide_number === 4) {
+      const points = Array.isArray(activeSlide.content) ? activeSlide.content : [];
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.8rem', color: theme.primary, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Success Metrics & Growth Loops
+            </span>
+            <h3 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '700' }}>
+              {activeSlide.headline}
+            </h3>
+            <ul style={{ paddingLeft: '1.1rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.85rem', color: '#94a3b8' }}>
+              {points.map((pt, i) => (
+                <li key={i}>{pt}</li>
+              ))}
+            </ul>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem' }}>
+            {activeSlide.key_metrics?.map((m, i) => (
+              <div key={i} style={{ 
+                background: theme.cardBg, 
+                padding: '1rem 1.25rem', 
+                borderRadius: '10px', 
+                border: `1px solid ${theme.border}`,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '500' }}>{m.label}</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '800', color: theme.accent }}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback slide renderer
+    return <p style={{ color: '#cbd5e1' }}>{activeSlide.content}</p>;
+  };
 
   return (
     <div>
@@ -202,11 +358,28 @@ ${contentText}
           <button className="btn-secondary" onClick={exportMarpMarkdown} style={{ gap: '0.5rem' }}>
             <Download size={16} /> Marp MD
           </button>
-          <button className="btn-primary" onClick={exportPPTX} style={{ gap: '0.5rem' }}>
-            <Presentation size={16} /> Export Editable PPTX
+          <button 
+            className="btn-primary" 
+            onClick={handleExportSlides} 
+            disabled={exportSlidesLoading}
+            style={{ gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
+          >
+            {exportSlidesLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={16} />}
+            {exportSlidesLoading ? 'Generating Slides...' : 'Export to Google Slides'}
           </button>
         </div>
       </div>
+
+      {exportSlidesUrl && (
+        <div className="glass-panel" style={{ marginBottom: '1.5rem', padding: '1.25rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', textAlign: 'left', borderRadius: '8px' }}>
+          <h4 style={{ color: 'var(--success)', margin: '0 0 0.4rem 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            ✅ Google Slides Exported Successfully!
+          </h4>
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            Live Presentation: <a href={exportSlidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{exportSlidesUrl}</a>
+          </p>
+        </div>
+      )}
 
       <div className="grid-2" style={{ gridTemplateColumns: '7fr 3fr', gap: '2rem' }}>
         {/* Slide Canvas Column */}
@@ -214,91 +387,34 @@ ${contentText}
           {/* Slide Frame (16:9 Aspect Ratio) */}
           <div className="glass-panel" style={{ 
             aspectRatio: '16/9', 
-            background: '#0d1624', 
-            border: '2px solid #1f2f47', 
-            borderRadius: '12px',
+            background: theme.bg, 
+            border: `2px solid ${theme.border}`, 
+            borderRadius: '16px',
             padding: '2.5rem',
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-            textAlign: 'left'
+            boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
+            textAlign: 'left',
+            overflow: 'hidden'
           }}>
-            {/* Slide Header */}
-            <div style={{ borderBottom: '1px solid #1f2f47', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', fontWeight: '600', textTransform: 'uppercase', tracking: '0.05em' }}>
-                Slide {activeSlide.slide_number} of {slides.length}
+            {/* Top brand indicator */}
+            <div style={{ position: 'absolute', top: '12px', right: '20px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: theme.primary }}></span>
+              <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
+                {brand !== 'default' ? `${brand.toUpperCase()} ANALYSIS` : 'PULSE INTELLIGENCE'}
               </span>
-              <h2 style={{ fontSize: '1.75rem', color: '#fff', margin: '0.2rem 0' }}>{activeSlide.title}</h2>
-              <p style={{ fontSize: '1.05rem', color: '#60a5fa', margin: '0.2rem 0', fontWeight: '500', fontStyle: 'italic' }}>
-                {activeSlide.headline}
-              </p>
             </div>
 
-            {/* Slide Body Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '2rem', flex: 1 }}>
-              {/* Slide Left Column (Metrics / Visuals Config) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center' }}>
-                {activeSlide.key_metrics?.map((m, i) => (
-                  <div key={i} style={{ background: '#122035', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid var(--accent-primary)' }}>
-                    <div style={{ fontSize: '2rem', fontWeight: '800', color: '#fff' }}>{m.value}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{m.label}</div>
-                  </div>
-                ))}
-
-                {/* Optional visual placeholder for charts */}
-                {activeSlide.visualization?.type === 'distribution' && (
-                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', border: '1px dashed #1f2f47', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <strong>Chart: Sources Distribution</strong>
-                    <div style={{ display: 'flex', gap: '4px', marginTop: '0.5rem', height: '10px', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ flex: 3, background: 'var(--success)' }}></div>
-                      <div style={{ flex: 1, background: 'var(--info)' }}></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Slide Right Column (Key Points / MVP Details) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center', overflowY: 'auto' }}>
-                {activeSlide.slide_number === 3 && activeSlide.mvp_details ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '0.9rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.4rem' }}>
-                      <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Target Users:</span>
-                      <span style={{ color: '#fff' }}>{activeSlide.mvp_details.target_users}</span>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.4rem' }}>
-                      <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Pain Points:</span>
-                      <span style={{ color: '#fff' }}>{activeSlide.mvp_details.pain_points}</span>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.4rem' }}>
-                      <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>MVP:</span>
-                      <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>{activeSlide.mvp_details.proposed_solution}</span>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--text-muted)', fontWeight: '600', display: 'block', marginBottom: '0.2rem' }}>Core MVP Features:</span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                        {(activeSlide.mvp_details.core_features || []).map(f => (
-                          <span key={f} className="badge badge-info" style={{ fontSize: '0.8rem' }}>{f}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : Array.isArray(activeSlide.content) ? (
-                  <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.95rem', color: '#cbd5e1', lineHeight: '1.5' }}>
-                    {activeSlide.content.map((point, index) => (
-                      <li key={index} style={{ marginBottom: '0.25rem' }}>{point}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ fontSize: '1rem', color: '#cbd5e1', margin: 0, lineHeight: '1.6' }}>{activeSlide.content}</p>
-                )}
-              </div>
+            {/* Slide Body */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              {renderSlideContent()}
             </div>
 
             {/* Slide Footer */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #1f2f47', paddingTop: '0.75rem', marginTop: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${theme.border}`, paddingTop: '0.75rem', marginTop: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
               <span>Pulse Intelligence — Category Discovery Project</span>
-              <span>McKinsey Standard Layout</span>
+              <span>{theme.brandLabel}</span>
             </div>
           </div>
 

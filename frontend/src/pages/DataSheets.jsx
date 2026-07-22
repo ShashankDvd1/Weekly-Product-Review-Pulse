@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, Download, Search, Filter, Database, MessageSquare } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
@@ -91,8 +91,8 @@ const DataSheets = () => {
     const data = getFilteredData();
     if (data.length === 0) return;
 
-    let headers = [];
-    let rows = [];
+    let headers;
+    let rows;
 
     if (activeTab === 'insights') {
       headers = ['Type', 'Category', 'Title/Type', 'Confidence', 'Details', 'Apps Affected'];

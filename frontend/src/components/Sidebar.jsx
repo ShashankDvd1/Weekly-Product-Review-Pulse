@@ -1,38 +1,21 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Search, 
   Users, 
-  Lightbulb, 
-  Microscope, 
-  FileText,
-  BarChart3,
-  Terminal,
-  Table,
-  Presentation,
   Award,
-  Compass,
-  Briefcase,
-  Brain
+  Table,
+  Brain,
+  BarChart3
 } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const navItems = [
     { path: '/', label: 'Overview', icon: <LayoutDashboard size={20} /> },
-    { path: '/control-center', label: 'Control Center', icon: <Terminal size={20} /> },
-    { path: '/category-discovery', label: 'Category Discovery', icon: <Search size={20} /> },
-    { path: '/personas', label: 'User Personas', icon: <Users size={20} /> },
-    { path: '/opportunities', label: 'Growth Opportunities', icon: <Lightbulb size={20} /> },
-    { path: '/research-copilot', label: 'Research Copilot', icon: <Microscope size={20} /> },
-    { path: '/evidence', label: 'Evidence Explorer', icon: <FileText size={20} /> },
-    { path: '/sheets', label: 'Data Sheets', icon: <Table size={20} /> },
-    { path: '/deck', label: 'Executive Deck', icon: <Presentation size={20} /> },
-    { path: '/review-board', label: 'Review Board', icon: <Award size={20} /> },
-    { path: '/viva-defense', label: 'Viva Defense', icon: <Compass size={20} /> },
-    { path: '/mvp-case', label: 'MVP Case Study', icon: <Briefcase size={20} /> },
-    { path: '/strategy-deep-dive', label: 'Strategy Deep Dive', icon: <Brain size={20} /> },
+    { path: '/insights', label: 'Consumer Insights', icon: <Users size={20} /> },
+    { path: '/strategy', label: 'Strategy & Case Study', icon: <Brain size={20} /> },
+    { path: '/signals', label: 'Signals Database', icon: <Table size={20} /> },
+    { path: '/review', label: 'Review Board', icon: <Award size={20} /> },
   ];
 
   return (

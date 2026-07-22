@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Award, ShieldAlert, Sparkles, HelpCircle, Wrench, RefreshCw, FileText, CheckCircle, TrendingUp, Sliders } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
@@ -68,8 +68,11 @@ const ReviewBoard = () => {
       <ShieldAlert size={48} color="var(--warning)" style={{ marginBottom: '1rem' }} />
       <h3>Review Board is not ready</h3>
       <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-        Please run the full intelligence pipeline on the Overview tab first to populate review board data.
+        No collected intelligence dataset found. Please run the Intelligence Pipeline on the <strong>Pulse Overview</strong> tab to generate Review Board scorecards.
       </p>
+      <a href="/" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+        <RefreshCw size={16} /> Go to Pulse Overview & Run Pipeline
+      </a>
     </div>
   );
 
@@ -214,9 +217,9 @@ const ReviewBoard = () => {
             {/* Individual Reviewer Overview Cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[
-                { name: 'Dr. Sarah Sterling', title: 'Academic Reviewer', avg: profAvg, feedback: evaluation.professor_scorecard.overall_reviewer_feedback, color: 'var(--accent-primary)' },
-                { name: 'Alex Chen', title: 'Product Reviewer', avg: pmAvg, feedback: evaluation.pm_scorecard.overall_reviewer_feedback, color: 'var(--accent-secondary)' },
-                { name: 'Marcus Vance', title: 'Investor Reviewer', avg: founderAvg, feedback: evaluation.founder_scorecard.overall_reviewer_feedback, color: 'var(--accent-tertiary)' },
+                { name: 'Dr. Sarah Sterling', title: 'Academic Reviewer', avg: profAvg, feedback: evaluation?.professor_scorecard?.overall_reviewer_feedback || evaluation?.professor_scorecard?.summary || 'N/A', color: 'var(--accent-primary)' },
+                { name: 'Alex Chen', title: 'Product Reviewer', avg: pmAvg, feedback: evaluation?.pm_scorecard?.overall_reviewer_feedback || evaluation?.pm_scorecard?.summary || 'N/A', color: 'var(--accent-secondary)' },
+                { name: 'Marcus Vance', title: 'Investor Reviewer', avg: founderAvg, feedback: evaluation?.founder_scorecard?.overall_reviewer_feedback || evaluation?.founder_scorecard?.summary || 'N/A', color: 'var(--accent-tertiary)' },
               ].map((rev, idx) => (
                 <div key={idx} className="glass-card" style={{ display: 'grid', gridTemplateColumns: '1fr 5fr', gap: '1.5rem', borderLeft: `4px solid ${rev.color}` }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', padding: '0.5rem' }}>

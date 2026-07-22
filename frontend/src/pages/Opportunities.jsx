@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Lightbulb, TrendingUp, Zap, Beaker } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

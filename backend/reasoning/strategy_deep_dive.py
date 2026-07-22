@@ -41,8 +41,8 @@ Every recommendation must answer:
 You must respond in a single valid JSON object matching the requested schema. Do not output markdown around the JSON."""
 
 
-def _build_context(signals, themes, barriers, personas, opportunities) -> str:
-    """Build a compact context string from pipeline data."""
+def _build_context(signals, themes, barriers, personas, opportunities, problem_statement: str = None) -> str:
+    """Build a compact context string from pipeline data and problem statement."""
     sig_summary = f"Total signals analyzed: {len(signals)}"
     theme_titles = ", ".join(t.title for t in themes[:5]) if themes else "None"
     barrier_types = ", ".join(b.barrier_type.value for b in barriers[:5]) if barriers else "None"
@@ -54,8 +54,10 @@ def _build_context(signals, themes, barriers, personas, opportunities) -> str:
         stars = f"{'★' * (s.rating or 0)}" if s.rating else ""
         sample_reviews.append(f"[{s.source.value}|{s.app_name}|{stars}] {s.content[:200]}")
 
+    prob_stmt_block = f"## TARGET PROBLEM STATEMENT / STRATEGIC FOCUS\n{problem_statement}\n" if problem_statement else ""
+
     return f"""## PROJECT CONTEXT
-{sig_summary}
+{prob_stmt_block}{sig_summary}
 Themes: {theme_titles}
 Barriers: {barrier_types}
 Personas: {persona_names}
@@ -70,12 +72,12 @@ STEP_CONFIGS = [
         "id": "step_1",
         "title": "Problem Restatement",
         "phase": 1,
-        "prompt": """Restate the core problem discovered from the consumer signals.
-Then rewrite it from four perspectives:
-1. User perspective: What pain does the user feel?
-2. Business perspective: What revenue/growth risk does this create?
-3. Technology perspective: What technical constraint causes or amplifies it?
-4. Market perspective: How does this problem position the company vs competitors?
+        "prompt": """Restate the core problem using the MECE (Mutually Exclusive, Collectively Exhaustive) framework.
+Then rewrite it from four distinct strategic perspectives:
+1. User perspective (HEART Framework: Pain/Friction points)
+2. Business perspective (Revenue/Growth/Retention risk)
+3. Technology perspective (Architectural/Data/System constraints)
+4. Market perspective (Competitive positioning & Differentiation gap)
 
 Return JSON: {{"user_perspective": "...", "business_perspective": "...", "technology_perspective": "...", "market_perspective": "...", "core_problem_restatement": "..."}}"""
     },
@@ -83,20 +85,21 @@ Return JSON: {{"user_perspective": "...", "business_perspective": "...", "techno
         "id": "step_2",
         "title": "Challenge Assumptions",
         "phase": 1,
-        "prompt": """List every hidden assumption embedded in the problem space and signals.
-For each assumption, answer:
-- Why do we believe this?
-- What evidence supports it?
-- What evidence contradicts it?
+        "prompt": """Apply First-Principles Thinking to identify and challenge every hidden assumption embedded in this problem space.
+For each assumption, perform a validation check:
+- What is the underlying belief?
+- What direct user evidence/data backs this up?
+- What contradicting signals/data points did we scrape?
+- Verdict: Validated or Refuted?
 
-Return JSON: {{"assumptions": [{{"assumption": "...", "why_believed": "...", "supporting_evidence": "...", "contradicting_evidence": "..."}}]}}"""
+Return JSON: {{"assumptions": [{{"assumption": "...", "why_believed": "...", "supporting_evidence": "...", "contradicting_evidence": "...", "verdict": "Validated/Refuted"}}]}}"""
     },
     {
         "id": "step_3",
         "title": "5 Whys Analysis",
         "phase": 1,
-        "prompt": """Perform a rigorous 5 Whys analysis on the top problem discovered from the signals.
-Continue until no deeper explanation exists.
+        "prompt": """Perform a rigorous 5 Whys cause-and-effect analysis using the Ishikawa (Fishbone) causal framework.
+Deconstruct the core customer complaint down to its systemic, operational, or psychological root cause.
 
 Return JSON: {{"problem": "...", "why_1": {{"question": "Why?", "answer": "..."}}, "why_2": {{"question": "Why?", "answer": "..."}}, "why_3": {{"question": "Why?", "answer": "..."}}, "why_4": {{"question": "Why?", "answer": "..."}}, "why_5": {{"question": "Why?", "answer": "..."}}, "root_cause": "..."}}"""
     },
@@ -104,9 +107,9 @@ Return JSON: {{"problem": "...", "why_1": {{"question": "Why?", "answer": "..."}
         "id": "step_4",
         "title": "Issue Tree",
         "phase": 1,
-        "prompt": """Build an issue tree that decomposes the problem into branches:
-User, Business, Technology, Psychology, Market, Operations, Data, Economics, Trust, Social, Behavior.
-Each branch must have 2-3 specific sub-issues grounded in the signal data.
+        "prompt": """Decompose the problem into a MECE Issue Tree spanning multiple critical branches:
+User, Business, Psychology, Operations, and Economics.
+Each branch must have 2-3 specific sub-issues grounded in the actual scraped signals.
 
 Return JSON: {{"branches": [{{"category": "...", "sub_issues": [{{"issue": "...", "evidence": "..."}}]}}]}}"""
     },
@@ -114,21 +117,21 @@ Return JSON: {{"branches": [{{"category": "...", "sub_issues": [{{"issue": "..."
         "id": "step_5",
         "title": "Behavioral Analysis",
         "phase": 2,
-        "prompt": """Analyze which behavioral and psychological factors stop users from exploring new categories or changing habits.
-Evaluate each: Fear, Risk, Regret, Choice Overload, Trust, Status, Habit, Loss Aversion, Social Proof, Mental Models, Cognitive Load, Motivation, Decision Fatigue.
+        "prompt": """Evaluate user friction using the Fogg Behavior Model (B=MAP: Motivation, Ability, Prompt) and Prospect Theory (Loss Aversion, Status Quo Bias, Habit loops).
+Identify exactly which behavioral blockers prevent users from exploring new categories or changing their purchasing habits.
 
-Return JSON: {{"behavioral_factors": [{{"factor": "...", "impact_level": "high/medium/low", "evidence_from_signals": "...", "intervention_idea": "..."}}]}}"""
+Return JSON: {{"behavioral_factors": [{{"factor": "B=MAP component / Prospect Theory", "impact_level": "high/medium/low", "evidence_from_signals": "...", "intervention_idea": "..."}}]}}"""
     },
     {
         "id": "step_6",
         "title": "Jobs To Be Done",
         "phase": 2,
-        "prompt": """Identify deep Jobs-To-Be-Done from the signals:
-- Functional Job: What task are users trying to accomplish?
-- Emotional Job: What feeling are they seeking?
-- Social Job: How do they want to be perceived?
-- Hidden Job: What unspoken need exists?
-- Future Job: What job will emerge as the market evolves?
+        "prompt": """Define the deep Jobs-To-Be-Done (Clayton Christensen's JTBD Framework / Outcome-Driven Innovation):
+- Functional Job: Operational task user is trying to get done.
+- Emotional Job: Personal feeling/security sought.
+- Social Job: How they want to be perceived by peers.
+- Hidden Job: Unspoken/unconscious friction need.
+- Future Job: Job that will emerge as the platform evolves.
 
 Return JSON: {{"functional_job": "...", "emotional_job": "...", "social_job": "...", "hidden_job": "...", "future_job": "..."}}"""
     },
@@ -136,8 +139,8 @@ Return JSON: {{"functional_job": "...", "emotional_job": "...", "social_job": ".
         "id": "step_7",
         "title": "User Journey Mapping",
         "phase": 2,
-        "prompt": """Map the complete user journey across Before, During, and After phases.
-For each phase identify: Pain points, Emotions, Questions users ask, Opportunities for intervention, and Failure points.
+        "prompt": """Map the customer journey across Before, During, and After phases applying the Peak-End Rule and Moments of Friction.
+Identify: Pain points, Emotions, Questions asked, Opportunities for intervention, and Failure points for each phase.
 
 Return JSON: {{"before": {{"pain_points": [...], "emotions": [...], "questions": [...], "opportunities": [...], "failure_points": [...]}}, "during": {{"pain_points": [...], "emotions": [...], "questions": [...], "opportunities": [...], "failure_points": [...]}}, "after": {{"pain_points": [...], "emotions": [...], "questions": [...], "opportunities": [...], "failure_points": [...]}}}}"""
     },
@@ -145,7 +148,8 @@ Return JSON: {{"before": {{"pain_points": [...], "emotions": [...], "questions":
         "id": "step_8",
         "title": "Root Cause Matrix",
         "phase": 2,
-        "prompt": """Create a root cause matrix linking problems to evidence, root causes, impact, and possible interventions.
+        "prompt": """Structure a Root Cause Matrix applying Systems Thinking and Bottleneck Mapping.
+Link specific observed problems to their supporting signals, root causes, system impact, and leverage points (interventions).
 Provide exactly 5 rows.
 
 Return JSON: {{"matrix": [{{"problem": "...", "evidence": "...", "root_cause": "...", "impact": "...", "intervention": "..."}}]}}"""
@@ -154,13 +158,8 @@ Return JSON: {{"matrix": [{{"problem": "...", "evidence": "...", "root_cause": "
         "id": "step_9",
         "title": "Competitive & Market Research",
         "phase": 2,
-        "prompt": """Analyze the competitive landscape for quick commerce category exploration:
-- Direct competitors (Zepto, Blinkit, Swiggy Instamart, etc.)
-- Indirect competitors (Amazon, Flipkart, BigBasket)
-- Substitutes (offline retail, specialty stores)
-- Emerging startups
-
-For each explain: WHY they succeed, WHY they fail, and identify market gaps.
+        "prompt": """Analyze the competitive landscape using Porter's Five Forces and SWOT frameworks.
+Assess direct quick commerce players, indirect marketplaces, and substitutes. Explain why they succeed/fail and find market gaps.
 
 Return JSON: {{"competitors": [{{"name": "...", "type": "direct/indirect/substitute/emerging", "why_succeeds": "...", "why_fails": "...", "market_gap": "..."}}]}}"""
     },
@@ -168,12 +167,8 @@ Return JSON: {{"competitors": [{{"name": "...", "type": "direct/indirect/substit
         "id": "step_10",
         "title": "White Space Opportunities",
         "phase": 3,
-        "prompt": """Identify white space opportunities by answering:
-- What is everyone optimizing for?
-- What is nobody optimizing for?
-- Where is the blind spot?
-- What assumption does every competitor share?
-- Can that assumption be broken?
+        "prompt": """Apply the Blue Ocean Strategy Canvas and Value Proposition Design Grid to uncover white space opportunities.
+Analyze what competitors over-optimize for, what they neglect, and outline opportunities that break shared industry assumptions.
 
 Return JSON: {{"everyone_optimizes": "...", "nobody_optimizes": "...", "blind_spot": "...", "shared_assumption": "...", "breaking_assumption": "...", "white_space_opportunities": [{{"title": "...", "rationale": "..."}}]}}"""
     },
@@ -181,9 +176,8 @@ Return JSON: {{"everyone_optimizes": "...", "nobody_optimizes": "...", "blind_sp
         "id": "step_11",
         "title": "Second-Order Thinking",
         "phase": 3,
-        "prompt": """Apply second-order thinking to the top recommended solution.
-Answer: What happens immediately? After one month? After one year?
-What unintended consequences? Who loses? Who benefits? Could users game this? Could the metric be manipulated?
+        "prompt": """Apply Second-Order Thinking and Game Theory to your recommended solution using the Futures Wheel.
+Outline immediately visible effects, 1-month consequences, and 1-year systemic shifts. Evaluate gaming risks, incentives, and metric manipulation.
 
 Return JSON: {{"immediate_effects": [...], "one_month_effects": [...], "one_year_effects": [...], "unintended_consequences": [...], "who_loses": [...], "who_benefits": [...], "gaming_risks": [...], "metric_manipulation_risks": [...]}}"""
     },
@@ -191,15 +185,12 @@ Return JSON: {{"immediate_effects": [...], "one_month_effects": [...], "one_year
         "id": "step_12",
         "title": "Metrics Framework",
         "phase": 3,
-        "prompt": """Define a complete metrics framework:
-- North Star Metric
-- Input Metrics (3)
-- Output Metrics (3)
-- Guardrail Metrics (2)
-- Counter Metrics (2)
-- Leading Indicators (2)
-- Lagging Indicators (2)
-- Experiment Plan with success and failure criteria
+        "prompt": """Design a comprehensive Product Metrics Dashboard using the Google HEART Framework and North Star Metric Framework:
+- North Star Metric (name, definition, 90-day target)
+- Input Metrics (3) & Output Metrics (3)
+- Guardrail Metrics (2) & Counter Metrics (2)
+- Leading & Lagging Indicators
+- A/B Testing Experiment Plan with statistical success/failure criteria.
 
 Return JSON: {{"north_star": {{"name": "...", "definition": "...", "target": "..."}}, "input_metrics": [{{"name": "...", "definition": "..."}}], "output_metrics": [{{"name": "...", "definition": "..."}}], "guardrail_metrics": [{{"name": "...", "definition": "...", "threshold": "..."}}], "counter_metrics": [{{"name": "...", "definition": "..."}}], "leading_indicators": [{{"name": "...", "signal": "..."}}], "lagging_indicators": [{{"name": "...", "signal": "..."}}], "experiment_plan": {{"hypothesis": "...", "success_criteria": "...", "failure_criteria": "...", "sample_size": "...", "duration": "..."}}}}"""
     },
@@ -207,13 +198,8 @@ Return JSON: {{"north_star": {{"name": "...", "definition": "...", "target": "..
         "id": "step_13",
         "title": "AI Opportunity Discovery",
         "phase": 3,
-        "prompt": """Instead of asking "Can AI be added?", analyze:
-- What decisions currently require human effort that AI could assist?
-- Can AI reduce uncertainty for users?
-- Can AI summarize complexity?
-- Can AI predict user intent?
-- Can AI personalize outcomes?
-- Can AI become a trusted advisor?
+        "prompt": """Build an AI Utility Matrix mapping Generative vs Predictive vs Agentic opportunities.
+Analyze what user decisions require high cognitive effort, where AI can reduce user uncertainty, and where it can predict user intent.
 
 Return JSON: {{"ai_opportunities": [{{"decision_area": "...", "current_human_effort": "...", "ai_intervention": "...", "impact": "...", "feasibility": "high/medium/low"}}]}}"""
     },
@@ -221,59 +207,90 @@ Return JSON: {{"ai_opportunities": [{{"decision_area": "...", "current_human_eff
         "id": "step_14",
         "title": "Solution Generation",
         "phase": 4,
-        "prompt": """Generate solutions across 4 categories. For each provide: why it works, trade-offs, implementation difficulty (1-10), business impact (1-10), defensibility assessment.
+        "prompt": """Generate four solution options (Conservative, Innovative, Moonshot, AI-First).
+Apply the RICE Prioritization Framework to assign numeric scores to each solution:
+- Reach (estimated users impacted/month)
+- Impact (1-10 product utility impact)
+- Confidence (1-10 data validation confidence)
+- Effort (1-10 engineering effort)
+- Calculated RICE Score = (Reach * Impact * Confidence) / Effort
 
-Return JSON: {{"conservative": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "difficulty": 0, "impact": 0, "defensibility": "..."}}, "innovative": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "difficulty": 0, "impact": 0, "defensibility": "..."}}, "moonshot": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "difficulty": 0, "impact": 0, "defensibility": "..."}}, "ai_first": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "difficulty": 0, "impact": 0, "defensibility": "..."}}}}"""
+Return JSON: {{"conservative": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "reach": 0, "impact": 0, "confidence": 0, "effort": 0, "rice_score": 0.0}}, "innovative": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "reach": 0, "impact": 0, "confidence": 0, "effort": 0, "rice_score": 0.0}}, "moonshot": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "reach": 0, "impact": 0, "confidence": 0, "effort": 0, "rice_score": 0.0}}, "ai_first": {{"title": "...", "description": "...", "why_works": "...", "trade_offs": "...", "reach": 0, "impact": 0, "confidence": 0, "effort": 0, "rice_score": 0.0}}}}"""
     },
     {
         "id": "step_15",
         "title": "Competitive Advantage Assessment",
         "phase": 4,
-        "prompt": """Evaluate the recommended solution using competitive moat criteria:
-- Can competitors copy this? How long?
-- Does it improve with data?
-- Does it become stronger with more users?
-- Does it create switching costs?
-- Does it create network effects?
-- Does it create proprietary intelligence?
-- Does it become an AI moat?
+        "prompt": """Evaluate the recommended solution using Hamilton Helmer's 7 Powers Moat Framework.
+Assess how the solution builds: Scale Economies, Network Effects, Counter-Positioning, Switching Costs, Branding, Cornered Resource, or Process Power.
 
-Return JSON: {{"copyability": {{"can_copy": true, "time_to_copy": "..."}}, "data_advantage": "...", "user_network_effect": "...", "switching_costs": "...", "network_effects": "...", "proprietary_intelligence": "...", "ai_moat": "...", "overall_defensibility_score": 0, "verdict": "..."}}"""
+Return JSON: {{"powers": [{{"power": "Scale Economies/Network Effects/Counter-Positioning/Switching Costs/Branding/Cornered Resource/Process Power", "strength": "high/medium/low", "evidence": "..."}}], "overall_defensibility_score": 0, "verdict": "..."}}"""
     },
     {
         "id": "step_16",
         "title": "Executive Presentation",
         "phase": 4,
-        "prompt": """Create executive-ready takeaways assuming leadership has only 5 minutes.
-Provide:
-- One-line insight
-- 3 key supporting data points
-- The single recommended action
-- Decision rationale (why this, why now)
-- What would a Principal PM, McKinsey Partner, and Behavioral Scientist debate before approving?
+        "prompt": """Apply the Minto Pyramid Principle (SCQA structure: Situation, Complication, Question, Answer) to draft executive slides.
+Provide a clear situation context, complicating signals, the strategic question, and your data-validated recommendation.
 
-Return JSON: {{"one_line_insight": "...", "supporting_data": [...], "recommended_action": "...", "why_this": "...", "why_now": "...", "debate_points": [{{"role": "Principal PM / McKinsey Partner / Behavioral Scientist", "argument": "..."}}]}}"""
+Return JSON: {{"situation": "...", "complication": "...", "question": "...", "answer": "...", "supporting_data": [...], "debate_points": [{{"role": "Principal PM / McKinsey Partner / Behavioral Scientist", "argument": "..."}}]}}"""
     },
 ]
 
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
-def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities) -> dict:
+def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None) -> dict:
     """
-    Execute the full 16-step strategy deep dive analysis.
-    Returns a dict with step results and progress metadata.
+    Execute the full 16-step strategy deep dive analysis in structured dependency batches
+    to ensure logical reasoning flow while parallelizing independent tasks for maximum speed.
     """
     llm = get_llm_client()
-    context = _build_context(signals, themes, barriers, personas, opportunities)
-
     results = {}
     completed = 0
     total = len(STEP_CONFIGS)
+    lock = threading.Lock()
 
-    for step_cfg in STEP_CONFIGS:
+    # Define sequential dependency batches:
+    # Batch 1: Problem Restatement (MECE foundation)
+    # Batch 2: Challenge Assumptions (First-Principles) & 5 Whys (Ishikawa Causal Root)
+    # Batch 3: Issue Tree (MECE Tree built off causal root)
+    # Batch 4: Multi-perspective research (Fogg B=MAP, JTBD, Journey, Competitors, White Space, Metrics, AI Opportunity)
+    # Batch 5: Causal Matrix synthesis & RICE Solution Options
+    # Batch 6: Second-Order Futures Wheel & Hamilton Helmer 7 Powers Moat Assessment
+    # Batch 7: Minto Pyramid SCQA Executive Takeaways
+    batches = [
+        ["step_1"],
+        ["step_2", "step_3"],
+        ["step_4"],
+        ["step_5", "step_6", "step_7", "step_9", "step_10", "step_12", "step_13"],
+        ["step_8", "step_14"],
+        ["step_11", "step_15"],
+        ["step_16"]
+    ]
+
+    def process_step(step_cfg):
+        nonlocal completed
         step_id = step_cfg["id"]
         logger.info(f"[Strategy Deep Dive] Running {step_id}: {step_cfg['title']}...")
+        if progress_callback:
+            try:
+                progress_callback(step_id, step_cfg["title"], "start")
+            except Exception:
+                pass
 
-        full_prompt = f"""{context}
+        # Build context dynamically from base context + previously completed steps
+        base_context = _build_context(signals, themes, barriers, personas, opportunities, problem_statement=problem_statement)
+        completed_context_parts = []
+        with lock:
+            for s_id, s_info in results.items():
+                completed_context_parts.append(f"### COMPLETED {s_id.upper()}: {s_info['title']}\n{json.dumps(s_info['data'], indent=2)}")
+        
+        full_context = base_context
+        if completed_context_parts:
+            full_context += "\n\n## COMPLETED STEPS HISTORY (Logical Causal Flow)\n" + "\n\n".join(completed_context_parts)
+
+        full_prompt = f"""{full_context}
 
 ---
 
@@ -284,31 +301,46 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities) -
         try:
             response = llm.generate(STRATEGY_SYSTEM_PROMPT, full_prompt, creative=False)
             if isinstance(response, dict):
-                results[step_id] = {
-                    "title": step_cfg["title"],
-                    "phase": step_cfg["phase"],
-                    "data": response,
-                    "status": "complete",
-                }
+                parsed_data = response
             else:
-                parsed = json.loads(response)
+                parsed_data = json.loads(response)
+            
+            with lock:
                 results[step_id] = {
                     "title": step_cfg["title"],
                     "phase": step_cfg["phase"],
-                    "data": parsed,
+                    "data": parsed_data,
                     "status": "complete",
                 }
+            if progress_callback:
+                try:
+                    progress_callback(step_id, step_cfg["title"], "complete")
+                except Exception:
+                    pass
         except Exception as e:
             logger.error(f"[Strategy Deep Dive] Step {step_id} failed: {e}")
-            results[step_id] = {
-                "title": step_cfg["title"],
-                "phase": step_cfg["phase"],
-                "data": {"error": str(e)},
-                "status": "failed",
-            }
+            with lock:
+                results[step_id] = {
+                    "title": step_cfg["title"],
+                    "phase": step_cfg["phase"],
+                    "data": {"error": str(e)},
+                    "status": "failed",
+                }
+            if progress_callback:
+                try:
+                    progress_callback(step_id, step_cfg["title"], "failed", detail=str(e))
+                except Exception:
+                    pass
 
-        completed += 1
-        logger.info(f"[Strategy Deep Dive] Progress: {completed}/{total}")
+        with lock:
+            completed += 1
+            logger.info(f"[Strategy Deep Dive] Progress: {completed}/{total}")
+
+    # Process each batch sequentially, running steps within each batch concurrently
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for batch_step_ids in batches:
+            batch_configs = [cfg for cfg in STEP_CONFIGS if cfg["id"] in batch_step_ids]
+            list(executor.map(process_step, batch_configs))
 
     return {
         "steps": results,

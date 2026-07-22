@@ -98,12 +98,12 @@ CRITICAL RULES:
 """
 
 
-def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 2500) -> list[str]:
+def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 5000) -> list[str]:
     """
     Chunk signals into batches. If there are too many signals, downsample them 
     using stratified sampling to avoid hitting LLM token rate limits.
     """
-    MAX_SIGNALS = 60
+    MAX_SIGNALS = 100
     if len(signals) > MAX_SIGNALS:
         logger.info(f"Downsampling signals count from {len(signals)} to {MAX_SIGNALS} for LLM analysis.")
         # Stratified sampling by app and rating
@@ -112,17 +112,18 @@ def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 250
             key = (s.app_name, s.rating or 3)
             groups.setdefault(key, []).append(s)
             
+        import random
         sampled_signals = []
         total_groups = len(groups)
         if total_groups > 0:
             per_group_limit = max(1, MAX_SIGNALS // total_groups)
             for key, group_list in groups.items():
-                sampled_signals.extend(group_list[:per_group_limit])
+                sampled_signals.extend(random.sample(group_list, min(len(group_list), per_group_limit)))
                 
         if len(sampled_signals) < MAX_SIGNALS:
             remaining_quota = MAX_SIGNALS - len(sampled_signals)
             all_remaining = [s for s in signals if s not in sampled_signals]
-            sampled_signals.extend(all_remaining[:remaining_quota])
+            sampled_signals.extend(random.sample(all_remaining, min(len(all_remaining), remaining_quota)))
             
         signals = sampled_signals
 
@@ -164,7 +165,9 @@ def detect_themes(
     chunks = _prepare_signals_for_llm(signals)
     all_themes = []
 
-    for i, chunk in enumerate(chunks):
+    from concurrent.futures import ThreadPoolExecutor
+
+    def analyze_chunk(chunk):
         prompt = f"""Analyze these {len(signals)} consumer signals about {context}.
 
 Extract the TOP THEMES — patterns that appear repeatedly across multiple signals.
@@ -184,9 +187,16 @@ Return JSON: {{"themes": [...]}}
 
 SIGNALS:
 {chunk}"""
+        try:
+            return llm.analyze(BEHAVIOR_SYSTEM_PROMPT, prompt, use_reasoning=False)
+        except Exception as e:
+            logger.error(f"Failed to analyze theme chunk: {e}")
+            return {"themes": []}
 
-        result = llm.analyze(BEHAVIOR_SYSTEM_PROMPT, prompt, use_reasoning=True)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        chunk_results = list(executor.map(analyze_chunk, chunks))
 
+    for result in chunk_results:
         for theme_data in result.get("themes", []):
             # Map confidence to level
             conf = theme_data.get("confidence", 0.5)
@@ -233,6 +243,7 @@ SIGNALS:
 def detect_category_barriers(
     signals: list[UnifiedSignal],
     target_categories: Optional[list[str]] = None,
+    problem_statement: Optional[str] = None,
 ) -> list[CategoryBarrier]:
     """
     Detect barriers that prevent users from exploring new product categories.
@@ -260,10 +271,14 @@ def detect_category_barriers(
         "Beauty, Electronics, Home & Kitchen, Baby Care, Pet Care, Stationery, Toys"
     )
 
-    for chunk in chunks:
+    from concurrent.futures import ThreadPoolExecutor
+
+    def analyze_barrier_chunk(chunk):
+        problem_context = f"The specific problem to focus on is: {problem_statement}" if problem_statement else f"The question: Why do users keep buying from familiar categories (Grocery, Snacks, Dairy) but avoid exploring: {categories_str}?"
+        
         prompt = f"""Analyze these consumer signals to identify CATEGORY EXPLORATION BARRIERS in quick commerce apps.
 
-The question: Why do users keep buying from familiar categories (Grocery, Snacks, Dairy) but avoid exploring: {categories_str}?
+{problem_context}
 
 For each barrier you find, provide:
 - "category": The product category users avoid (e.g., "Beauty", "Electronics")
@@ -277,11 +292,23 @@ For each barrier you find, provide:
 
 Return JSON: {{"barriers": [...]}}
 
+CRITICAL STYLE RULES:
+- Do NOT reuse the same sentence structures, phrasing, or templates (like "Users are concerned about...") across different barriers.
+- Each barrier's description must be completely distinct, context-rich, and directly address the specific characteristics of that category (e.g., fears of counterfeit beauty products, fears of receiving malfunctioning or unboxable electronics, worries of delivery delays for dinner ingredients).
+- Provide unique recommended interventions tailored to the specific barrier.
+
 CONSUMER SIGNALS:
 {chunk}"""
+        try:
+            return llm.analyze(BEHAVIOR_SYSTEM_PROMPT, prompt, use_reasoning=False)
+        except Exception as e:
+            logger.error(f"Failed to analyze barrier chunk: {e}")
+            return {"barriers": []}
 
-        result = llm.analyze(BEHAVIOR_SYSTEM_PROMPT, prompt, use_reasoning=True)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        chunk_results = list(executor.map(analyze_barrier_chunk, chunks))
 
+    for result in chunk_results:
         for barrier_data in result.get("barriers", []):
             conf = barrier_data.get("confidence", 0.5)
             barrier_type_str = barrier_data.get("barrier_type", "awareness")
@@ -304,7 +331,7 @@ CONSUMER SIGNALS:
                 category=barrier_data.get("category", "Unknown"),
                 barrier_type=barrier_type,
                 description=barrier_data.get("description", ""),
-                signal_count=barrier_data.get("signal_count", 0),
+                signal_count=int(float(barrier_data.get("signal_count", 0))) if barrier_data.get("signal_count") is not None else 0,
                 confidence=conf,
                 confidence_level=(
                     ConfidenceLevel.HIGH if conf >= 0.7

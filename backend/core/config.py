@@ -19,7 +19,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # ─────────────────────────────────────────────
 LLM_MODEL_FAST = "llama-3.1-8b-instant"        # Fast, cheap: sentiment, classification
 LLM_MODEL_REASONING = "llama-3.3-70b-versatile" # Deep reasoning: behavior, personas, JTBD
-LLM_TEMPERATURE_ANALYTICAL = 0.1                # Low creativity for analysis
+LLM_TEMPERATURE_ANALYTICAL = 0.2                # Low creativity for analysis
 LLM_TEMPERATURE_CREATIVE = 0.4                  # Moderate creativity for personas/JTBD
 
 # Groq free tier rate limits
@@ -61,6 +61,11 @@ REDDIT_SEARCH_TERMS_QUICK_COMMERCE = [
     "10 minute delivery",
     "instant delivery",
     "grocery delivery app",
+    "blinkit makeup",
+    "blinkit electronics",
+    "blinkit categories",
+    "blinkit toys",
+    "blinkit skincare"
 ]
 REDDIT_MIN_SCORE = 2          # Minimum upvote score to include
 REDDIT_MIN_WORD_COUNT = 10    # Minimum words for a useful comment
@@ -125,8 +130,8 @@ CATEGORY_BARRIER_TYPES = [
 # ─────────────────────────────────────────────
 # Data Pipeline
 # ─────────────────────────────────────────────
-MAX_REVIEWS_PER_APP = 500
-DEDUP_SIMILARITY_THRESHOLD = 0.95
+MAX_REVIEWS_PER_APP = 5000
+DEDUP_SIMILARITY_THRESHOLD = 0.85
 MIN_CLUSTER_SIZE = 5
 
 # ─────────────────────────────────────────────
@@ -141,14 +146,28 @@ CONFIDENCE_LEVELS = {
 }
 
 # ─────────────────────────────────────────────
-# Google Sheets Configuration
+# Google API Configuration
 # ─────────────────────────────────────────────
-GOOGLE_SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+GOOGLE_API_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/forms.body",
+    "https://www.googleapis.com/auth/drive"
+]
 GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv(
     "GOOGLE_SERVICE_ACCOUNT_FILE",
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "credentials", "service_account.json"),
 )
+GOOGLE_CLIENT_SECRET_FILE = os.getenv(
+    "GOOGLE_CLIENT_SECRET_FILE",
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "credentials", "client_secret.json"),
+)
+GOOGLE_TOKEN_FILE = os.getenv(
+    "GOOGLE_TOKEN_FILE",
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "credentials", "token.json"),
+)
 GOOGLE_SPREADSHEET_ID = os.getenv("GOOGLE_SPREADSHEET_ID", "")
+GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "1-KqYGsX7eUVmo9ShlXx0i2c0tg8EnbsB")
+GOOGLE_SLIDES_TEMPLATE_ID = os.getenv("GOOGLE_SLIDES_TEMPLATE_ID", "1C5pqUxKQ9gsPy_Fs6DA2CW5mCrgNFVluBi4axOWb9E4")
 
 # Sheet names within the workbook
 SHEET_NAMES = {

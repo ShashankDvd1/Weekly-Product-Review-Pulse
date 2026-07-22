@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Activity, MessageSquare, AlertTriangle, TrendingUp, RefreshCw, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Activity, MessageSquare, AlertTriangle, TrendingUp, RefreshCw, Users, Terminal, Send, Play, CheckCircle2, Calendar, Search, Layers } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { getBackendUrl } from '../config';
 
@@ -53,6 +53,12 @@ const Dashboard = () => {
     swiggy_instamart: true
   });
 
+  // AI Prompt Mode Ingestion states
+  const [promptMode, setPromptMode] = useState('quick'); // 'quick' or 'ai_prompt'
+  const [prompt, setPrompt] = useState('');
+  const [parsing, setParsing] = useState(false);
+  const [parsedConfig, setParsedConfig] = useState(null);
+
   useEffect(() => {
     if (dateRangeOption === 'custom') return;
     
@@ -68,6 +74,7 @@ const Dashboard = () => {
     pastDate.setDate(today.getDate() - days);
     const fromStr = pastDate.toISOString().split('T')[0];
     
+    // eslint-disable-next-line
     setFromDate(fromStr);
     setToDate(toStr);
   }, [dateRangeOption]);
@@ -76,8 +83,17 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  async function fetchDashboardData() {
     try {
+      // Check if pipeline is running in the background
+      const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+      const statusData = await statusRes.json();
+      if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
+        setPipelineRunning(true);
+        setPipelineStatus(statusData.status);
+        setPipelineLogs(statusData.progress || []);
+      }
+
       const response = await fetch(`${getBackendUrl()}/api/v2/dashboard/overview`);
       if (!response.ok) throw new Error('Failed to fetch dashboard data');
       const result = await response.json();
@@ -86,6 +102,58 @@ const Dashboard = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [problemStatement, setProblemStatement] = useState(
+    "Users stick to repetitive buying habits and rarely explore new categories like electronics, toys, or beauty."
+  );
+
+  const handleParsePrompt = async (e) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
+
+    setParsing(true);
+    setError(null);
+    setParsedConfig(null);
+
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/parse-prompt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) throw new Error("Failed to parse prompt command");
+      const config = await res.json();
+      setParsedConfig(config);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const handleLaunchAIPipeline = async () => {
+    if (!parsedConfig) return;
+
+    setPipelineRunning(true);
+    setPipelineLogs(["[SYSTEM] Initiating AI custom intelligence run..."]);
+    
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...parsedConfig,
+          problem_statement: problemStatement
+        })
+      });
+      if (!res.ok) throw new Error("Pipeline run encountered a server error");
+      const result = await res.json();
+      setPipelineLogs(result.progress || []);
+    } catch (err) {
+      setError(err.message);
+      setPipelineRunning(false);
     }
   };
 
@@ -101,7 +169,7 @@ const Dashboard = () => {
     
     try {
       setPipelineRunning(true);
-      setPipelineLogs(["[SYSTEM] Initiating intelligence run..."]);
+      setPipelineLogs(["[SYSTEM] Initiating intelligence run with custom problem statement..."]);
       const response = await fetch(`${getBackendUrl()}/api/v2/pipeline/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,7 +177,8 @@ const Dashboard = () => {
           apps: appsToRun,
           from_date: fromDate,
           to_date: toDate,
-          include_reddit: true
+          include_reddit: true,
+          problem_statement: problemStatement
         })
       });
       if (!response.ok) throw new Error('Pipeline failed to initiate');
@@ -145,82 +214,158 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="page-title text-gradient">Pulse Overview</h1>
-          <p className="page-subtitle">High-level insights across all quick commerce apps.</p>
+          <h1 className="page-title text-gradient">Pulse Dashboard</h1>
+          <p className="page-subtitle">Configure pipelines, monitor ingestion runs, and track overall commerce indicators.</p>
           {data?.date_range?.from_date && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
               Dataset coverage: <strong>{data.date_range.from_date}</strong> to <strong>{data.date_range.to_date}</strong>
             </p>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          {/* App Selection Checkboxes */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-              <input 
-                type="checkbox" 
-                checked={selectedApps.zepto} 
-                onChange={(e) => setSelectedApps(prev => ({ ...prev, zepto: e.target.checked }))} 
-              />
-              Zepto
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-              <input 
-                type="checkbox" 
-                checked={selectedApps.blinkit} 
-                onChange={(e) => setSelectedApps(prev => ({ ...prev, blinkit: e.target.checked }))} 
-              />
-              Blinkit
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-              <input 
-                type="checkbox" 
-                checked={selectedApps.swiggy_instamart} 
-                onChange={(e) => setSelectedApps(prev => ({ ...prev, swiggy_instamart: e.target.checked }))} 
-              />
-              Swiggy Instamart
-            </label>
-          </div>
+      </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Range:</span>
-            <select
-              value={dateRangeOption}
-              onChange={(e) => setDateRangeOption(e.target.value)}
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}
+      {/* SETUP & INGESTION CONTROL PANEL */}
+      <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', textAlign: 'left' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.75rem', marginBottom: '1.25rem' }}>
+          <h3 style={{ margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Terminal size={18} color="var(--accent-primary)" /> Ingestion Settings & Control
+          </h3>
+          <div className="glass-panel" style={{ display: 'flex', padding: '0.2rem', borderRadius: '6px', gap: '0.2rem' }}>
+            <button
+              onClick={() => setPromptMode('quick')}
+              style={{
+                padding: '0.35rem 0.75rem', borderRadius: '4px', border: 'none', fontSize: '0.75rem', fontWeight: 'bold',
+                background: promptMode === 'quick' ? 'var(--accent-primary)' : 'transparent',
+                color: promptMode === 'quick' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer', transition: 'all 0.2s ease'
+              }}
             >
-              <option value="7days">1 Week</option>
-              <option value="14days">2 Weeks</option>
-              <option value="30days">1 Month</option>
-              <option value="custom">Custom</option>
-            </select>
+              Quick Setup
+            </button>
+            <button
+              onClick={() => setPromptMode('ai_prompt')}
+              style={{
+                padding: '0.35rem 0.75rem', borderRadius: '4px', border: 'none', fontSize: '0.75rem', fontWeight: 'bold',
+                background: promptMode === 'ai_prompt' ? 'var(--accent-primary)' : 'transparent',
+                color: promptMode === 'ai_prompt' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer', transition: 'all 0.2s ease'
+              }}
+            >
+              AI Ingestion Prompt
+            </button>
+          </div>
+        </div>
 
-            {dateRangeOption === 'custom' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>From:</span>
-                <input 
-                  type="date" 
-                  value={fromDate} 
-                  onChange={(e) => setFromDate(e.target.value)}
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }}
-                />
-                <span style={{ color: 'var(--text-secondary)' }}>To:</span>
-                <input 
-                  type="date" 
-                  value={toDate} 
-                  onChange={(e) => setToDate(e.target.value)}
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }}
-                />
+        {/* QUICK SETTINGS SUBPANEL */}
+        {promptMode === 'quick' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Target Apps</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.zepto} onChange={(e) => setSelectedApps(prev => ({ ...prev, zepto: e.target.checked }))} /> Zepto
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.blinkit} onChange={(e) => setSelectedApps(prev => ({ ...prev, blinkit: e.target.checked }))} /> Blinkit
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.swiggy_instamart} onChange={(e) => setSelectedApps(prev => ({ ...prev, swiggy_instamart: e.target.checked }))} /> Swiggy Instamart
+                  </label>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Date Range</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                  <select
+                    value={dateRangeOption}
+                    onChange={(e) => setDateRangeOption(e.target.value)}
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff', padding: '0.4rem 0.8rem', fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}
+                  >
+                    <option value="7days">1 Week</option>
+                    <option value="14days">2 Weeks</option>
+                    <option value="30days">1 Month</option>
+                    <option value="custom">Custom Range</option>
+                  </select>
+                  {dateRangeOption === 'custom' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingLeft: '0.5rem' }}>
+                      <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }} />
+                      <span style={{ color: 'var(--text-secondary)' }}>to</span>
+                      <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button className="btn-primary" onClick={handleRunPipeline} disabled={pipelineRunning} style={{ marginLeft: 'auto', padding: '0.6rem 1.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {pipelineRunning ? <div className="loader" style={{ width: '16px', height: '16px', borderTopColor: '#fff' }}></div> : <Play size={16} />}
+                Launch Ingestion
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* AI PROMPT INGESTION SUBPANEL */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleParsePrompt} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <textarea 
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="e.g. 'Fetch Zepto reviews for the last 14 days and search reddit for grocery checkout errors'"
+                disabled={parsing || pipelineRunning}
+                style={{ 
+                  width: '100%', minHeight: '80px', background: 'var(--bg-secondary)', 
+                  border: '1px solid var(--border-glass)', borderRadius: '8px', color: '#fff', 
+                  padding: '0.75rem', fontFamily: 'inherit', resize: 'vertical', fontSize: '0.9rem'
+                }}
+              />
+              <button type="submit" className="btn-primary" disabled={parsing || pipelineRunning || !prompt.trim()} style={{ alignSelf: 'flex-end', padding: '0.4rem 1.2rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {parsing ? <RefreshCw className="loader" size={14} /> : <Send size={14} />}
+                Parse Ingestion Request
+              </button>
+            </form>
+
+            {parsedConfig && (
+              <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                  <strong>Ingestion Plan:</strong> Apps: {parsedConfig.apps.join(', ')} | Range: {parsedConfig.from_date} to {parsedConfig.to_date} | Reddit: {parsedConfig.include_reddit ? 'Yes' : 'No'}
+                </div>
+                <button className="btn-primary" onClick={handleLaunchAIPipeline} disabled={pipelineRunning} style={{ background: 'var(--success)', padding: '0.4rem 1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Play size={14} /> Run AI Plan
+                </button>
               </div>
             )}
           </div>
-          <button className="btn-primary" onClick={handleRunPipeline} disabled={loading || pipelineRunning}>
-            {pipelineRunning ? <div className="loader" style={{ width: '16px', height: '16px', borderTopColor: '#fff', marginRight: '8px' }}></div> : <RefreshCw size={18} />}
-            {pipelineRunning ? 'Running...' : 'Run Pipeline'}
-          </button>
-        </div>
+        )}
+      </div>
+
+      {/* Problem Statement Control Bar */}
+      <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1rem 1.25rem', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent-primary)', marginBottom: '0.4rem' }}>
+          🎯 Target Problem Statement / Strategic Focus:
+        </label>
+        <input 
+          type="text" 
+          value={problemStatement} 
+          onChange={(e) => setProblemStatement(e.target.value)} 
+          placeholder="e.g. Why do users stick to grocery categories and avoid exploring electronics or beauty?"
+          style={{
+            width: '100%',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-glass)',
+            borderRadius: '6px',
+            color: '#fff',
+            padding: '0.6rem 0.85rem',
+            fontSize: '0.9rem',
+            fontFamily: 'inherit',
+            outline: 'none'
+          }}
+        />
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.35rem' }}>
+          This problem statement anchors all AI reasoning engines (Theme Detection, Category Barriers, Personas, JTBD, Opportunities & Survey Generation).
+        </span>
       </div>
 
       {/* Real-time Pipeline Console */}
@@ -249,12 +394,23 @@ const Dashboard = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               {pipelineRunning && <span style={{ color: '#cbd5e1', fontSize: '0.85rem', animation: 'pulse 1.5s infinite' }}>Analyzing signals in real-time...</span>}
               {pipelineLogs.length > 0 && (
-                <button 
-                  onClick={() => setPipelineLogs([])} 
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
-                >
-                  Clear Console
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(pipelineLogs.join('\n'));
+                      alert("Console logs copied to clipboard!");
+                    }} 
+                    style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}
+                  >
+                    📋 Copy Logs
+                  </button>
+                  <button 
+                    onClick={() => setPipelineLogs([])} 
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    Clear Console
+                  </button>
+                </div>
               )}
             </div>
           </div>

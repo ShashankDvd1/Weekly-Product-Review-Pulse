@@ -8,6 +8,8 @@ into actionable recommendations.
 
 import logging
 import uuid
+from typing import Optional, List
+from typing import Optional
 
 from core.llm_client import get_llm_client
 from core.schemas import (
@@ -42,6 +44,7 @@ def identify_opportunities(
     jobs: list[JTBD],
     signals: list[UnifiedSignal],
     num_opportunities: int = 8,
+    problem_statement: Optional[str] = None,
 ) -> list[GrowthOpportunity]:
     """
     Synthesize analysis outputs into growth opportunities.

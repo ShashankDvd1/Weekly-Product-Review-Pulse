@@ -144,11 +144,7 @@ class LLMClient:
         Returns:
             Parsed JSON dict from the LLM response
         """
-        if self._force_fast_model:
-            model = LLM_MODEL_FAST
-        else:
-            model = LLM_MODEL_REASONING if use_reasoning else LLM_MODEL_FAST
-
+        model = LLM_MODEL_REASONING if use_reasoning else LLM_MODEL_FAST
         temperature = LLM_TEMPERATURE_ANALYTICAL
 
         messages = [
@@ -160,8 +156,7 @@ class LLMClient:
             raw = self._call(messages, model, temperature)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
-                logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Permanently falling back to fast model {LLM_MODEL_FAST}...")
-                self._force_fast_model = True
+                logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
                 raw = self._call(messages, model, temperature)
             else:
@@ -185,11 +180,7 @@ class LLMClient:
         Returns:
             Parsed JSON dict
         """
-        if self._force_fast_model:
-            model = LLM_MODEL_FAST
-        else:
-            model = LLM_MODEL_REASONING
-            
+        model = LLM_MODEL_REASONING
         temperature = LLM_TEMPERATURE_CREATIVE if creative else LLM_TEMPERATURE_ANALYTICAL
 
         messages = [
@@ -201,8 +192,7 @@ class LLMClient:
             raw = self._call(messages, model, temperature)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
-                logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Permanently falling back to fast model {LLM_MODEL_FAST}...")
-                self._force_fast_model = True
+                logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
                 raw = self._call(messages, model, temperature)
             else:

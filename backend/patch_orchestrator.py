@@ -69,6 +69,8 @@ new_collect_all = '''    def collect_all(
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
+                        else:
+                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for custom ID: {app_store_id}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_store_id}: {str(e)[:100]}")
 
@@ -101,6 +103,8 @@ new_collect_all = '''    def collect_all(
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
+                        else:
+                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for {app_name}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_name}: {str(e)[:100]}")
 

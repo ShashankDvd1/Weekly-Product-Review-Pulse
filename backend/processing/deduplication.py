@@ -51,21 +51,39 @@ def semantic_deduplicate(
         logger.exception("Failed to generate embeddings in batch, falling back to original signals")
         return unique_candidates
 
-    # 3. Perform cosine similarity checks in a fast NumPy matrix loop
+    # 3. Perform cosine similarity checks using a precalculated similarity matrix
     unique_signals = []
-    unique_indices = []
-
-    for i, signal in enumerate(unique_candidates):
-        is_dup = False
-        for u_idx in unique_indices:
-            sim = float(np.dot(embeddings[i], embeddings[u_idx]))
-            if sim >= similarity_threshold:
-                is_dup = True
-                break
+    kept_indices = []
+    
+    try:
+        embeddings = np.array(embeddings)
+        # Compute all-to-all similarity in one fast matrix multiplication
+        similarities = np.dot(embeddings, embeddings.T)
         
-        if not is_dup:
-            unique_signals.append(signal)
-            unique_indices.append(i)
+        for i, signal in enumerate(unique_candidates):
+            is_dup = False
+            for u_idx in kept_indices:
+                if similarities[i, u_idx] >= similarity_threshold:
+                    is_dup = True
+                    break
+            
+            if not is_dup:
+                unique_signals.append(signal)
+                kept_indices.append(i)
+    except Exception as e:
+        logger.error(f"Fast matrix deduplication failed: {e}. Falling back to iterative method.")
+        unique_indices = []
+        for i, signal in enumerate(unique_candidates):
+            is_dup = False
+            for u_idx in unique_indices:
+                sim = float(np.dot(embeddings[i], embeddings[u_idx]))
+                if sim >= similarity_threshold:
+                    is_dup = True
+                    break
+            
+            if not is_dup:
+                unique_signals.append(signal)
+                unique_indices.append(i)
 
     # 4. Batch store the final unique signals in ChromaDB for search compatibility
     try:

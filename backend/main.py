@@ -230,6 +230,26 @@ def get_interview_questions():
         "recommendations": []
     }
 
+class GenerateFormRequest(BaseModel):
+    product_name: str
+    problem_statement: str
+    product_description: str
+    target_segment: str
+    key_features: str
+    assumptions: str
+
+@app.post("/api/v2/research/generate-form")
+def generate_survey_form(req: GenerateFormRequest):
+    """Automatically generate an AI Survey and optionally a Google Form."""
+    from reasoning.form_generator import generate_survey_and_form
+    
+    try:
+        result = generate_survey_and_form(req.model_dump())
+        return result
+    except Exception as e:
+        logger.exception("Failed to generate survey form")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ── Reports ──────────────────────────────────
 
@@ -312,6 +332,35 @@ def get_executive_deck_report():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/v2/reports/executive-deck/export-slides")
+def export_executive_deck_slides_endpoint():
+    """Export the AI Executive Insight presentation deck into Google Slides."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        raise HTTPException(status_code=400, detail="Executive deck data not generated yet. Run the full pipeline first.")
+
+    from output.report_generator import generate_executive_deck
+    try:
+        deck_data = generate_executive_deck(
+            orchestrator.signals,
+            orchestrator.themes,
+            orchestrator.barriers,
+            orchestrator.personas,
+            orchestrator.jobs,
+            orchestrator.opportunities,
+        )
+        from reasoning.mcp_doc_exporter import export_executive_deck_slides
+        presentation_url = export_executive_deck_slides(deck_data)
+        return {
+            "status": "success",
+            "presentation_url": presentation_url
+        }
+    except Exception as e:
+        logger.exception("Failed to export executive deck to Google Slides")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 # ── Review Board ──────────────────────────────
 
 class VivaStartRequest(BaseModel):
@@ -365,23 +414,69 @@ def get_mvp_case_study_endpoint():
 
 
 @app.get("/api/v2/reports/strategy-deep-dive")
-def get_strategy_deep_dive():
-    """Run or return the 16-step Strategy Deep Dive analysis."""
+def get_strategy_deep_dive(background_tasks: BackgroundTasks):
+    """Run or return the 16-step Strategy Deep Dive analysis asynchronously."""
     orchestrator = get_orchestrator()
     if not orchestrator.signals:
         return {"error": "No data available. Run the full pipeline first."}
 
-    if orchestrator.strategy_deep_dive is None:
-        from reasoning.strategy_deep_dive import run_strategy_deep_dive
-        orchestrator.strategy_deep_dive = run_strategy_deep_dive(
-            orchestrator.signals,
-            orchestrator.themes,
-            orchestrator.barriers,
-            orchestrator.personas,
-            orchestrator.opportunities,
-        )
+    if orchestrator.strategy_status in ["idle", "failed"]:
+        orchestrator.strategy_deep_dive = None
+        background_tasks.add_task(orchestrator.run_strategy_deep_dive_async)
+        
+    return {
+        "status": orchestrator.strategy_status,
+        "logs": orchestrator.strategy_logs,
+        "completed_steps": orchestrator.strategy_completed_steps,
+        "total_steps": orchestrator.strategy_total_steps,
+        "board_presentation": orchestrator.board_presentation if orchestrator.strategy_status == "completed" else None,
+        "result": orchestrator.strategy_deep_dive if orchestrator.strategy_status == "completed" else None
+    }
 
-    return orchestrator.strategy_deep_dive
+
+@app.post("/api/v2/reports/strategy-deep-dive/export-doc")
+def export_strategy_deep_dive_doc_endpoint():
+    """Export the 16-step Strategy Deep Dive into a Google Doc saved in the target Drive folder."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+
+    try:
+        from reasoning.mcp_doc_exporter import export_strategy_deep_dive_doc
+        doc_url = export_strategy_deep_dive_doc(orchestrator.strategy_deep_dive)
+        return {
+            "status": "success",
+            "doc_url": doc_url
+        }
+    except Exception as e:
+        logger.exception("Failed to export Strategy Deep Dive to Google Doc")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v2/reports/strategy-deep-dive/export-slides")
+def export_strategy_deep_dive_slides_endpoint():
+    """Export the Strategy Deep Dive into a Google Slides presentation saved in the target Drive folder."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+
+    try:
+        from reasoning.mcp_doc_exporter import export_strategy_deep_dive_slides
+        board_deck = orchestrator.board_presentation
+        if not board_deck:
+            from reasoning.board_presenter import synthesize_board_presentation
+            board_deck = synthesize_board_presentation(orchestrator.strategy_deep_dive)
+            orchestrator.board_presentation = board_deck
+            
+        presentation_url = export_strategy_deep_dive_slides(board_deck)
+        return {
+            "status": "success",
+            "presentation_url": presentation_url
+        }
+    except Exception as e:
+        logger.exception("Failed to export Strategy Deep Dive to Google Slides")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.post("/api/v2/review-board/viva/start")
@@ -482,6 +577,67 @@ def semantic_search_endpoint(query: str, top_k: int = 10):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ── Blinkit Case Study ──────────────────────────────
+from fastapi import UploadFile, File
+
+@app.post("/api/v2/blinkit/analyze")
+def run_blinkit_analysis():
+    """Run the specialized Blinkit cross-sell analysis on collected signals."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        raise HTTPException(status_code=400, detail="No signals available. Please run the collection pipeline first.")
+
+    if len(orchestrator.signals) < 100:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Blinkit Case Study requires a minimum of 100 consumer signals to ensure statistical validity (Currently: {len(orchestrator.signals)} signals). Please select a broader date range on the Overview tab and re-run the pipeline."
+        )
+
+    from ingestion.normalizer import filter_cross_category_signals
+    filtered_signals = filter_cross_category_signals(orchestrator.signals)
+    
+    if not filtered_signals:
+        raise HTTPException(status_code=400, detail="No signals remained after cross-category filtering.")
+        
+    from reasoning.blinkit_case_study import analyze_blinkit_cross_sell
+    problem_stmt = getattr(orchestrator, "active_problem_statement", None)
+    result = analyze_blinkit_cross_sell(filtered_signals, problem_statement=problem_stmt)
+    
+    # Cache the result in orchestrator for synthesis
+    orchestrator.blinkit_scraped_insights = result
+    
+    return {
+        "status": "success",
+        "filtered_count": len(filtered_signals),
+        "insights": result
+    }
+
+@app.post("/api/v2/blinkit/upload-survey")
+async def upload_blinkit_survey(file: UploadFile = File(...)):
+    """Upload Google Form CSV and synthesize with scraped data."""
+    import pandas as pd
+    from reasoning.blinkit_case_study import synthesize_primary_research
+    
+    df = pd.read_csv(file.file)
+    survey_data = df.to_dict('records')
+    
+    orchestrator = get_orchestrator()
+    scraped_insights = getattr(orchestrator, "blinkit_scraped_insights", {})
+    
+    result = synthesize_primary_research(scraped_insights, survey_data)
+    
+    # Write to problem statement doc
+    try:
+        # Resolve path correctly from backend dir to docs dir
+        import os
+        docs_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "Blinkit_Cross_Sell_Growth", "problem_statement.md")
+        with open(docs_path, "w", encoding="utf-8") as f:
+            f.write(result.get("problem_statement_markdown", "No content generated."))
+    except Exception as e:
+        logger.error(f"Failed to write problem statement: {e}")
+        
+    return result
 
 # ═══════════════════════════════════════════════
 

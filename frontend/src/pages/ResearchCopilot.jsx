@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Microscope, HelpCircle, CheckCircle, FileText, Play, Clock, Sparkles, AlertTriangle, Trash2 } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

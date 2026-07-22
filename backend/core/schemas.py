@@ -311,6 +311,7 @@ class FullPipelineRequest(BaseModel):
     app_store_id: Optional[str] = None
     reddit_subreddits: list[str] = Field(default_factory=list)
     reddit_search_terms: list[str] = Field(default_factory=list)
+    problem_statement: Optional[str] = None
 
 
 class DashboardOverview(BaseModel):

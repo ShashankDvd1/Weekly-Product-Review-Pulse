@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { UserCircle, ShoppingBag, Zap, Target } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

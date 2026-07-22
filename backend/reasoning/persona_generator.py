@@ -8,6 +8,8 @@ shopping habits, motivations, and barriers.
 
 import logging
 import uuid
+from typing import Optional, List
+from typing import Optional
 
 from core.llm_client import get_llm_client, count_tokens
 from core.schemas import UnifiedSignal, Persona
@@ -57,6 +59,7 @@ Always output valid JSON.
 def generate_personas(
     signals: list[UnifiedSignal],
     num_personas: int = 4,
+    problem_statement: Optional[str] = None,
 ) -> list[Persona]:
     """
     Generate user personas from consumer signals.
@@ -77,7 +80,7 @@ def generate_personas(
     llm = get_llm_client()
 
     # Prepare signal summary for the LLM (sample to respect token limits)
-    sample_size = min(len(signals), 60)
+    sample_size = min(len(signals), 120)
     sample = signals[:sample_size]
 
     signal_texts = []
@@ -92,8 +95,10 @@ def generate_personas(
 
     chunk = "\n\n".join(signal_texts)
 
-    prompt = f"""Based on these {len(sample)} consumer signals from quick commerce users, generate exactly {num_personas} distinct user personas.
+    prob_stmt_block = f"\nTARGET PROBLEM STATEMENT / STRATEGIC FOCUS:\n{problem_statement}\n" if problem_statement else ""
 
+    prompt = f"""Based on these {len(sample)} consumer signals from quick commerce users, generate exactly {num_personas} distinct user personas.
+{prob_stmt_block}
 These personas should represent DIFFERENT behavioral archetypes — users who use quick commerce apps differently.
 
 For each persona, provide:
@@ -110,7 +115,9 @@ For each persona, provide:
 - "confidence": Float 0.0-1.0
 
 IMPORTANT: Make each persona DISTINCT and BEHAVIORAL (not demographic). 
-At least one persona should be someone who DOES explore categories (to understand what drives exploration).
+- Do NOT generate generic clichés like "The Convenience Seeker" or "The Price Sensitive Shopper".
+- Instead, create hyper-specific behavioral archetypes relevant to quick-commerce category exploration (e.g. "The Non-Grocery Skeptic" who fears buying beauty/electronics because of counterfeit risk, "The Fresh-Food Loyalist" who only uses the app for daily vegetables and milk, "The Emergency-Only Purchaser", or "The Tech/Beauty Experimenter").
+- At least one persona should be someone who DOES explore categories (to understand what drives exploration).
 
 Return JSON: {{"personas": [...]}}
 

@@ -49,3 +49,10 @@ lerna-debug.log*
 backend/data/
 backend/output/*.json
 backend/output/*.csv
+
+# Google API Credentials & Secrets
+backend/credentials/
+*client_secret*.json
+*token*.json
+mcpreviewserver-*.json
+token.json

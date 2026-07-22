@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Terminal, Send, Play, CheckCircle2, AlertTriangle, Calendar, Search, Layers, RefreshCw } from 'lucide-react';
 import { getBackendUrl } from '../config';
 

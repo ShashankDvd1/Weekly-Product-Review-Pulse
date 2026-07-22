@@ -75,8 +75,63 @@ class PipelineOrchestrator:
         }
         self.mvp_case_study = None
         self.strategy_deep_dive = None
+        self.board_presentation = None
+        self.strategy_status = "idle"  # idle, running, completed, failed
+        self.strategy_logs = []
+        self.strategy_completed_steps = 0
+        self.strategy_total_steps = 17
         self._status = "idle"
         self._progress = []
+
+    def run_strategy_deep_dive_async(self):
+        """Runs the 16-step Strategy Deep Dive in a background thread with progress logging."""
+        if self.strategy_status == "running":
+            return
+        
+        self.strategy_status = "running"
+        self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive analysis pipeline initialized."]
+        self.strategy_completed_steps = 0
+        
+        def progress_cb(step_id, step_title, status, detail=""):
+            timestamp = datetime.now().strftime('%H:%M:%S')
+            if status == "start":
+                msg = f"[{timestamp}] Running {step_id.upper()}: {step_title}..."
+            elif status == "complete":
+                self.strategy_completed_steps += 1
+                msg = f"[{timestamp}] Step {step_id.upper()} completed successfully ({self.strategy_completed_steps}/16)."
+            elif status == "failed":
+                msg = f"[{timestamp}] ERROR: Step {step_id.upper()} failed. Details: {detail}"
+            self.strategy_logs.append(msg)
+            logger.info(msg)
+
+        try:
+            from reasoning.strategy_deep_dive import run_strategy_deep_dive
+            problem_stmt = getattr(self, "active_problem_statement", None)
+            result = run_strategy_deep_dive(
+                self.signals,
+                self.themes,
+                self.barriers,
+                self.personas,
+                self.opportunities,
+                problem_statement=problem_stmt,
+                progress_callback=progress_cb
+            )
+            self.strategy_deep_dive = result
+            
+            # Step 17: Board Presentation Synthesis
+            progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "start")
+            from reasoning.board_presenter import synthesize_board_presentation
+            board_deck = synthesize_board_presentation(result)
+            self.board_presentation = board_deck
+            progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "complete")
+            
+            self.strategy_status = "completed"
+            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive & CPO Presentation synthesis completed successfully.")
+        except Exception as e:
+            self.strategy_status = "failed"
+            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Critical failure in Strategy Deep Dive pipeline: {e}")
+            logger.exception("Strategy Deep Dive failed")
+
 
     @property
     def status(self) -> str:
@@ -118,7 +173,7 @@ class PipelineOrchestrator:
             from_date = "2024-01-01"
             to_date = datetime.now().strftime("%Y-%m-%d")
 
-        TARGET_GENUINE_REVIEWS = 150
+        TARGET_GENUINE_REVIEWS = 250
         MAX_RETRIES = 2
         
         current_from_date = from_date
@@ -140,7 +195,7 @@ class PipelineOrchestrator:
                 if play_store_package:
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=300)
+                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=5000)
                         if not df_play.empty:
                             df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
@@ -152,12 +207,14 @@ class PipelineOrchestrator:
                 if app_store_id:
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=4)
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=100)
                         if not df_app.empty:
                             df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
+                        else:
+                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for custom ID: {app_store_id}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_store_id}: {str(e)[:100]}")
 
@@ -173,7 +230,7 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=300)
+                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=5000)
                         if not df_play.empty:
                             df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, package)
@@ -184,12 +241,14 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=4)
+                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=100)
                         if not df_app.empty:
                             df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
+                        else:
+                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for {app_name}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_name}: {str(e)[:100]}")
 
@@ -212,16 +271,11 @@ class PipelineOrchestrator:
             
             all_signals.extend(batch_signals)
             
-            self._log_progress(f"🔄 Deduplicating {len(all_signals)} cumulative signals...")
-            from processing.deduplication import semantic_deduplicate
-            unique_signals = semantic_deduplicate(all_signals)
-            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
-            
-            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(unique_signals)} reviews...")
+            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(all_signals)} cumulative signals...")
             from reasoning.quality_filter import assess_review_quality_batch
-            assessed_signals = assess_review_quality_batch(unique_signals)
+            assessed_signals = assess_review_quality_batch(all_signals)
             
-            accepted_signals = [
+            accepted_signals_pre = [
                 s for s in assessed_signals 
                 if getattr(s, 'quality_category', QualityCategory.DISCARD) in [
                     QualityCategory.MEDIUM_SIGNAL, 
@@ -229,11 +283,15 @@ class PipelineOrchestrator:
                     QualityCategory.GOLD_INSIGHT
                 ]
             ]
+            self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals_pre)}")
             
-            self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals)}")
+            self._log_progress(f"🔄 Deduplicating {len(accepted_signals_pre)} high-signal reviews...")
+            from processing.deduplication import semantic_deduplicate
+            unique_signals = semantic_deduplicate(accepted_signals_pre)
+            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
             
-            if len(accepted_signals) >= TARGET_GENUINE_REVIEWS:
-                self.signals = accepted_signals
+            if len(unique_signals) >= TARGET_GENUINE_REVIEWS:
+                self.signals = unique_signals
                 self._log_progress(f"✅ Reached target of {TARGET_GENUINE_REVIEWS} genuine reviews. Proceeding to analysis.")
                 break
             elif attempt < MAX_RETRIES:
@@ -257,68 +315,139 @@ class PipelineOrchestrator:
         return self.signals
 
     # ── Analysis Phase ─────────────────────────
-    def analyze_all(self) -> dict:
+    def analyze_all(self, problem_statement: Optional[str] = None) -> dict:
         """
         Run the complete AI analysis pipeline on collected signals.
         """
         if not self.signals:
             return {"error": "No signals to analyze. Run collect_all() first."}
 
+        self.active_problem_statement = problem_statement
         self._status = "analyzing"
 
-        # 1. Sentiment Analysis
-        self._log_progress(f"🎭 Running sentiment analysis on {len(self.signals)} signals...")
-        self.signals = analyze_sentiment_batch(self.signals)
-        self._log_progress(f"  ✅ Sentiment analysis complete")
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
 
-        # 2. Theme Detection
-        self._log_progress(f"🔍 Detecting themes...")
-        self.themes = detect_themes(self.signals)
-        self._log_progress(f"  ✅ {len(self.themes)} themes detected")
+        lock = threading.Lock()
 
-        # 3. Category Barrier Detection
-        self._log_progress(f"🚧 Detecting category exploration barriers...")
-        self.barriers = detect_category_barriers(self.signals)
-        self._log_progress(f"  ✅ {len(self.barriers)} category barriers detected")
+        def safe_log(msg):
+            with lock:
+                self._log_progress(msg)
 
-        # 4. Persona Generation
-        self._log_progress(f"👤 Generating user personas...")
-        self.personas = generate_personas(self.signals)
-        self._log_progress(f"  ✅ {len(self.personas)} personas generated")
+        # Phase 1: Concurrently run independent analyses
+        safe_log("🎭 Running parallel ingestion analysis stages...")
 
-        # 5. JTBD Analysis
-        self._log_progress(f"🎯 Extracting Jobs-To-Be-Done...")
-        self.jobs = analyze_jtbd(self.signals)
-        self._log_progress(f"  ✅ {len(self.jobs)} jobs extracted")
+        def run_sentiment():
+            safe_log("🎭 Running sentiment analysis...")
+            try:
+                self.signals = analyze_sentiment_batch(self.signals)
+                safe_log("  ✅ Sentiment analysis complete")
+            except Exception as e:
+                logger.error(f"Sentiment analysis failed: {e}")
+                safe_log(f"  ❌ Sentiment analysis failed: {e}")
 
-        # 6. Opportunity Mining
-        self._log_progress(f"💡 Identifying growth opportunities...")
-        self.opportunities = identify_opportunities(
-            self.themes, self.barriers, self.personas, self.jobs, self.signals
-        )
-        self._log_progress(f"  ✅ {len(self.opportunities)} opportunities identified")
+        def run_themes():
+            safe_log("🔍 Detecting themes...")
+            try:
+                self.themes = detect_themes(self.signals, context=problem_statement if problem_statement else "quick commerce category exploration behavior")
+                safe_log(f"  ✅ {len(self.themes)} themes detected")
+            except Exception as e:
+                logger.error(f"Theme detection failed: {e}")
+                safe_log(f"  ❌ Theme detection failed: {e}")
 
-        # 7. Research Copilot
-        self._log_progress(f"🔬 Generating research hypotheses...")
-        self.hypotheses = generate_hypotheses(self.barriers, self.opportunities, self.themes)
-        self._log_progress(f"  ✅ {len(self.hypotheses)} hypotheses generated")
+        def run_barriers():
+            safe_log("🚧 Detecting category exploration barriers...")
+            try:
+                self.barriers = detect_category_barriers(self.signals, problem_statement=problem_statement)
+                safe_log(f"  ✅ {len(self.barriers)} category barriers detected")
+            except Exception as e:
+                logger.error(f"Category barrier detection failed: {e}")
+                safe_log(f"  ❌ Category barrier detection failed: {e}")
 
-        self._log_progress(f"📋 Generating interview questions...")
-        self.interview_script = generate_interview_questions(
-            self.personas, self.barriers, self.hypotheses
-        )
-        self._log_progress(f"  ✅ {len(self.interview_script.optimized_script) if self.interview_script else 0} optimized questions generated")
+        def run_personas():
+            safe_log("👤 Generating user personas...")
+            try:
+                self.personas = generate_personas(self.signals, problem_statement=problem_statement)
+                safe_log(f"  ✅ {len(self.personas)} personas generated")
+            except Exception as e:
+                logger.error(f"Persona generation failed: {e}")
+                safe_log(f"  ❌ Persona generation failed: {e}")
 
-        # 8. Executive Summary
-        self._log_progress(f"📊 Generating executive summary...")
-        self.executive_summary = generate_executive_summary(
-            self.signals, self.themes, self.barriers,
-            self.personas, self.jobs, self.opportunities,
-        )
-        self._log_progress(f"  ✅ Executive summary generated")
+        def run_jtbd():
+            safe_log("🎯 Extracting Jobs-To-Be-Done...")
+            try:
+                self.jobs = analyze_jtbd(self.signals, problem_statement=problem_statement)
+                safe_log(f"  ✅ {len(self.jobs)} jobs extracted")
+            except Exception as e:
+                logger.error(f"JTBD analysis failed: {e}")
+                safe_log(f"  ❌ JTBD analysis failed: {e}")
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [
+                executor.submit(run_sentiment),
+                executor.submit(run_themes),
+                executor.submit(run_barriers),
+                executor.submit(run_personas),
+                executor.submit(run_jtbd)
+            ]
+            for f in futures:
+                f.result()
+
+        # Phase 2: Opportunity Mining (depends on themes, barriers, personas, jobs)
+        safe_log("💡 Identifying growth opportunities...")
+        try:
+            self.opportunities = identify_opportunities(
+                self.themes, self.barriers, self.personas, self.jobs, self.signals, problem_statement=problem_statement
+            )
+            safe_log(f"  ✅ {len(self.opportunities)} opportunities identified")
+        except Exception as e:
+            logger.error(f"Opportunity mining failed: {e}")
+            safe_log(f"  ❌ Opportunity mining failed: {e}")
+            self.opportunities = []
+
+        # Phase 3: Parallel reporting and hypotheses creation
+        def run_hypotheses_and_interview():
+            safe_log("🔬 Generating research hypotheses...")
+            try:
+                self.hypotheses = generate_hypotheses(self.barriers, self.opportunities, self.themes)
+                safe_log(f"  ✅ {len(self.hypotheses)} hypotheses generated")
+            except Exception as e:
+                logger.error(f"Hypotheses generation failed: {e}")
+                safe_log(f"  ❌ Hypotheses generation failed: {e}")
+                self.hypotheses = []
+
+            safe_log("📋 Generating interview questions...")
+            try:
+                self.interview_script = generate_interview_questions(
+                    self.personas, self.barriers, self.hypotheses
+                )
+                safe_log(f"  ✅ {len(self.interview_script.optimized_script) if self.interview_script else 0} optimized questions generated")
+            except Exception as e:
+                logger.error(f"Interview script generation failed: {e}")
+                safe_log(f"  ❌ Interview script generation failed: {e}")
+
+        def run_summary():
+            safe_log("📊 Generating executive summary...")
+            try:
+                self.executive_summary = generate_executive_summary(
+                    self.signals, self.themes, self.barriers,
+                    self.personas, self.jobs, self.opportunities,
+                )
+                safe_log("  ✅ Executive summary generated")
+            except Exception as e:
+                logger.error(f"Executive summary generation failed: {e}")
+                safe_log(f"  ❌ Executive summary generation failed: {e}")
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(run_hypotheses_and_interview),
+                executor.submit(run_summary)
+            ]
+            for f in futures:
+                f.result()
 
         self._status = "complete"
-        self._log_progress(f"🎉 Analysis pipeline complete!")
+        safe_log("🎉 Analysis pipeline complete!")
 
         return self.get_full_results()
 
@@ -355,7 +484,7 @@ class PipelineOrchestrator:
                 return {"status": "error", "message": "No data collected from any source"}
 
             # Analyze
-            results = self.analyze_all()
+            results = self.analyze_all(problem_statement=request.problem_statement)
             self._status = "complete"
 
             return results

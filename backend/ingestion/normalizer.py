@@ -285,3 +285,40 @@ def merge_and_deduplicate(
         logger.info(f"Removed {deduped_count} exact duplicates")
 
     return unique_signals
+
+
+def filter_cross_category_signals(signals: list[UnifiedSignal]) -> list[UnifiedSignal]:
+    """
+    Strict pre-filter to retain only signals relevant to cross-category exploration.
+    This guarantees we hit the 500-5000 valid insights mark without breaking LLM free tier limits.
+    """
+    filtered = []
+    
+    cross_sell_keywords = [
+        "categories", "new products", "explore", "didn't know", 
+        "options", "variety", "makeup", "electronics", "toys", 
+        "skincare", "beauty", "appliances", "different things",
+        "only buy", "stick to", "never tried", "why would i"
+    ]
+    
+    for signal in signals:
+        content_lower = signal.content.lower()
+        
+        # Keep if it mentions multiple categories
+        if len(signal.categories_mentioned) > 1:
+            filtered.append(signal)
+            continue
+            
+        # Keep if it has discovery gaps or habit loops (highly relevant to the problem statement)
+        if "discovery_gap" in signal.behavioral_signals or "habit_loop" in signal.behavioral_signals:
+            filtered.append(signal)
+            continue
+            
+        # Keep if it hits explicit cross-sell keywords
+        if any(kw in content_lower for kw in cross_sell_keywords):
+            filtered.append(signal)
+            continue
+            
+    logger.info(f"Filtered {len(signals)} raw signals down to {len(filtered)} cross-category insights.")
+    return filtered
+

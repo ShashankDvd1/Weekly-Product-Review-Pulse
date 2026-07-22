@@ -8,6 +8,8 @@ Maps user needs into the JTBD framework:
 
 import logging
 import uuid
+from typing import Optional, List
+from typing import Optional
 
 from core.llm_client import get_llm_client
 from core.schemas import UnifiedSignal, JTBD, JTBDCategory
@@ -60,6 +62,7 @@ Always output valid JSON.
 def analyze_jtbd(
     signals: list[UnifiedSignal],
     num_jobs: int = 8,
+    problem_statement: Optional[str] = None,
 ) -> list[JTBD]:
     """
     Extract Jobs-To-Be-Done from consumer signals.
@@ -72,7 +75,7 @@ def analyze_jtbd(
     llm = get_llm_client()
 
     # Sample and prepare signals
-    sample_size = min(len(signals), 60)
+    sample_size = min(len(signals), 120)
     sample = signals[:sample_size]
 
     signal_texts = []

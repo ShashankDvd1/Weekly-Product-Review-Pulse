@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Link, Search } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
