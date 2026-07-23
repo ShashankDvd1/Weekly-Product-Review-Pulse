@@ -541,10 +541,47 @@ def export_strategy_deep_dive_markdown():
         raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
         
     try:
+        def dict_to_markdown(data, depth=0) -> str:
+            if isinstance(data, dict):
+                lines = []
+                for k, v in data.items():
+                    title = k.replace("_", " ").title()
+                    if isinstance(v, (dict, list)):
+                        lines.append(f"{'  ' * depth}- **{title}**:")
+                        lines.append(dict_to_markdown(v, depth + 1))
+                    else:
+                        lines.append(f"{'  ' * depth}- **{title}**: {v}")
+                return "\n".join(lines)
+            elif isinstance(data, list):
+                lines = []
+                for item in data:
+                    if isinstance(item, (dict, list)):
+                        lines.append(dict_to_markdown(item, depth))
+                    else:
+                        lines.append(f"{'  ' * depth}- {item}")
+                return "\n".join(lines)
+            else:
+                return f"{'  ' * depth}{data}"
+
         md_content = f"# Strategy Deep Dive Report\\n\\n"
-        for step in orchestrator.strategy_deep_dive:
-            md_content += f"## {step.get('title', 'Untitled Step')}\\n\\n"
-            md_content += f"{step.get('content', '')}\\n\\n"
+        steps_dict = orchestrator.strategy_deep_dive.get("steps", {})
+        
+        # Sort keys numerically (step_1, step_2, ..., step_16)
+        sorted_keys = sorted(
+            steps_dict.keys(), 
+            key=lambda x: int(x.split("_")[1]) if "_" in x and x.split("_")[1].isdigit() else 99
+        )
+        
+        for step_id in sorted_keys:
+            step_data = steps_dict[step_id]
+            md_content += f"## {step_data.get('title', 'Untitled Step')}\\n\\n"
+            
+            raw_data = step_data.get("data", {})
+            if isinstance(raw_data, dict) and "error" in raw_data:
+                md_content += f"⚠️ *Step failed to execute: {raw_data['error']}*\\n\\n"
+            else:
+                md_content += dict_to_markdown(raw_data) + "\\n\\n"
+                
             md_content += "---\\n\\n"
             
         return {

@@ -510,15 +510,14 @@ const StrategyHub = () => {
             {exportSlidesLoading ? 'Generating Slides...' : 'Export to Google Slides'}
           </button>
           <button 
-            onClick={handleExportSource}
+            className="btn-secondary" 
+            onClick={handleExportSource} 
             disabled={exportSourceLoading}
-            className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-medium transition-colors"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}
           >
-            <Download className="w-4 h-4" />
-            <span>
+            {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
             {exportSourceLoading ? 'Generating...' : 'Download Report (MD)'}
-            </span>
-          </button> 
+          </button>
           <button 
             className="btn-primary" 
             onClick={handleGenerateForm} 
