@@ -157,15 +157,15 @@ const StrategyDeepDive = () => {
   const handleExportSource = async () => {
     try {
       setExportSourceLoading(true);
-      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-source`);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-markdown`);
       const resData = await res.json();
       if (res.ok) {
-        const jsonStr = JSON.stringify(resData.source_json, null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json" });
+        const mdContent = resData.markdown_content;
+        const blob = new Blob([mdContent], { type: "text/markdown" });
         const href = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = href;
-        link.download = "executive_presentation_source.json";
+        link.download = "strategy_deep_dive_report.md";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -301,7 +301,7 @@ const StrategyDeepDive = () => {
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}
             >
               {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
-              {exportSourceLoading ? 'Generating...' : 'Download Source (JSON)'}
+              {exportSourceLoading ? 'Generating...' : 'Download Report (MD)'}
             </button>
           </div>
         )}

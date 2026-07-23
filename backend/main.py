@@ -534,6 +534,28 @@ def export_strategy_deep_dive_source():
         logger.exception("Failed to export Strategy Deep Dive source")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/v2/reports/strategy-deep-dive/export-markdown")
+def export_strategy_deep_dive_markdown():
+    """Returns the full 16-step Strategy Deep Dive as a Markdown document."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+        
+    try:
+        md_content = f"# Strategy Deep Dive Report\\n\\n"
+        for step in orchestrator.strategy_deep_dive:
+            md_content += f"## {step.get('title', 'Untitled Step')}\\n\\n"
+            md_content += f"{step.get('content', '')}\\n\\n"
+            md_content += "---\\n\\n"
+            
+        return {
+            "status": "success",
+            "markdown_content": md_content
+        }
+    except Exception as e:
+        logger.exception("Failed to export Strategy Deep Dive to Markdown")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/v2/review-board/viva/start")
 def start_viva_defense(req: VivaStartRequest):
