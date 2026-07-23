@@ -434,6 +434,34 @@ def get_strategy_deep_dive(background_tasks: BackgroundTasks):
     }
 
 
+@app.post("/api/v2/reports/strategy-deep-dive/run")
+def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
+    """Forces a fresh run of the Strategy Deep Dive by bypassing/deleting cache."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals:
+        raise HTTPException(status_code=400, detail="No signals available. Run the ingestion pipeline first.")
+    
+    # Reset status and delete cache file if exists
+    import os
+    cache_path = os.path.join("data", "strategy_cache.json")
+    if os.path.exists(cache_path):
+        try:
+            os.remove(cache_path)
+            logger.info("Deleted strategy cache file to force fresh run.")
+        except Exception as e:
+            logger.error(f"Failed to delete strategy cache file: {e}")
+            
+    orchestrator.strategy_status = "idle"
+    orchestrator.strategy_deep_dive = None
+    orchestrator.board_presentation = None
+    orchestrator.strategy_completed_steps = 0
+    orchestrator.strategy_logs = []
+    
+    background_tasks.add_task(orchestrator.run_strategy_deep_dive_async)
+    return {"status": "running"}
+
+
+
 @app.post("/api/v2/reports/strategy-deep-dive/export-doc")
 def export_strategy_deep_dive_doc_endpoint():
     """Export the 16-step Strategy Deep Dive into a Google Doc saved in the target Drive folder."""
@@ -477,6 +505,27 @@ def export_strategy_deep_dive_slides_endpoint():
         logger.exception("Failed to export Strategy Deep Dive to Google Slides")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/v2/reports/strategy-deep-dive/export-source")
+def export_strategy_deep_dive_source():
+    """Returns the board presentation raw JSON for design engines."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+        
+    try:
+        board_deck = orchestrator.board_presentation
+        if not board_deck:
+            from reasoning.board_presenter import synthesize_board_presentation
+            board_deck = synthesize_board_presentation(orchestrator.strategy_deep_dive)
+            orchestrator.board_presentation = board_deck
+            
+        return {
+            "status": "success",
+            "source_json": board_deck
+        }
+    except Exception as e:
+        logger.exception("Failed to export Strategy Deep Dive source")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/v2/review-board/viva/start")

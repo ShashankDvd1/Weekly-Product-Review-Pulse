@@ -18,7 +18,8 @@ import {
   Shield,
   Database,
   Upload,
-  Play
+  Play,
+  Download
 } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
@@ -132,6 +133,8 @@ const StrategyHub = () => {
   const [exportSlidesLoading, setExportSlidesLoading] = useState(false);
   const [exportSlidesUrl, setExportSlidesUrl] = useState(null);
 
+  const [exportSourceLoading, setExportSourceLoading] = useState(false);
+
   const [logs, setLogs] = useState([]);
   const [completedSteps, setCompletedSteps] = useState(0);
   const [totalSteps, setTotalSteps] = useState(17);
@@ -191,6 +194,32 @@ const StrategyHub = () => {
       alert("Error exporting presentation: " + err.message);
     } finally {
       setExportSlidesLoading(false);
+    }
+  };
+
+  const handleExportSource = async () => {
+    try {
+      setExportSourceLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-source`);
+      const resData = await res.json();
+      if (res.ok) {
+        const jsonStr = JSON.stringify(resData.source_json, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const href = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = href;
+        link.download = "executive_presentation_source.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+      } else {
+        alert(resData.detail || "Could not export presentation source.");
+      }
+    } catch (err) {
+      alert("Error exporting presentation source: " + err.message);
+    } finally {
+      setExportSourceLoading(false);
     }
   };
 
@@ -290,6 +319,33 @@ const StrategyHub = () => {
       setLoading(false);
     }
   };
+  const handleForceRun = async () => {
+    if (!window.confirm("Are you sure you want to delete the cached strategy report and execute a fresh Strategy Deep Dive? This will take 5-8 minutes.")) {
+      return;
+    }
+    setLoading(true);
+    setTriggered(true);
+    setLogs(["[SYSTEM] Deleting cache and requesting fresh Strategy Deep Dive run in background..."]);
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/run`, {
+        method: 'POST'
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setCompletedSteps(0);
+        setData(null);
+        setBoardPresentation(null);
+        startPolling();
+      } else {
+        alert(result.detail || 'Failed to start fresh run');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Force run strategy deep dive failed:', err);
+      setLoading(false);
+    }
+  };
+
 
   const handleNextSlide = () => {
     if (boardPresentation && currentSlideIndex < boardPresentation.slides.length - 1) {
@@ -391,32 +447,44 @@ const StrategyHub = () => {
           <p className="page-subtitle">Formulate, reason, and trace product strategy frameworks and CPO board presentations.</p>
         </div>
 
-        {/* Tab switcher */}
-        <div className="glass-panel" style={{ display: 'flex', padding: '0.25rem', borderRadius: '8px', gap: '0.25rem' }}>
-          <button 
-            onClick={() => setActiveTab('steps')}
-            style={{
-              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
-              background: activeTab === 'steps' ? 'var(--accent-primary)' : 'transparent',
-              color: activeTab === 'steps' ? '#fff' : 'var(--text-secondary)',
-              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease'
-            }}
-          >
-            16-Step Analysis
-          </button>
-          <button 
-            onClick={() => setActiveTab('slides')}
-            style={{
-              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
-              background: activeTab === 'slides' ? 'var(--accent-primary)' : 'transparent',
-              color: activeTab === 'slides' ? '#fff' : 'var(--text-secondary)',
-              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
-              opacity: boardPresentation ? 1 : 0.5
-            }}
-            disabled={!boardPresentation}
-          >
-            Board Presentation (10 Slides)
-          </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {triggered && !loading && (
+            <button 
+              className="btn-secondary" 
+              onClick={handleForceRun}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#f59e0b', borderColor: '#f59e0b', padding: '0.5rem 1.1rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.05)' }}
+            >
+              <Play size={14} /> Re-run Deep Dive
+            </button>
+          )}
+
+          {/* Tab switcher */}
+          <div className="glass-panel" style={{ display: 'flex', padding: '0.25rem', borderRadius: '8px', gap: '0.25rem' }}>
+            <button 
+              onClick={() => setActiveTab('steps')}
+              style={{
+                padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+                background: activeTab === 'steps' ? 'var(--accent-primary)' : 'transparent',
+                color: activeTab === 'steps' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease'
+              }}
+            >
+              16-Step Analysis
+            </button>
+            <button 
+              onClick={() => setActiveTab('slides')}
+              style={{
+                padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+                background: activeTab === 'slides' ? 'var(--accent-primary)' : 'transparent',
+                color: activeTab === 'slides' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
+                opacity: boardPresentation ? 1 : 0.5
+              }}
+              disabled={!boardPresentation}
+            >
+              Board Presentation (10 Slides)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -440,6 +508,15 @@ const StrategyHub = () => {
           >
             {exportSlidesLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={18} />}
             {exportSlidesLoading ? 'Generating Slides...' : 'Export to Google Slides'}
+          </button>
+          <button 
+            className="btn-secondary" 
+            onClick={handleExportSource} 
+            disabled={exportSourceLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}
+          >
+            {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
+            {exportSourceLoading ? 'Generating...' : 'Download Source (JSON)'}
           </button>
           <button 
             className="btn-primary" 

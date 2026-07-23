@@ -168,20 +168,20 @@ Return a JSON object in this format:
 def trim_step_data(data):
     if isinstance(data, dict):
         trimmed = {}
-        for k, v in data.items():
+        for k, v in list(data.items())[:5]:  # Keep max 5 keys at any level
             if isinstance(v, list):
-                trimmed[k] = [trim_step_data(item) for item in v[:4]]
+                trimmed[k] = [trim_step_data(item) for item in v[:2]]
             elif isinstance(v, str):
-                trimmed[k] = v[:400] + "..." if len(v) > 400 else v
+                trimmed[k] = v[:120] + "..." if len(v) > 120 else v
             elif isinstance(v, dict):
                 trimmed[k] = trim_step_data(v)
             else:
                 trimmed[k] = v
         return trimmed
     elif isinstance(data, list):
-        return [trim_step_data(item) for item in data[:4]]
+        return [trim_step_data(item) for item in data[:2]]
     elif isinstance(data, str):
-        return data[:400] + "..." if len(data) > 400 else data
+        return data[:120] + "..." if len(data) > 120 else data
     return data
 
 def synthesize_board_presentation(strategy_data: dict) -> dict:

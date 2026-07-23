@@ -96,9 +96,26 @@ class PipelineOrchestrator:
                     self.strategy_deep_dive = cache_data.get("strategy_deep_dive")
                     self.board_presentation = cache_data.get("board_presentation")
                     self.active_problem_statement = cache_data.get("active_problem_statement")
-                    self.strategy_status = "completed"
-                    self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Loaded strategy deep dive from local cache file."]
-                    logger.info("Loaded strategy deep dive from local cache file.")
+                    
+                    if self.strategy_deep_dive:
+                        if not self.board_presentation:
+                            logger.info("Cache has deep dive but lacks board presentation. Synthesizing now...")
+                            from reasoning.board_presenter import synthesize_board_presentation
+                            self.board_presentation = synthesize_board_presentation(self.strategy_deep_dive)
+                            # Save back to cache
+                            try:
+                                with open(cache_path, "w", encoding="utf-8") as f_out:
+                                    json.dump({
+                                        "strategy_deep_dive": self.strategy_deep_dive,
+                                        "board_presentation": self.board_presentation,
+                                        "active_problem_statement": self.active_problem_statement
+                                    }, f_out, indent=2)
+                            except Exception as write_err:
+                                logger.error(f"Failed to write updated cache: {write_err}")
+                        
+                        self.strategy_status = "completed"
+                        self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Loaded strategy deep dive and presentation from local cache file."]
+                        logger.info("Loaded strategy deep dive and presentation from local cache file.")
         except Exception as ce:
             logger.error(f"Failed to load strategy cache: {ce}")
 

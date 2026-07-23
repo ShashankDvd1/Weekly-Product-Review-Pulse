@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Brain, ChevronDown, ChevronRight, Loader2, AlertTriangle, Target, Users, Lightbulb, Presentation, CheckCircle2, FileText, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Brain, ChevronDown, ChevronRight, Loader2, AlertTriangle, Target, Users, Lightbulb, Presentation, CheckCircle2, FileText, ArrowLeft, ArrowRight, Download } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
 const PHASE_META = {
@@ -110,6 +110,8 @@ const StrategyDeepDive = () => {
   const [exportSlidesLoading, setExportSlidesLoading] = useState(false);
   const [exportSlidesUrl, setExportSlidesUrl] = useState(null);
 
+  const [exportSourceLoading, setExportSourceLoading] = useState(false);
+
   const [logs, setLogs] = useState([]);
   const [completedSteps, setCompletedSteps] = useState(0);
   const [totalSteps, setTotalSteps] = useState(17);
@@ -149,6 +151,32 @@ const StrategyDeepDive = () => {
       alert("Error exporting presentation: " + err.message);
     } finally {
       setExportSlidesLoading(false);
+    }
+  };
+
+  const handleExportSource = async () => {
+    try {
+      setExportSourceLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-source`);
+      const resData = await res.json();
+      if (res.ok) {
+        const jsonStr = JSON.stringify(resData.source_json, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const href = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = href;
+        link.download = "executive_presentation_source.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+      } else {
+        alert(resData.detail || "Could not export presentation source.");
+      }
+    } catch (err) {
+      alert("Error exporting presentation source: " + err.message);
+    } finally {
+      setExportSourceLoading(false);
     }
   };
 
@@ -265,6 +293,15 @@ const StrategyDeepDive = () => {
             >
               {exportSlidesLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={18} />}
               {exportSlidesLoading ? 'Generating Slides...' : 'Export to Google Slides'}
+            </button>
+            <button 
+              className="btn-secondary" 
+              onClick={handleExportSource} 
+              disabled={exportSourceLoading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}
+            >
+              {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
+              {exportSourceLoading ? 'Generating...' : 'Download Source (JSON)'}
             </button>
           </div>
         )}
