@@ -23,7 +23,7 @@ LLM_TEMPERATURE_ANALYTICAL = 0.2                # Low creativity for analysis
 LLM_TEMPERATURE_CREATIVE = 0.4                  # Moderate creativity for personas/JTBD
 
 # Groq free tier rate limits
-GROQ_MAX_TPM = 6000   # Tokens per minute
+GROQ_MAX_TPM = 40000   # Tokens per minute
 GROQ_MAX_RPM = 30     # Requests per minute
 GROQ_RPM_DELAY = 60.0 / GROQ_MAX_RPM
 

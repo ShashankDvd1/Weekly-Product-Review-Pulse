@@ -106,7 +106,7 @@ const Dashboard = () => {
   };
 
   const [problemStatement, setProblemStatement] = useState(
-    "Users stick to repetitive buying habits and rarely explore new categories like electronics, toys, or beauty."
+    "You are a Product Manager on the Growth Team at your chosen company. Quick commerce platforms have successfully become a part of users' weekly routines. Many users place recurring orders for Groceries, snacks & beverages and household essentials. Over time, however, shopping behavior becomes highly repetitive. Users often purchase the same set of products repeatedly and rarely explore new categories available on the platform. One of the company's strategic goals is to: Increase the percentage of Monthly Active Customers who purchase products from at least one new category every month. Examples: A user who buys groceries starts buying pet supplies; a user who buys snacks starts buying personal care products; a user who buys household essentials starts buying baby products."
   );
 
   const handleParsePrompt = async (e) => {
