@@ -108,15 +108,22 @@ class LLMClient:
             except Exception as e:
                 err_str = str(e)
                 if "429" in err_str:
-                    if "tpd" in err_str.lower() or "tokens per day" in err_str.lower():
-                        logger.error(f"Groq Daily Token Limit (TPD) Exceeded: {err_str}")
-                        raise RuntimeError(f"Groq Daily Token Limit Exceeded. You have run out of API tokens for today: {err_str}")
-                    
-                    if attempt == retries - 1:
-                        logger.error(f"Rate limited on final attempt {attempt + 1}: {err_str}")
-                        raise
-                    wait_time = (attempt + 1) * 15  # 15s, 30s, 45s, 60s
-                    logger.warning(f"Rate limited (attempt {attempt + 1}/{retries}), waiting {wait_time}s...")
+                    import re
+                    # Parse try again duration from Groq rate limit message
+                    match = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", err_str.lower())
+                    wait_time = 0
+                    if match:
+                        minutes = int(match.group(1)) if match.group(1) else 0
+                        seconds = float(match.group(2))
+                        wait_time = int(minutes * 60 + seconds) + 3  # Add 3s buffer
+                    else:
+                        wait_time = (attempt + 1) * 30  # Default backoff
+                        
+                    if wait_time > 300:
+                        logger.error(f"Groq rate limit wait time too long ({wait_time}s): {err_str}")
+                        raise RuntimeError(f"Groq Daily Token Limit Exceeded (Wait time > 5m: {wait_time}s): {err_str}")
+                        
+                    logger.warning(f"Groq Rate Limit (429) hit. Waiting {wait_time}s before retry (attempt {attempt + 1}/{retries})...")
                     time.sleep(wait_time)
                 elif "connection" in err_str.lower() or "getaddrinfo" in err_str.lower() or "connecterror" in err_str.lower():
                     if attempt == retries - 1:
