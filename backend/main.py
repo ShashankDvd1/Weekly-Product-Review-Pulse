@@ -472,7 +472,7 @@ def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
 def export_strategy_deep_dive_doc_endpoint():
     """Export the 16-step Strategy Deep Dive into a Google Doc saved in the target Drive folder."""
     orchestrator = get_orchestrator()
-    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+    if not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
 
     try:
@@ -491,7 +491,7 @@ def export_strategy_deep_dive_doc_endpoint():
 def export_strategy_deep_dive_slides_endpoint():
     """Export the Strategy Deep Dive into a Google Slides presentation saved in the target Drive folder."""
     orchestrator = get_orchestrator()
-    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+    if not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
 
     try:
@@ -515,7 +515,7 @@ def export_strategy_deep_dive_slides_endpoint():
 def export_strategy_deep_dive_source():
     """Returns the board presentation raw JSON for design engines."""
     orchestrator = get_orchestrator()
-    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+    if not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
         
     try:
@@ -537,7 +537,7 @@ def export_strategy_deep_dive_source():
 def export_strategy_deep_dive_markdown():
     """Returns the full 16-step Strategy Deep Dive as a Markdown document."""
     orchestrator = get_orchestrator()
-    if not orchestrator.signals or not orchestrator.strategy_deep_dive:
+    if not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
         
     try:
