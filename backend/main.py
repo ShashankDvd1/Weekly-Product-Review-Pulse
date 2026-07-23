@@ -8,7 +8,7 @@ Preserves all original /api/* endpoints for backward compatibility.
 """
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -17,6 +17,8 @@ import logging
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import csv
+import io
 
 # Load environment variables from .env file
 load_dotenv()
@@ -440,6 +442,37 @@ def get_strategy_deep_dive(background_tasks: BackgroundTasks):
     }
 
 
+@app.get("/api/v2/reports/mvp-workspace")
+def get_mvp_workspace():
+    """Generates or returns the MVP Workspace PRD document based on Deep Dive results."""
+    orchestrator = get_orchestrator()
+    if orchestrator.strategy_status != "completed" or not orchestrator.strategy_deep_dive:
+        return {"error": "Strategy Deep Dive must be completed first."}
+        
+    # Check if we already generated it
+    if hasattr(orchestrator, "mvp_workspace_prd") and orchestrator.mvp_workspace_prd:
+        return orchestrator.mvp_workspace_prd
+        
+    from reasoning.mvp_workspace_generator import generate_mvp_workspace
+    prd = generate_mvp_workspace(orchestrator.strategy_deep_dive)
+    orchestrator.mvp_workspace_prd = prd
+    
+    # Save cache
+    import json, os
+    try:
+        cache_path = os.path.join("data", "strategy_cache.json")
+        if os.path.exists(cache_path):
+            with open(cache_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            data["mvp_workspace_prd"] = prd
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+    except Exception as e:
+        logger.error(f"Failed to save MVP Workspace to cache: {e}")
+        
+    return prd
+
+
 @app.post("/api/v2/reports/strategy-deep-dive/run")
 def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
     """Forces a fresh run of the Strategy Deep Dive by bypassing/deleting cache."""
@@ -466,6 +499,30 @@ def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
     background_tasks.add_task(orchestrator.run_strategy_deep_dive_async)
     return {"status": "running"}
 
+
+
+@app.post("/api/v2/surveys/upload")
+async def upload_survey_data(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    """Uploads survey CSV, analyzes it against Phase 1 insights, and resumes Phase 2."""
+    orchestrator = get_orchestrator()
+    if orchestrator.strategy_status != "awaiting_survey" or not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Phase 1 must be completed before uploading a survey.")
+
+    content = await file.read()
+    decoded = content.decode('utf-8', errors='replace')
+    csv_reader = csv.DictReader(io.StringIO(decoded))
+    survey_data = [row for row in csv_reader]
+
+    from reasoning.survey_analyzer import analyze_survey_data
+    validation_results = analyze_survey_data(survey_data, orchestrator.strategy_deep_dive.get("steps", {}))
+    
+    # Store validation results in deep dive
+    orchestrator.strategy_deep_dive["survey_validation"] = validation_results
+    orchestrator.strategy_status = "running"
+    
+    # Start Phase 2
+    background_tasks.add_task(orchestrator.run_strategy_deep_dive_async, 2)
+    return {"status": "success", "message": "Survey analyzed. Phase 2 started."}
 
 
 @app.post("/api/v2/reports/strategy-deep-dive/export-doc")

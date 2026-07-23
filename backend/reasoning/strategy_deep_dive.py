@@ -261,15 +261,14 @@ def _summarize_step_data(step_id: str, data: any) -> str:
     return "\n".join(summary_parts)[:350]
 
 
-def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None, existing_steps = None, on_step_complete = None) -> dict:
+def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None, existing_steps = None, on_step_complete = None, target_phase = "all", survey_context = None) -> dict:
     """
     Execute the full 16-step strategy deep dive analysis in structured dependency batches
     to ensure logical reasoning flow while parallelizing independent tasks for maximum speed.
+    Supports running only Phase 1 (Discovery) or Phase 2 (Solutioning).
     """
     llm = get_llm_client()
     results = {}
-    completed = 0
-    total = len(STEP_CONFIGS)
     lock = threading.Lock()
 
     # Pre-populate results with already completed steps from cache
@@ -278,23 +277,30 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
             if s_val.get("status") == "complete":
                 results[s_id] = s_val
 
-    # Define sequential dependency batches:
-    # Batch 1: Problem Restatement (MECE foundation)
-    # Batch 2: Challenge Assumptions (First-Principles) & 5 Whys (Ishikawa Causal Root)
-    # Batch 3: Issue Tree (MECE Tree built off causal root)
-    # Batch 4: Multi-perspective research (Fogg B=MAP, JTBD, Journey, Competitors, White Space, Metrics, AI Opportunity)
-    # Batch 5: Causal Matrix synthesis & RICE Solution Options
-    # Batch 6: Second-Order Futures Wheel & Hamilton Helmer 7 Powers Moat Assessment
-    # Batch 7: Minto Pyramid SCQA Executive Takeaways
-    batches = [
+    # Define sequential dependency batches
+    batches_phase_1 = [
         ["step_1"],
         ["step_2", "step_3"],
         ["step_4"],
         ["step_5", "step_6", "step_7", "step_9", "step_10", "step_12", "step_13"],
-        ["step_8", "step_14"],
-        ["step_11", "step_15"],
+        ["step_8", "step_11"]
+    ]
+    batches_phase_2 = [
+        ["step_14"],
+        ["step_15"],
         ["step_16"]
     ]
+
+    if target_phase == 1:
+        batches = batches_phase_1
+    elif target_phase == 2:
+        batches = batches_phase_2
+    else:
+        batches = batches_phase_1 + batches_phase_2
+
+    target_step_ids = [step for batch in batches for step in batch]
+    total = len(target_step_ids)
+    completed = 0
 
     def process_step(step_cfg):
         nonlocal completed
@@ -335,6 +341,10 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
         full_context = base_context
         if completed_context_parts:
             full_context += "\n\n## COMPLETED STEPS HISTORY (Logical Causal Flow)\n" + "\n\n".join(completed_context_parts)
+            
+        if survey_context:
+            full_context += f"\n\n## VALIDATED SURVEY CONTEXT (From User Interviews)\n{json.dumps(survey_context, indent=2)}\nUse this validated context to inform your solutions."
+
 
         full_prompt = f"""{full_context}
 

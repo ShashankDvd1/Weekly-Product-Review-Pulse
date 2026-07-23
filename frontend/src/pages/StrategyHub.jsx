@@ -233,10 +233,12 @@ const StrategyHub = () => {
         if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
         if (result.total_steps !== undefined) setTotalSteps(result.total_steps);
 
-        if (result.status === 'completed') {
+        if (result.status === 'completed' || result.status === 'awaiting_survey') {
           clearInterval(interval);
           setData(result.result);
-          setBoardPresentation(result.board_presentation);
+          if (result.board_presentation) {
+            setBoardPresentation(result.board_presentation);
+          }
           setLoading(false);
         } else if (result.status === 'failed') {
           clearInterval(interval);
@@ -262,9 +264,11 @@ const StrategyHub = () => {
         if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
         if (result.total_steps !== undefined) setTotalSteps(result.total_steps);
 
-        if (result.status === 'completed') {
+        if (result.status === 'completed' || result.status === 'awaiting_survey') {
           setData(result.result);
-          setBoardPresentation(result.board_presentation);
+          if (result.board_presentation) {
+            setBoardPresentation(result.board_presentation);
+          }
           setTriggered(true);
         } else if (result.status === 'running') {
           setTriggered(true);
@@ -384,13 +388,15 @@ const StrategyHub = () => {
     formData.append('file', file);
 
     try {
-      const res = await fetch(`${getBackendUrl()}/api/v2/blinkit/upload-survey`, {
+      const res = await fetch(`${getBackendUrl()}/api/v2/surveys/upload`, {
         method: 'POST',
         body: formData
       });
       const data = await res.json();
       if (res.ok) {
         setSurveyResult(data);
+        alert("Survey analyzed! Resuming Strategy Deep Dive Phase 2.");
+        startPolling();
       } else {
         alert(data.detail || 'Failed to upload');
       }
@@ -491,33 +497,6 @@ const StrategyHub = () => {
       {/* Export Action Bar (Visible if strategy completed and steps/slides tab is open) */}
       {data && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem' }}>
-          <button 
-            className="btn-primary" 
-            onClick={handleExportDoc} 
-            disabled={exportLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            {exportLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <FileText size={18} />}
-            {exportLoading ? 'Generating Doc...' : 'Export to Google Doc'}
-          </button>
-          <button 
-            className="btn-primary" 
-            onClick={handleExportSlides} 
-            disabled={exportSlidesLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}
-          >
-            {exportSlidesLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={18} />}
-            {exportSlidesLoading ? 'Generating Slides...' : 'Export to Google Slides'}
-          </button>
-          <button 
-            className="btn-secondary" 
-            onClick={handleExportSource} 
-            disabled={exportSourceLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}
-          >
-            {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
-            {exportSourceLoading ? 'Generating...' : 'Download Report (MD)'}
-          </button>
           <button 
             className="btn-primary" 
             onClick={handleGenerateForm} 
@@ -667,6 +646,58 @@ const StrategyHub = () => {
                   </div>
                 );
               })}
+
+              {/* Survey Validation Section after Phase 3 if it's completed */}
+              {data.steps?.step_13?.status === 'complete' && (
+                <div style={{ marginBottom: '2.5rem', background: 'var(--surface)', padding: '1.5rem', borderRadius: '8px', border: '1px solid #10b98130' }}>
+                  <h2 style={{ margin: '0 0 1rem 0', color: '#10b981' }}>User Validation & Survey Integration</h2>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                    Phase 1 (Discovery) is complete. To proceed to Phase 2 (Solutioning), upload user survey data (CSV/Excel) to validate our hypotheses.
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <input 
+                      type="file" 
+                      accept=".csv, .xlsx, .xls"
+                      onChange={(e) => setFile(e.target.files[0])}
+                      style={{ color: 'var(--text-main)', background: 'var(--surface-light)', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                    />
+                    <button 
+                      className="btn-primary" 
+                      onClick={handleSurveyUpload}
+                      disabled={uploading || !file}
+                    >
+                      {uploading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Upload size={16} />}
+                      Analyze Survey Responses
+                    </button>
+                  </div>
+
+                  {data.survey_validation && (
+                    <div style={{ background: 'var(--surface-light)', padding: '1rem', borderRadius: '6px', borderLeft: '4px solid #10b981' }}>
+                      <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Validation Complete!</h3>
+                      <p style={{ color: 'var(--text-main)', margin: '0 0 1rem 0' }}>{data.survey_validation.updated_problem_statement}</p>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {data.survey_validation.validation_matrix?.map((item, i) => (
+                          <div key={i} style={{ background: 'var(--surface)', padding: '0.75rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <strong style={{ color: '#fff' }}>Insight:</strong>
+                              <span style={{ 
+                                color: item.status === 'Confirmed' ? '#10b981' : item.status === 'Contradicted' ? '#ef4444' : '#3b82f6',
+                                fontWeight: 'bold'
+                              }}>
+                                {item.status}
+                              </span>
+                            </div>
+                            <span style={{ color: 'var(--text-muted)' }}>{item.original_insight}</span>
+                            <span style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>↳ {item.survey_evidence}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
 
             </>

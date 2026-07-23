@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ReviewBoard from './ReviewBoard';
+import MVPWorkspace from './MVPWorkspace';
 import VivaDefense from './VivaDefense';
 
 const ReviewHub = () => {
@@ -24,7 +24,7 @@ const ReviewHub = () => {
               cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease'
             }}
           >
-            Board Evaluation
+            MVP Workspace
           </button>
           <button 
             onClick={() => setActiveTab('defense')}
@@ -40,7 +40,7 @@ const ReviewHub = () => {
         </div>
       </div>
 
-      {activeTab === 'evaluation' ? <ReviewBoard /> : <VivaDefense />}
+      {activeTab === 'evaluation' ? <MVPWorkspace /> : <VivaDefense />}
     </div>
   );
 };

@@ -92,10 +92,21 @@ class PipelineOrchestrator:
             cache_path = os.path.join("data", "strategy_cache.json")
             if os.path.exists(cache_path):
                 with open(cache_path, "r", encoding="utf-8") as f:
-                    cache_data = json.load(f)
-                    self.strategy_deep_dive = cache_data.get("strategy_deep_dive")
-                    self.board_presentation = cache_data.get("board_presentation")
-                    self.active_problem_statement = cache_data.get("active_problem_statement")
+                    data = json.load(f)
+                    self.strategy_deep_dive = data.get("strategy_deep_dive")
+                    self.board_presentation = data.get("board_presentation")
+                    self.mvp_workspace_prd = data.get("mvp_workspace_prd")
+                    self.active_problem_statement = data.get("active_problem_statement")
+                    
+                    # Check status
+                    if self.strategy_deep_dive and self.board_presentation:
+                        self.strategy_status = "completed"
+                        self.strategy_completed_steps = 16
+                    elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) == 9:
+                        self.strategy_status = "awaiting_survey"
+                        self.strategy_completed_steps = 9
+                    elif self.strategy_deep_dive:
+                        self.strategy_status = "completed" # fallback
                     
                     if self.strategy_deep_dive:
                         if not self.board_presentation:
@@ -150,8 +161,8 @@ class PipelineOrchestrator:
         except Exception as pce:
             logger.error(f"Failed to load pipeline cache: {pce}")
 
-    def run_strategy_deep_dive_async(self):
-        """Runs the 16-step Strategy Deep Dive in a background thread with progress logging."""
+    def run_strategy_deep_dive_async(self, target_phase=1):
+        """Runs the Strategy Deep Dive in a background thread with progress logging. Defaults to Phase 1."""
         if self.strategy_status == "running":
             return
         
@@ -204,19 +215,25 @@ class PipelineOrchestrator:
                 problem_statement=problem_stmt,
                 progress_callback=progress_cb,
                 existing_steps=existing_steps,
-                on_step_complete=on_step_complete
+                on_step_complete=on_step_complete,
+                target_phase=target_phase,
+                survey_context=self.strategy_deep_dive.get("survey_validation") if self.strategy_deep_dive else None
             )
             self.strategy_deep_dive = result
             
-            # Step 17: Board Presentation Synthesis
-            progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "start")
-            from reasoning.board_presenter import synthesize_board_presentation
-            board_deck = synthesize_board_presentation(result)
-            self.board_presentation = board_deck
-            progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "complete")
-            
-            self.strategy_status = "completed"
-            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive & CPO Presentation synthesis completed successfully.")
+            if target_phase == 1:
+                self.strategy_status = "awaiting_survey"
+                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 1 (Discovery) completed successfully. Awaiting Survey Data.")
+            else:
+                # We are running phase 2 or all, do the presentation synthesis
+                progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "start")
+                from reasoning.board_presenter import synthesize_board_presentation
+                board_deck = synthesize_board_presentation(result)
+                self.board_presentation = board_deck
+                progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "complete")
+                
+                self.strategy_status = "completed"
+                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 2 & Executive Presentation completed successfully.")
             
             # Save strategy deep dive data to file cache
             try:
