@@ -119,6 +119,37 @@ class PipelineOrchestrator:
         except Exception as ce:
             logger.error(f"Failed to load strategy cache: {ce}")
 
+        # Load cached pipeline results if available
+        try:
+            pipeline_cache_path = os.path.join("data", "pipeline_cache.json")
+            if os.path.exists(pipeline_cache_path):
+                with open(pipeline_cache_path, "r", encoding="utf-8") as f:
+                    pc = json.load(f)
+                    from core.schemas import UnifiedSignal, Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity, Hypothesis, ExecutiveSummary
+                    self.signals = [UnifiedSignal.model_validate(s) for s in pc.get("signals", [])]
+                    self.themes = [Theme.model_validate(t) for t in pc.get("themes", [])]
+                    self.barriers = [CategoryBarrier.model_validate(b) for b in pc.get("barriers", [])]
+                    self.personas = [Persona.model_validate(p) for p in pc.get("personas", [])]
+                    self.jobs = [JTBD.model_validate(j) for j in pc.get("jobs", [])]
+                    self.opportunities = [GrowthOpportunity.model_validate(o) for o in pc.get("opportunities", [])]
+                    self.hypotheses = [Hypothesis.model_validate(h) for h in pc.get("hypotheses", [])]
+                    
+                    from core.schemas import OptimizedInterviewScript
+                    script_data = pc.get("interview_script")
+                    self.interview_script = OptimizedInterviewScript.model_validate(script_data) if script_data else None
+                    
+                    summary_data = pc.get("executive_summary")
+                    self.executive_summary = ExecutiveSummary.model_validate(summary_data) if summary_data else None
+                    
+                    from core.schemas import CollectionResult
+                    self.collection_results = [CollectionResult.model_validate(c) for c in pc.get("collection_results", [])]
+                    
+                    self._status = pc.get("status", "complete")
+                    self._progress = pc.get("progress", [])
+                    logger.info("Successfully loaded ingestion pipeline cache.")
+        except Exception as pce:
+            logger.error(f"Failed to load pipeline cache: {pce}")
+
     def run_strategy_deep_dive_async(self):
         """Runs the 16-step Strategy Deep Dive in a background thread with progress logging."""
         if self.strategy_status == "running":
@@ -497,6 +528,29 @@ class PipelineOrchestrator:
 
         self._status = "complete"
         safe_log("🎉 Analysis pipeline complete!")
+        
+        # Save pipeline results to local file cache
+        try:
+            cache_data = {
+                "status": self._status,
+                "progress": self._progress,
+                "signals": [s.model_dump() for s in self.signals],
+                "themes": [t.model_dump() for t in self.themes],
+                "barriers": [b.model_dump() for b in self.barriers],
+                "personas": [p.model_dump() for p in self.personas],
+                "jobs": [j.model_dump() for j in self.jobs],
+                "opportunities": [o.model_dump() for o in self.opportunities],
+                "hypotheses": [h.model_dump() for h in self.hypotheses],
+                "interview_script": self.interview_script.model_dump() if self.interview_script else None,
+                "executive_summary": self.executive_summary.model_dump() if self.executive_summary else None,
+                "collection_results": [c.model_dump() for c in self.collection_results],
+            }
+            os.makedirs("data", exist_ok=True)
+            with open(os.path.join("data", "pipeline_cache.json"), "w", encoding="utf-8") as f:
+                json.dump(cache_data, f, indent=2)
+            safe_log("💾 Ingestion pipeline cache successfully saved to local file.")
+        except Exception as e:
+            logger.error(f"Failed to save pipeline cache: {e}")
 
         return self.get_full_results()
 

@@ -91,6 +91,13 @@ def run_full_pipeline(request: FullPipelineRequest, background_tasks: Background
     This is the primary endpoint for the platform.
     """
     try:
+        import os
+        pipeline_cache_path = os.path.join("data", "pipeline_cache.json")
+        if os.path.exists(pipeline_cache_path):
+            try:
+                os.remove(pipeline_cache_path)
+            except Exception:
+                pass
         reset_orchestrator()
         orchestrator = get_orchestrator()
         background_tasks.add_task(orchestrator.run_full_pipeline, request)
