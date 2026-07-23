@@ -261,7 +261,7 @@ def _summarize_step_data(step_id: str, data: any) -> str:
     return "\n".join(summary_parts)[:350]
 
 
-def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None) -> dict:
+def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None, existing_steps = None, on_step_complete = None) -> dict:
     """
     Execute the full 16-step strategy deep dive analysis in structured dependency batches
     to ensure logical reasoning flow while parallelizing independent tasks for maximum speed.
@@ -271,6 +271,12 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
     completed = 0
     total = len(STEP_CONFIGS)
     lock = threading.Lock()
+
+    # Pre-populate results with already completed steps from cache
+    if existing_steps:
+        for s_id, s_val in existing_steps.items():
+            if s_val.get("status") == "complete":
+                results[s_id] = s_val
 
     # Define sequential dependency batches:
     # Batch 1: Problem Restatement (MECE foundation)
@@ -293,6 +299,25 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
     def process_step(step_cfg):
         nonlocal completed
         step_id = step_cfg["id"]
+        
+        # Check if we can reuse the cached result for this step
+        if existing_steps and step_id in existing_steps:
+            cached = existing_steps[step_id]
+            if cached.get("status") == "complete":
+                logger.info(f"[Strategy Deep Dive] Reusing cached result for step {step_id}: {step_cfg['title']}")
+                with lock:
+                    results[step_id] = cached
+                if progress_callback:
+                    try:
+                        progress_callback(step_id, step_cfg["title"], "start")
+                        progress_callback(step_id, step_cfg["title"], "complete")
+                    except Exception:
+                        pass
+                with lock:
+                    completed += 1
+                    logger.info(f"[Strategy Deep Dive] Progress: {completed}/{total}")
+                return
+
         logger.info(f"[Strategy Deep Dive] Running {step_id}: {step_cfg['title']}...")
         if progress_callback:
             try:
@@ -326,13 +351,21 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
             else:
                 parsed_data = json.loads(response)
             
+            step_res = {
+                "title": step_cfg["title"],
+                "phase": step_cfg["phase"],
+                "data": parsed_data,
+                "status": "complete",
+            }
             with lock:
-                results[step_id] = {
-                    "title": step_cfg["title"],
-                    "phase": step_cfg["phase"],
-                    "data": parsed_data,
-                    "status": "complete",
-                }
+                results[step_id] = step_res
+                
+            if on_step_complete:
+                try:
+                    on_step_complete(step_id, step_res)
+                except Exception as oce:
+                    logger.error(f"Error in on_step_complete callback: {oce}")
+
             if progress_callback:
                 try:
                     progress_callback(step_id, step_cfg["title"], "complete")

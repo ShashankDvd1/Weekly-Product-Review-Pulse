@@ -428,7 +428,6 @@ def get_strategy_deep_dive(background_tasks: BackgroundTasks):
         return {"error": "No data available. Run the full pipeline first."}
 
     if orchestrator.strategy_status in ["idle", "failed"]:
-        orchestrator.strategy_deep_dive = None
         background_tasks.add_task(orchestrator.run_strategy_deep_dive_async)
         
     return {

@@ -157,7 +157,10 @@ class PipelineOrchestrator:
         
         self.strategy_status = "running"
         self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive analysis pipeline initialized."]
-        self.strategy_completed_steps = 0
+        
+        # Count completed steps in existing cache to resume correctly
+        existing_steps = self.strategy_deep_dive.get("steps", {}) if self.strategy_deep_dive else {}
+        self.strategy_completed_steps = sum(1 for s in existing_steps.values() if s.get("status") == "complete")
         
         def progress_cb(step_id, step_title, status, detail=""):
             timestamp = datetime.now().strftime('%H:%M:%S')
@@ -171,6 +174,24 @@ class PipelineOrchestrator:
             self.strategy_logs.append(msg)
             logger.info(msg)
 
+        def on_step_complete(step_id, step_res):
+            if not self.strategy_deep_dive:
+                self.strategy_deep_dive = {"steps": {}}
+            if "steps" not in self.strategy_deep_dive:
+                self.strategy_deep_dive["steps"] = {}
+            self.strategy_deep_dive["steps"][step_id] = step_res
+            # Save strategy deep dive data to file cache incrementally
+            try:
+                os.makedirs("data", exist_ok=True)
+                with open(os.path.join("data", "strategy_cache.json"), "w", encoding="utf-8") as f:
+                    json.dump({
+                        "strategy_deep_dive": self.strategy_deep_dive,
+                        "board_presentation": self.board_presentation,
+                        "active_problem_statement": self.active_problem_statement
+                    }, f, indent=2)
+            except Exception as ce:
+                logger.error(f"Failed to auto-save strategy cache step: {ce}")
+
         try:
             from reasoning.strategy_deep_dive import run_strategy_deep_dive
             problem_stmt = getattr(self, "active_problem_statement", None)
@@ -181,7 +202,9 @@ class PipelineOrchestrator:
                 self.personas,
                 self.opportunities,
                 problem_statement=problem_stmt,
-                progress_callback=progress_cb
+                progress_callback=progress_cb,
+                existing_steps=existing_steps,
+                on_step_complete=on_step_complete
             )
             self.strategy_deep_dive = result
             
