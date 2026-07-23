@@ -247,7 +247,7 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
                         }
                     },
                     'outline': {
-                        'propertyState': 'RENDER_EMPTY'
+                        'propertyState': 'NOT_RENDERED'
                     }
                 },
                 'fields': 'shapeBackgroundFill.solidFill.color,outline.propertyState'

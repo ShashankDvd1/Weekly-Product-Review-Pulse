@@ -240,6 +240,27 @@ Return JSON: {{"situation": "...", "complication": "...", "question": "...", "an
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
+def _summarize_step_data(step_id: str, data: any) -> str:
+    """Helper to convert step output JSON data to a highly compact summary to fit within LLM token limits."""
+    if not data:
+        return ""
+    if isinstance(data, str):
+        return data[:300]
+    if not isinstance(data, dict):
+        return str(data)[:300]
+        
+    summary_parts = []
+    for k, v in data.items():
+        if isinstance(v, list):
+            summary_parts.append(f"{k}: {', '.join(str(x) for x in v[:3])}")
+        elif isinstance(v, dict):
+            sub_parts = [f"{sk}: {sv}" for sk, sv in list(v.items())[:2]]
+            summary_parts.append(f"{k}: {{{', '.join(sub_parts)}}}")
+        else:
+            summary_parts.append(f"{k}: {str(v)[:150]}")
+    return "\n".join(summary_parts)[:350]
+
+
 def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, problem_statement: str = None, progress_callback = None) -> dict:
     """
     Execute the full 16-step strategy deep dive analysis in structured dependency batches
@@ -284,7 +305,7 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
         completed_context_parts = []
         with lock:
             for s_id, s_info in results.items():
-                completed_context_parts.append(f"### COMPLETED {s_id.upper()}: {s_info['title']}\n{json.dumps(s_info['data'], indent=2)}")
+                completed_context_parts.append(f"### COMPLETED {s_id.upper()}: {s_info['title']}\n{_summarize_step_data(s_id, s_info['data'])}")
         
         full_context = base_context
         if completed_context_parts:
@@ -337,7 +358,7 @@ def run_strategy_deep_dive(signals, themes, barriers, personas, opportunities, p
             logger.info(f"[Strategy Deep Dive] Progress: {completed}/{total}")
 
     # Process each batch sequentially, running steps within each batch concurrently
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         for batch_step_ids in batches:
             batch_configs = [cfg for cfg in STEP_CONFIGS if cfg["id"] in batch_step_ids]
             list(executor.map(process_step, batch_configs))

@@ -5,9 +5,8 @@ from core.config import LLM_MODEL_REASONING, LLM_TEMPERATURE_ANALYTICAL
 
 logger = logging.getLogger(__name__)
 
-PROMPT_TEMPLATE = """You are a Chief Product Officer, Strategy Consultant (McKinsey/Bain/BCG), and Executive Storytelling expert.
+PROMPT_TEMPLATE = """You are a McKinsey Engagement Manager, Director of Product, and Executive Storytelling expert preparing a high-impact presentation for the CEO.
 Synthesize the provided 16-step Strategy Deep Dive results into one compelling 10-slide executive board presentation JSON.
-Every slide must communicate one key message, avoid operational details, focus on decisions, and highlight strategic implications.
 
 # INPUT
 Below are the completed steps of the Strategy Deep Dive:
@@ -15,15 +14,21 @@ Below are the completed steps of the Strategy Deep Dive:
 
 # CONSTRAINTS & RULES
 1. Output exactly 10 slides.
-2. Every slide must contain:
-   - one headline
-   - max 5 bullet points
-   - max 12 words per bullet point
-3. No paragraphs allowed inside slide lists.
-4. Merge duplicate findings and resolve contradictions.
-5. Highlight insights over observations. Mention risks, tradeoffs, and assumptions.
-6. Provide exact data/numbers when available.
-7. Return strictly a JSON object with the fields specified below. Do not output any formatting outside of the JSON block.
+2. Every slide must communicate ONE core insight answering "So What?".
+3. Never exceed 40 words per slide. Ensure a design ratio of 60% whitespace, 20% visuals (charts, matrices, timelines), and 20% text.
+4. HEADLINES MUST BE CONCLUSIONS, NOT generic section titles (e.g., "Verification badges reduce category bounce by 30%" instead of "Proposed Solution").
+5. Maximum of 4 bullet points per slide, with a strict maximum of 10 words per bullet point.
+6. Rewrite all AI terminology into natural, professional consultant language. Avoid buzzwords. Never repeat insights.
+7. Replace raw lists with structural frameworks:
+   - Convert tables into matrices
+   - Convert comparisons into 2x2 frameworks
+   - Convert processes into timelines
+8. Determine the quick-commerce brand being analyzed (e.g., Blinkit, Zepto, Swiggy Instamart) and set:
+   - "app_name": the brand name
+   - "primary_color": matching brand color (e.g. Blinkit: "#ffc20e", Zepto: "#5c2c90", Swiggy: "#fc8019")
+   - "secondary_color": matching secondary accent (e.g. Blinkit: "#3182ce", Zepto: "#e28743", Swiggy: "#8a3ab9")
+9. Every recommendation must synthesize and include: Evidence, Business impact, Tradeoff, Risk, Implementation effort, and Confidence.
+10. Return strictly a JSON object with the fields specified below. Do not output any formatting outside of the JSON block. No markdown backticks.
 
 # JSON SCHEMA
 Return a JSON object in this format:
@@ -352,11 +357,27 @@ def create_fallback_presentation(strategy_data: dict) -> dict:
         }
     ]
     
+    # Detect brand and color palette dynamically
+    lower_product = product_name.lower()
+    app_name = "Blinkit"
+    primary_color = "#ffc20e"
+    secondary_color = "#3182ce"
+    
+    if "zepto" in lower_product:
+        app_name = "Zepto"
+        primary_color = "#5c2c90"
+        secondary_color = "#e28743"
+    elif "swiggy" in lower_product or "instamart" in lower_product:
+        app_name = "Swiggy Instamart"
+        primary_color = "#fc8019"
+        secondary_color = "#8a3ab9"
+
     return {
         "presentation_title": f"{product_name} Strategic Board Deck",
         "subtitle": "Category Exploration & Discovery Optimization",
-        "presentation_theme": "McKinsey Corporate Theme",
-        "primary_color": "#0F172A",
-        "secondary_color": "#38BDF8",
+        "presentation_theme": f"{app_name} Premium Theme",
+        "app_name": app_name,
+        "primary_color": primary_color,
+        "secondary_color": secondary_color,
         "slides": slides
     }

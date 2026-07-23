@@ -75,7 +75,7 @@ def analyze_jtbd(
     llm = get_llm_client()
 
     # Sample and prepare signals
-    sample_size = min(len(signals), 120)
+    sample_size = min(len(signals), 80)
     sample = signals[:sample_size]
 
     signal_texts = []

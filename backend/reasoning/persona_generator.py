@@ -80,7 +80,7 @@ def generate_personas(
     llm = get_llm_client()
 
     # Prepare signal summary for the LLM (sample to respect token limits)
-    sample_size = min(len(signals), 120)
+    sample_size = min(len(signals), 80)
     sample = signals[:sample_size]
 
     signal_texts = []

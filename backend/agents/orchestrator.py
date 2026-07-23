@@ -7,6 +7,8 @@ and handles errors across the pipeline.
 """
 
 import logging
+import os
+import json
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -83,6 +85,23 @@ class PipelineOrchestrator:
         self._status = "idle"
         self._progress = []
 
+        # Load cached strategy deep dive if available
+        try:
+            import os
+            import json
+            cache_path = os.path.join("data", "strategy_cache.json")
+            if os.path.exists(cache_path):
+                with open(cache_path, "r", encoding="utf-8") as f:
+                    cache_data = json.load(f)
+                    self.strategy_deep_dive = cache_data.get("strategy_deep_dive")
+                    self.board_presentation = cache_data.get("board_presentation")
+                    self.active_problem_statement = cache_data.get("active_problem_statement")
+                    self.strategy_status = "completed"
+                    self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Loaded strategy deep dive from local cache file."]
+                    logger.info("Loaded strategy deep dive from local cache file.")
+        except Exception as ce:
+            logger.error(f"Failed to load strategy cache: {ce}")
+
     def run_strategy_deep_dive_async(self):
         """Runs the 16-step Strategy Deep Dive in a background thread with progress logging."""
         if self.strategy_status == "running":
@@ -127,6 +146,19 @@ class PipelineOrchestrator:
             
             self.strategy_status = "completed"
             self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive & CPO Presentation synthesis completed successfully.")
+            
+            # Save strategy deep dive data to file cache
+            try:
+                os.makedirs("data", exist_ok=True)
+                with open(os.path.join("data", "strategy_cache.json"), "w", encoding="utf-8") as f:
+                    json.dump({
+                        "strategy_deep_dive": self.strategy_deep_dive,
+                        "board_presentation": self.board_presentation,
+                        "active_problem_statement": self.active_problem_statement
+                    }, f, indent=2)
+                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive data successfully saved to local file cache.")
+            except Exception as ce:
+                logger.error(f"Failed to save strategy cache: {ce}")
         except Exception as e:
             self.strategy_status = "failed"
             self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Critical failure in Strategy Deep Dive pipeline: {e}")
