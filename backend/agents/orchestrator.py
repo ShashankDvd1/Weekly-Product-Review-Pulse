@@ -102,29 +102,35 @@ class PipelineOrchestrator:
                     if self.strategy_deep_dive and self.board_presentation:
                         self.strategy_status = "completed"
                         self.strategy_completed_steps = 16
-                    elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) == 9:
+                    elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) < 16:
                         self.strategy_status = "awaiting_survey"
-                        self.strategy_completed_steps = 9
+                        self.strategy_completed_steps = len(self.strategy_deep_dive["steps"])
                     elif self.strategy_deep_dive:
                         self.strategy_status = "completed" # fallback
                     
                     if self.strategy_deep_dive:
-                        if not self.board_presentation:
-                            logger.info("Cache has deep dive but lacks board presentation. Synthesizing now...")
-                            from reasoning.board_presenter import synthesize_board_presentation
-                            self.board_presentation = synthesize_board_presentation(self.strategy_deep_dive)
-                            # Save back to cache
-                            try:
-                                with open(cache_path, "w", encoding="utf-8") as f_out:
-                                    json.dump({
-                                        "strategy_deep_dive": self.strategy_deep_dive,
-                                        "board_presentation": self.board_presentation,
-                                        "active_problem_statement": self.active_problem_statement
-                                    }, f_out, indent=2)
-                            except Exception as write_err:
-                                logger.error(f"Failed to write updated cache: {write_err}")
+                        if not self.board_presentation and self.strategy_status == "completed":
+                            logger.info("Cache has deep dive but lacks board presentation. Synthesizing in background...")
+                            def run_bg_synthesis():
+                                try:
+                                    from reasoning.board_presenter import synthesize_board_presentation
+                                    self.board_presentation = synthesize_board_presentation(self.strategy_deep_dive)
+                                    # Save back to cache
+                                    try:
+                                        with open(cache_path, "w", encoding="utf-8") as f_out:
+                                            json.dump({
+                                                "strategy_deep_dive": self.strategy_deep_dive,
+                                                "board_presentation": self.board_presentation,
+                                                "active_problem_statement": self.active_problem_statement
+                                            }, f_out, indent=2)
+                                    except Exception as write_err:
+                                        logger.error(f"Failed to write updated cache: {write_err}")
+                                except Exception as synth_err:
+                                    logger.error(f"Failed to synthesize board presentation in background: {synth_err}")
+                            
+                            import threading
+                            threading.Thread(target=run_bg_synthesis, daemon=True).start()
                         
-                        self.strategy_status = "completed"
                         self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Loaded strategy deep dive and presentation from local cache file."]
                         logger.info("Loaded strategy deep dive and presentation from local cache file.")
         except Exception as ce:
@@ -163,11 +169,14 @@ class PipelineOrchestrator:
 
     def run_strategy_deep_dive_async(self, target_phase=1):
         """Runs the Strategy Deep Dive in a background thread with progress logging. Defaults to Phase 1."""
-        if self.strategy_status == "running":
+        if self.strategy_status == "running" and target_phase != 2:
             return
         
         self.strategy_status = "running"
-        self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive analysis pipeline initialized."]
+        if target_phase == 1 or not hasattr(self, "strategy_logs") or not self.strategy_logs:
+            self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive analysis pipeline initialized."]
+        else:
+            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Resuming Strategy Deep Dive (Phase 2)...")
         
         # Count completed steps in existing cache to resume correctly
         existing_steps = self.strategy_deep_dive.get("steps", {}) if self.strategy_deep_dive else {}
@@ -574,16 +583,16 @@ class PipelineOrchestrator:
             cache_data = {
                 "status": self._status,
                 "progress": self._progress,
-                "signals": [s.model_dump() for s in self.signals],
-                "themes": [t.model_dump() for t in self.themes],
-                "barriers": [b.model_dump() for b in self.barriers],
-                "personas": [p.model_dump() for p in self.personas],
-                "jobs": [j.model_dump() for j in self.jobs],
-                "opportunities": [o.model_dump() for o in self.opportunities],
-                "hypotheses": [h.model_dump() for h in self.hypotheses],
-                "interview_script": self.interview_script.model_dump() if self.interview_script else None,
-                "executive_summary": self.executive_summary.model_dump() if self.executive_summary else None,
-                "collection_results": [c.model_dump() for c in self.collection_results],
+                "signals": [s.model_dump(mode='json') for s in self.signals],
+                "themes": [t.model_dump(mode='json') for t in self.themes],
+                "barriers": [b.model_dump(mode='json') for b in self.barriers],
+                "personas": [p.model_dump(mode='json') for p in self.personas],
+                "jobs": [j.model_dump(mode='json') for j in self.jobs],
+                "opportunities": [o.model_dump(mode='json') for o in self.opportunities],
+                "hypotheses": [h.model_dump(mode='json') for h in self.hypotheses],
+                "interview_script": self.interview_script.model_dump(mode='json') if self.interview_script else None,
+                "executive_summary": self.executive_summary.model_dump(mode='json') if self.executive_summary else None,
+                "collection_results": [c.model_dump(mode='json') for c in self.collection_results],
             }
             os.makedirs("data", exist_ok=True)
             with open(os.path.join("data", "pipeline_cache.json"), "w", encoding="utf-8") as f:

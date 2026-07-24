@@ -98,7 +98,7 @@ CRITICAL RULES:
 """
 
 
-def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 5000) -> list[str]:
+def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 3000) -> list[str]:
     """
     Chunk signals into batches. If there are too many signals, downsample them 
     using stratified sampling to avoid hitting LLM token rate limits.

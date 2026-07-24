@@ -108,9 +108,16 @@ class LLMClient:
             except Exception as e:
                 err_str = str(e)
                 if "429" in err_str:
+                    # Check for daily limits immediately to trigger instant fallback
+                    err_lower = err_str.lower()
+                    if "tokens per day" in err_lower or "requests per day" in err_lower or "tpd" in err_lower or "rpd" in err_lower:
+                        logger.error(f"Groq Daily Limit Exceeded (TPD/RPD): {err_str}")
+                        self._force_fast_model = True
+                        raise RuntimeError(f"Groq Daily Limit Exceeded: {err_str}")
+
                     import re
                     # Parse try again duration from Groq rate limit message
-                    match = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", err_str.lower())
+                    match = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", err_lower)
                     wait_time = 0
                     if match:
                         minutes = int(match.group(1)) if match.group(1) else 0
@@ -121,6 +128,7 @@ class LLMClient:
                         
                     if wait_time > 300:
                         logger.error(f"Groq rate limit wait time too long ({wait_time}s): {err_str}")
+                        self._force_fast_model = True
                         raise RuntimeError(f"Groq Daily Token Limit Exceeded (Wait time > 5m: {wait_time}s): {err_str}")
                         
                     logger.warning(f"Groq Rate Limit (429) hit. Waiting {wait_time}s before retry (attempt {attempt + 1}/{retries})...")
@@ -151,7 +159,11 @@ class LLMClient:
         Returns:
             Parsed JSON dict from the LLM response
         """
-        model = LLM_MODEL_REASONING if use_reasoning else LLM_MODEL_FAST
+        if self._force_fast_model or os.getenv("FORCE_FAST_MODEL") == "true":
+            model = LLM_MODEL_FAST
+        else:
+            model = LLM_MODEL_REASONING if use_reasoning else LLM_MODEL_FAST
+            
         temperature = LLM_TEMPERATURE_ANALYTICAL
 
         messages = [
@@ -187,7 +199,11 @@ class LLMClient:
         Returns:
             Parsed JSON dict
         """
-        model = LLM_MODEL_REASONING
+        if self._force_fast_model or os.getenv("FORCE_FAST_MODEL") == "true":
+            model = LLM_MODEL_FAST
+        else:
+            model = LLM_MODEL_REASONING
+            
         temperature = LLM_TEMPERATURE_CREATIVE if creative else LLM_TEMPERATURE_ANALYTICAL
 
         messages = [

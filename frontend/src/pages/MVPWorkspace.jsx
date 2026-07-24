@@ -11,6 +11,62 @@ const MVPWorkspace = () => {
   const [exportSlidesLoading, setExportSlidesLoading] = useState(false);
   const [exportSlidesUrl, setExportSlidesUrl] = useState(null);
   const [exportSourceLoading, setExportSourceLoading] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState('prd');
+  const [copied, setCopied] = useState(false);
+
+  const generatePrototypingPrompt = () => {
+    if (!workspace) return "";
+    return `# Figma & Lovable Interactive MVP Prototyping Prompt
+
+## Context & Vision
+- **MVP Strategic Rationale**: ${workspace.why_this_mvp || ""}
+- **Core User Segment**: ${workspace.problem_definition?.target_user_segment || ""}
+- **Identified Core Problem**: ${workspace.problem_definition?.core_problem || ""}
+
+## Target Interactive User Flow (Lovable / Stitch Workflow)
+${workspace.user_journey_mapping?.map((step, idx) => `
+### Step ${idx + 1}: ${step.step}
+- **Action**: ${step.user_action}
+- **UI/System Response**: ${step.system_response}
+`).join('\n') || "No journey steps defined."}
+
+## Component & Screen Layout Guidance
+${workspace.wireframe_suggestions?.map((wire, idx) => `
+### Screen ${idx + 1}: ${wire.screen_name}
+- **Layout Structure**: ${wire.layout_guidance}
+- **Key Interface Components**:
+${wire.key_elements?.map(el => `  - [ ] ${el}`).join('\n') || "  - None"}
+`).join('\n') || "No wireframes defined."}
+
+## High-Priority Features list (Must Have Core)
+${workspace.moscow_prioritization?.must_have?.map(feat => `- **MVP Feature**: ${feat}`).join('\n') || "- None"}
+
+## Instructions for AI Sandbox Prototype (Lovable.dev)
+1. Build an interactive single-page application (SPA) mapping this exact user journey.
+2. Embed the screens described in the wireframe guide using tabbed/drawer navigation.
+3. Apply standard Quick Commerce styles (modern dark theme: background #0d111d, card surface #161b22, neon green accent #10b981).
+4. Implement reactive dashboard state: allow adding items to basket, simulating returns, and surfacing trust badges dynamically.
+`;
+  };
+
+  const handleDownloadWorkflowPrompt = () => {
+    const promptText = generatePrototypingPrompt();
+    const blob = new Blob([promptText], { type: 'text/markdown' });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = "figma_lovable_mvp_workflow.md";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+  };
+
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(generatePrototypingPrompt());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -101,122 +157,176 @@ const MVPWorkspace = () => {
     <div style={{ padding: '2rem 0', maxWidth: '1000px', margin: '0 auto' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1.5rem' }}>
-        <h1 style={{ margin: '0 0 0.5rem 0', color: '#fff', fontSize: '2rem' }}>Product Requirements Document</h1>
-        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.1rem' }}>MVP Definition & Strategy</p>
-      </div>
-
-      {/* Problem & Audience */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', marginBottom: '1rem' }}>
-            <Target size={18} /> <h3 style={{ margin: 0 }}>Core Problem</h3>
-          </div>
-          <p style={{ color: '#fff', lineHeight: 1.5 }}>{workspace.problem_definition?.core_problem}</p>
-        </div>
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', marginBottom: '1rem' }}>
-            <Monitor size={18} /> <h3 style={{ margin: 0 }}>Target Audience</h3>
-          </div>
-          <p style={{ color: '#fff', lineHeight: 1.5 }}>{workspace.problem_definition?.target_user_segment}</p>
+      <div style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ margin: '0 0 0.5rem 0', color: '#fff', fontSize: '2rem' }}>Product Requirements Document</h1>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.1rem' }}>MVP Definition & Strategy</p>
         </div>
       </div>
 
-      {/* Why this MVP */}
-      <div className="stat-card" style={{ marginBottom: '2rem' }}>
-        <h3 style={{ margin: '0 0 1rem 0', color: '#fff' }}>Strategic Rationale (Why this MVP?)</h3>
-        <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>{workspace.why_this_mvp}</p>
+      {/* Sub-tab switcher */}
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '2rem', gap: '1.5rem' }}>
+        <button 
+          onClick={() => setActiveSubTab('prd')}
+          style={{
+            background: 'none', border: 'none', padding: '0.75rem 0', color: activeSubTab === 'prd' ? '#10b981' : 'var(--text-muted)',
+            borderBottom: activeSubTab === 'prd' ? '2px solid #10b981' : 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem',
+            outline: 'none'
+          }}
+        >
+          📋 Product Requirements (PRD)
+        </button>
+        <button 
+          onClick={() => setActiveSubTab('workflow')}
+          style={{
+            background: 'none', border: 'none', padding: '0.75rem 0', color: activeSubTab === 'workflow' ? '#10b981' : 'var(--text-muted)',
+            borderBottom: activeSubTab === 'workflow' ? '2px solid #10b981' : 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem',
+            outline: 'none'
+          }}
+        >
+          ⚡ Prototyping & Figma/Lovable Workflow
+        </button>
       </div>
 
-      {/* MoSCoW */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Layers size={20} color="#10b981" /> Scope Prioritization (MoSCoW)
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <div style={{ background: 'var(--surface)', border: '1px solid #10b98130', borderRadius: '8px', padding: '1rem' }}>
-            <h4 style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>Must Have (MVP Core)</h4>
-            <ul style={{ margin: 0, paddingLeft: '1.5rem', color: 'var(--text-main)' }}>
-              {workspace.moscow_prioritization?.must_have?.map((item, i) => <li key={i}>{item}</li>)}
-            </ul>
-          </div>
-          <div style={{ background: 'var(--surface)', border: '1px solid #3b82f630', borderRadius: '8px', padding: '1rem' }}>
-            <h4 style={{ color: '#3b82f6', margin: '0 0 0.5rem 0' }}>Should Have</h4>
-            <ul style={{ margin: 0, paddingLeft: '1.5rem', color: 'var(--text-main)' }}>
-              {workspace.moscow_prioritization?.should_have?.map((item, i) => <li key={i}>{item}</li>)}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Features */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Settings size={20} color="#8b5cf6" /> Feature Breakdown
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {workspace.feature_breakdown?.map((feat, i) => (
-            <div key={i} style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid #8b5cf6' }}>
-              <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0' }}>{feat.feature_name}</h4>
-              <p style={{ color: 'var(--text-muted)', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>{feat.description}</p>
-              <div style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 'bold' }}>Value: {feat.user_value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Wireframes */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Monitor size={20} color="#ec4899" /> UI/UX Guidelines
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-          {workspace.wireframe_suggestions?.map((wire, i) => (
-            <div key={i} style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: '8px', border: '1px solid #ec489930' }}>
-              <h4 style={{ color: '#ec4899', margin: '0 0 1rem 0' }}>{wire.screen_name}</h4>
-              <div style={{ color: 'var(--text-main)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                <strong>Layout:</strong> {wire.layout_guidance}
+      {activeSubTab === 'prd' ? (
+        <>
+          {/* Problem & Audience */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', marginBottom: '1rem' }}>
+                <Target size={18} /> <h3 style={{ margin: 0 }}>Core Problem</h3>
               </div>
-              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                {wire.key_elements?.map((el, j) => <li key={j} style={{ marginBottom: '0.25rem' }}>{el}</li>)}
-              </ul>
+              <p style={{ color: '#fff', lineHeight: 1.5 }}>{workspace.problem_definition?.core_problem}</p>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="stat-card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', marginBottom: '1rem' }}>
+                <Monitor size={18} /> <h3 style={{ margin: 0 }}>Target Audience</h3>
+              </div>
+              <p style={{ color: '#fff', lineHeight: 1.5 }}>{workspace.problem_definition?.target_user_segment}</p>
+            </div>
+          </div>
 
-      {/* KPIs */}
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <BarChart2 size={20} color="#f59e0b" /> KPI Dashboard
-        </h2>
-        <div className="stat-card" style={{ padding: '0' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: 'var(--surface-light)', borderBottom: '1px solid var(--border)' }}>
-                <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Metric</th>
-                <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Type</th>
-                <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Target</th>
-              </tr>
-            </thead>
-            <tbody>
-              {workspace.kpi_dashboard?.map((kpi, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '1rem', color: '#fff', fontWeight: '500' }}>{kpi.metric_name}</td>
-                  <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>
-                    <span style={{ 
-                      padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem',
-                      background: kpi.type.includes('North Star') ? '#f59e0b20' : 'var(--surface-light)',
-                      color: kpi.type.includes('North Star') ? '#f59e0b' : 'var(--text-muted)'
-                    }}>{kpi.type}</span>
-                  </td>
-                  <td style={{ padding: '1rem', color: '#10b981' }}>{kpi.target}</td>
-                </tr>
+          {/* Why this MVP */}
+          <div className="stat-card" style={{ marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#fff' }}>Strategic Rationale (Why this MVP?)</h3>
+            <p style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>{workspace.why_this_mvp}</p>
+          </div>
+
+          {/* MoSCoW */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Layers size={20} color="#10b981" /> Scope Prioritization (MoSCoW)
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ background: 'var(--surface)', border: '1px solid #10b98130', borderRadius: '8px', padding: '1rem' }}>
+                <h4 style={{ color: '#10b981', margin: '0 0 0.5rem 0' }}>Must Have (MVP Core)</h4>
+                <ul style={{ margin: 0, paddingLeft: '1.5rem', color: 'var(--text-main)' }}>
+                  {workspace.moscow_prioritization?.must_have?.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+              <div style={{ background: 'var(--surface)', border: '1px solid #3b82f630', borderRadius: '8px', padding: '1rem' }}>
+                <h4 style={{ color: '#3b82f6', margin: '0 0 0.5rem 0' }}>Should Have</h4>
+                <ul style={{ margin: 0, paddingLeft: '1.5rem', color: 'var(--text-main)' }}>
+                  {workspace.moscow_prioritization?.should_have?.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Settings size={20} color="#8b5cf6" /> Feature Breakdown
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {workspace.feature_breakdown?.map((feat, i) => (
+                <div key={i} style={{ background: 'var(--surface)', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid #8b5cf6' }}>
+                  <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0' }}>{feat.feature_name}</h4>
+                  <p style={{ color: 'var(--text-muted)', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>{feat.description}</p>
+                  <div style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 'bold' }}>Value: {feat.user_value}</div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          {/* Wireframes */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Monitor size={20} color="#ec4899" /> UI/UX Guidelines
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+              {workspace.wireframe_suggestions?.map((wire, i) => (
+                <div key={i} style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: '8px', border: '1px solid #ec489930' }}>
+                  <h4 style={{ color: '#ec4899', margin: '0 0 1rem 0' }}>{wire.screen_name}</h4>
+                  <div style={{ color: 'var(--text-main)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                    <strong>Layout:</strong> {wire.layout_guidance}
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    {wire.key_elements?.map((el, j) => <li key={j} style={{ marginBottom: '0.25rem' }}>{el}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* KPIs */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ color: '#fff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart2 size={20} color="#f59e0b" /> KPI Dashboard
+            </h2>
+            <div className="stat-card" style={{ padding: '0' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'var(--surface-light)', borderBottom: '1px solid var(--border)' }}>
+                    <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Metric</th>
+                    <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Type</th>
+                    <th style={{ textAlign: 'left', padding: '1rem', color: 'var(--text-muted)' }}>Target</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workspace.kpi_dashboard?.map((kpi, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '1rem', color: '#fff', fontWeight: '500' }}>{kpi.metric_name}</td>
+                      <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>
+                        <span style={{ 
+                          padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem',
+                          background: kpi.type.includes('North Star') ? '#f59e0b20' : 'var(--surface-light)',
+                          color: kpi.type.includes('North Star') ? '#f59e0b' : 'var(--text-muted)'
+                        }}>{kpi.type}</span>
+                      </td>
+                      <td style={{ padding: '1rem', color: '#10b981' }}>{kpi.target}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '2rem', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: '#fff' }}>🤖 Lovable & Figma Prototyping Prompt</h3>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button className="btn-secondary" onClick={handleCopyPrompt} style={{ fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}>
+                {copied ? '✅ Copied!' : '📋 Copy Prompt'}
+              </button>
+              <button className="btn-primary" onClick={handleDownloadWorkflowPrompt} style={{ fontSize: '0.85rem', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Download size={14} /> Download Prompt (.md)
+              </button>
+            </div>
+          </div>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+            Copy this dynamically-generated prompt directly into <strong>Lovable.dev</strong>, <strong>Stitch</strong>, or your AI wireframing tools. It fully describes the app requirements, user flows, and UX layouts.
+          </p>
+          <pre style={{
+            background: '#090e18', padding: '1.5rem', borderRadius: '8px', border: '1px solid #1e293b',
+            color: '#cbd5e1', fontSize: '0.85rem', overflowX: 'auto', whiteSpace: 'pre-wrap', fontFamily: 'monospace',
+            maxHeight: '500px', overflowY: 'auto', lineHeight: '1.6'
+          }}>
+            {generatePrototypingPrompt()}
+          </pre>
         </div>
-      </div>
+      )}
 
       {/* Exports */}
       <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>

@@ -438,7 +438,7 @@ def get_strategy_deep_dive(background_tasks: BackgroundTasks):
         "completed_steps": orchestrator.strategy_completed_steps,
         "total_steps": orchestrator.strategy_total_steps,
         "board_presentation": orchestrator.board_presentation if orchestrator.strategy_status == "completed" else None,
-        "result": orchestrator.strategy_deep_dive if orchestrator.strategy_status == "completed" else None
+        "result": orchestrator.strategy_deep_dive if orchestrator.strategy_deep_dive else None
     }
 
 
@@ -508,10 +508,11 @@ async def upload_survey_data(background_tasks: BackgroundTasks, file: UploadFile
     if orchestrator.strategy_status != "awaiting_survey" or not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Phase 1 must be completed before uploading a survey.")
 
+    import pandas as pd
+    import io
     content = await file.read()
-    decoded = content.decode('utf-8', errors='replace')
-    csv_reader = csv.DictReader(io.StringIO(decoded))
-    survey_data = [row for row in csv_reader]
+    df = pd.read_csv(io.BytesIO(content))
+    survey_data = df.to_dict('records')
 
     from reasoning.survey_analyzer import analyze_survey_data
     validation_results = analyze_survey_data(survey_data, orchestrator.strategy_deep_dive.get("steps", {}))

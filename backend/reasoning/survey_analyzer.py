@@ -59,7 +59,7 @@ Return ONLY a valid JSON object matching this schema:
 
     logger.info("Running Survey Validation against Phase 1 insights...")
     try:
-        result = llm.generate_json(prompt)
+        result = llm.generate("You are a Principal PM and User Researcher.", prompt)
         logger.info("Survey Validation completed successfully.")
         return result
     except Exception as e:

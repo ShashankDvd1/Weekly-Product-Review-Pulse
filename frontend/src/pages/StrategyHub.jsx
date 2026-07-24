@@ -233,17 +233,21 @@ const StrategyHub = () => {
         if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
         if (result.total_steps !== undefined) setTotalSteps(result.total_steps);
 
-        if (result.status === 'completed' || result.status === 'awaiting_survey') {
+        if (result.status === 'completed') {
           clearInterval(interval);
           setData(result.result);
           if (result.board_presentation) {
             setBoardPresentation(result.board_presentation);
           }
           setLoading(false);
-        } else if (result.status === 'failed') {
+          setActiveTab('slides');
+        } else if (result.status === 'awaiting_survey') {
           clearInterval(interval);
+          setData(result.result);
+          if (result.board_presentation) {
+            setBoardPresentation(result.board_presentation);
+          }
           setLoading(false);
-          alert("Strategy deep dive analysis failed. Check console.");
         }
       } catch (err) {
         clearInterval(interval);
@@ -496,7 +500,7 @@ const StrategyHub = () => {
 
       {/* Export Action Bar (Visible if strategy completed and steps/slides tab is open) */}
       {data && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <button 
             className="btn-primary" 
             onClick={handleGenerateForm} 
@@ -505,6 +509,36 @@ const StrategyHub = () => {
           >
             {generatingForm ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Upload size={18} />}
             {generatingForm ? 'Generating Form...' : '⚡ Generate Google Form Survey'}
+          </button>
+
+          <button 
+            className="btn-secondary" 
+            onClick={handleExportDoc} 
+            disabled={exportLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', borderRadius: '6px' }}
+          >
+            {exportLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <FileText size={18} />}
+            {exportLoading ? 'Exporting Doc...' : '📝 Export Google Doc'}
+          </button>
+
+          <button 
+            className="btn-secondary" 
+            onClick={handleExportSlides} 
+            disabled={exportSlidesLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', borderRadius: '6px' }}
+          >
+            {exportSlidesLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={18} />}
+            {exportSlidesLoading ? 'Exporting Slides...' : '📊 Export Google Slides'}
+          </button>
+
+          <button 
+            className="btn-secondary" 
+            onClick={handleExportSource} 
+            disabled={exportSourceLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', borderRadius: '6px' }}
+          >
+            {exportSourceLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
+            {exportSourceLoading ? 'Downloading...' : '⬇️ Download Markdown'}
           </button>
         </div>
       )}
@@ -710,7 +744,7 @@ const StrategyHub = () => {
         <div className="grid-2" style={{ gridTemplateColumns: '7fr 3fr', gap: '2rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="glass-panel" style={{ 
-              aspectRatio: '16/9', background: 'linear-gradient(135deg, #0b1329, #14213d)', border: `2px solid rgba(255,255,255,0.08)`, 
+              minHeight: '440px', background: 'linear-gradient(135deg, #0b1329, #14213d)', border: `2px solid rgba(255,255,255,0.08)`, 
               borderRadius: '16px', padding: '2.5rem', display: 'flex', flexDirection: 'column', position: 'relative',
               boxShadow: '0 15px 35px rgba(0,0,0,0.6)', textAlign: 'left', overflow: 'hidden'
             }}>
@@ -739,7 +773,7 @@ const StrategyHub = () => {
                           {activeSlide.headline}
                         </h2>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.65rem' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', overflowY: 'auto', maxHeight: '330px', paddingRight: '0.5rem' }}>
                         {entries.slice(0, 4).map(([key, val]) => {
                           const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                           return (
@@ -748,13 +782,7 @@ const StrategyHub = () => {
                               border: `1px solid rgba(255,255,255,0.05)`, borderLeft: `3px solid ${brandColor}`
                             }}>
                               <strong style={{ color: '#fff', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.15rem' }}>{label}</strong>
-                              {Array.isArray(val) ? (
-                                <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.4' }}>
-                                  {val.map((item, idx) => <li key={idx}>{item}</li>)}
-                                </ul>
-                              ) : (
-                                <span style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.4' }}>{val}</span>
-                              )}
+                              {renderValue(val)}
                             </div>
                           );
                         })}

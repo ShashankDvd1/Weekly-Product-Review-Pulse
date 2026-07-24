@@ -97,7 +97,7 @@ Return ONLY a valid JSON object matching this exact schema:
 
     logger.info("Generating MVP Workspace PRD...")
     try:
-        result = llm.generate_json(prompt)
+        result = llm.generate("You are an elite Principal Product Manager and Technical Lead.", prompt)
         logger.info("MVP Workspace generated successfully.")
         return result
     except Exception as e:

@@ -168,21 +168,46 @@ Return a JSON object in this format:
 def trim_step_data(data):
     if isinstance(data, dict):
         trimmed = {}
-        for k, v in list(data.items())[:5]:  # Keep max 5 keys at any level
+        for k, v in list(data.items())[:6]:  # Keep max 6 keys
             if isinstance(v, list):
-                trimmed[k] = [trim_step_data(item) for item in v[:2]]
+                trimmed[k] = [trim_step_data(item) for item in v[:3]]  # Keep max 3 items
             elif isinstance(v, str):
-                trimmed[k] = v[:120] + "..." if len(v) > 120 else v
+                trimmed[k] = v[:350] + "..." if len(v) > 350 else v
             elif isinstance(v, dict):
                 trimmed[k] = trim_step_data(v)
             else:
                 trimmed[k] = v
         return trimmed
     elif isinstance(data, list):
-        return [trim_step_data(item) for item in data[:2]]
+        return [trim_step_data(item) for item in data[:3]]
     elif isinstance(data, str):
-        return data[:120] + "..." if len(data) > 120 else data
+        return data[:350] + "..." if len(data) > 350 else data
     return data
+
+def format_step_data_as_text(data, indent=""):
+    if isinstance(data, dict):
+        lines = []
+        for k, v in data.items():
+            key_label = k.replace("_", " ").title()
+            if isinstance(v, (dict, list)):
+                lines.append(f"{indent}- **{key_label}**:")
+                sub_res = format_step_data_as_text(v, indent + "  ")
+                if sub_res:
+                    lines.append(sub_res)
+            else:
+                lines.append(f"{indent}- **{key_label}**: {v}")
+        return "\n".join(lines)
+    elif isinstance(data, list):
+        lines = []
+        for item in data:
+            if isinstance(item, (dict, list)):
+                sub_res = format_step_data_as_text(item, indent + "  ")
+                if sub_res:
+                    lines.append(sub_res)
+            else:
+                lines.append(f"{indent}- {item}")
+        return "\n".join(lines)
+    return f"{indent}{data}"
 
 def synthesize_board_presentation(strategy_data: dict) -> dict:
     """
@@ -195,11 +220,16 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
     # Formulate step text to feed as context (trimmed to prevent payload limit errors)
     steps = strategy_data.get("steps", {})
     steps_context_list = []
+    # Filter for high-impact steps to fit context constraints while preserving factual detail
+    high_impact_steps = ["step_1", "step_2", "step_3", "step_10", "step_11", "step_12", "step_13", "step_14", "step_15", "step_16"]
     for step_id, info in steps.items():
+        if step_id not in high_impact_steps:
+            continue
         step_title = info.get("title", step_id)
         raw_data = info.get("data", {})
         step_data = trim_step_data(raw_data)
-        steps_context_list.append(f"### {step_id.upper()}: {step_title}\n{json.dumps(step_data, indent=2)}")
+        formatted_text = format_step_data_as_text(step_data)
+        steps_context_list.append(f"### {step_id.upper()}: {step_title}\n{formatted_text}")
 
     strategy_steps_text = "\n\n".join(steps_context_list)
 
