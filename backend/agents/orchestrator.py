@@ -101,12 +101,13 @@ class PipelineOrchestrator:
                     # Check status
                     if self.strategy_deep_dive and self.board_presentation:
                         self.strategy_status = "completed"
-                        self.strategy_completed_steps = 16
+                        self.strategy_completed_steps = 17
                     elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) < 16:
                         self.strategy_status = "awaiting_survey"
                         self.strategy_completed_steps = len(self.strategy_deep_dive["steps"])
                     elif self.strategy_deep_dive:
                         self.strategy_status = "completed" # fallback
+                        self.strategy_completed_steps = 17
                     
                     if self.strategy_deep_dive:
                         if not self.board_presentation and self.strategy_status == "completed":
@@ -178,17 +179,25 @@ class PipelineOrchestrator:
         else:
             self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Resuming Strategy Deep Dive (Phase 2)...")
         
-        # Count completed steps in existing cache to resume correctly
+        # Extract existing steps from the deep dive state
         existing_steps = self.strategy_deep_dive.get("steps", {}) if self.strategy_deep_dive else {}
-        self.strategy_completed_steps = sum(1 for s in existing_steps.values() if s.get("status") == "complete")
+        
+        # Track completed steps by ID to prevent double-counting
+        self.strategy_completed_steps_set = {
+            s_id for s_id, s in existing_steps.items() if s.get("status") == "complete"
+        }
+        if self.board_presentation:
+            self.strategy_completed_steps_set.add("step_17")
+        self.strategy_completed_steps = len(self.strategy_completed_steps_set)
         
         def progress_cb(step_id, step_title, status, detail=""):
             timestamp = datetime.now().strftime('%H:%M:%S')
             if status == "start":
                 msg = f"[{timestamp}] Running {step_id.upper()}: {step_title}..."
             elif status == "complete":
-                self.strategy_completed_steps += 1
-                msg = f"[{timestamp}] Step {step_id.upper()} completed successfully ({self.strategy_completed_steps}/16)."
+                self.strategy_completed_steps_set.add(step_id)
+                self.strategy_completed_steps = len(self.strategy_completed_steps_set)
+                msg = f"[{timestamp}] Step {step_id.upper()} completed successfully ({self.strategy_completed_steps}/{self.strategy_total_steps})."
             elif status == "failed":
                 msg = f"[{timestamp}] ERROR: Step {step_id.upper()} failed. Details: {detail}"
             self.strategy_logs.append(msg)

@@ -41,20 +41,21 @@ Return a JSON object in this format:
   "slides": [
     {{
       "slide_number": 1,
-      "type": "executive_summary",
-      "title": "Executive Summary",
-      "headline": "Full-sentence takeaway",
-      "problem": "Brief description of the problem",
-      "why_now": "Market/user triggers showing urgency",
-      "recommendation": "High-level recommendation summary",
-      "business_impact": "Expected outcome in numbers",
-      "speaker_notes": "Talk track for the presenter"
+      "type": "market_gap",
+      "title": "The Market Gap",
+      "headline": "Full-sentence takeaway as title",
+      "competitor_summary": "Competitor summary points",
+      "market_gap": "Identified market gap",
+      "white_space": "Unexplored white space opportunity",
+      "opportunities": ["Opportunity 1", "Opportunity 2"],
+      "strategic_advantage": "Moat advantage",
+      "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 2,
-      "type": "customer_problem",
-      "title": "Customer Problem",
-      "headline": "Full-sentence takeaway",
+      "type": "problem_statement",
+      "title": "Problem Statement",
+      "headline": "Full-sentence takeaway as title",
       "top_3_user_pains": ["Pain 1", "Pain 2", "Pain 3"],
       "customer_quotes": ["Quote 1", "Quote 2"],
       "behavior_patterns": "Observed behavioral trends",
@@ -64,46 +65,44 @@ Return a JSON object in this format:
     }},
     {{
       "slide_number": 3,
-      "type": "root_cause",
-      "title": "Root Cause Analysis",
-      "headline": "Full-sentence takeaway",
-      "root_causes": ["Root cause 1", "Root cause 2"],
+      "type": "user_research",
+      "title": "User Research & Evidence",
+      "headline": "Full-sentence takeaway as title",
+      "research_methods": ["Method 1", "Method 2"],
       "validated_assumptions": ["Assumption 1"],
       "false_assumptions": ["Assumption 2"],
-      "issue_tree_summary": "Issue tree insight",
-      "key_takeaway": "Insight takeaway",
+      "key_evidence": "Primary research evidence",
+      "insight_summary": "Overall insight from research",
       "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 4,
-      "type": "landscape",
-      "title": "Market & Competitive Landscape",
-      "headline": "Full-sentence takeaway",
-      "competitor_summary": "Competitor summary points",
-      "market_gap": "Identified market gap",
-      "white_space": "Unexplored white space opportunity",
-      "opportunities": ["Opportunity 1", "Opportunity 2"],
-      "strategic_advantage": "Moat advantage",
+      "type": "target_segment",
+      "title": "Target Segment",
+      "headline": "Full-sentence takeaway as title",
+      "segment_name": "Name of the target segment",
+      "demographics": "Key demographic points",
+      "psychographics": "Key psychographic points",
+      "primary_needs": ["Need 1", "Need 2"],
+      "segment_size": "Estimated size or value of segment",
       "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 5,
-      "type": "ai_opportunity",
-      "title": "AI Opportunity",
-      "headline": "Full-sentence takeaway",
+      "type": "breakdown",
+      "title": "Understanding the Breakdown",
+      "headline": "Full-sentence takeaway as title",
+      "root_causes": ["Root cause 1", "Root cause 2"],
       "current_process": "Current manual process",
-      "ai_can_improve": "How AI optimizes the process",
-      "automation": "Automation target",
-      "personalization": "Personalization mechanism",
-      "predictions": "Prediction utility",
-      "expected_business_value": "Calculated value addition",
+      "friction_points": ["Friction 1", "Friction 2"],
+      "impact_of_breakdown": "Cost or loss from breakdown",
       "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 6,
-      "type": "solutions",
-      "title": "Solution Options",
-      "headline": "Full-sentence takeaway",
+      "type": "proposed_solution",
+      "title": "Proposed Solution",
+      "headline": "Full-sentence takeaway as title",
       "conservative": "Conservative option description",
       "innovative": "Innovative option description",
       "moonshot": "Moonshot option description",
@@ -113,22 +112,20 @@ Return a JSON object in this format:
     }},
     {{
       "slide_number": 7,
-      "type": "business_impact",
-      "title": "Expected Business Impact",
-      "headline": "Full-sentence takeaway",
-      "north_star_metric": "North Star metric target",
-      "primary_metrics": ["Metric 1", "Metric 2"],
-      "guardrail_metrics": ["Guardrail 1"],
-      "counter_metrics": ["Counter 1"],
-      "expected_results": "Expected result figures",
-      "risks": ["Risk 1", "Risk 2"],
+      "type": "product_prototype",
+      "title": "Product Prototype & Integration",
+      "headline": "Full-sentence takeaway as title",
+      "key_features": ["Feature 1", "Feature 2"],
+      "user_flow": "Step-by-step user flow",
+      "ui_ux_changes": "Expected UI/UX modifications",
+      "integration_points": ["Integration 1", "Integration 2"],
       "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 8,
-      "type": "roadmap",
-      "title": "Implementation Roadmap",
-      "headline": "Full-sentence takeaway",
+      "type": "technical_implementation",
+      "title": "Technical Implementation",
+      "headline": "Full-sentence takeaway as title",
       "phase_1": "Phase 1 details",
       "phase_2": "Phase 2 details",
       "phase_3": "Phase 3 details",
@@ -138,27 +135,25 @@ Return a JSON object in this format:
     }},
     {{
       "slide_number": 9,
-      "type": "moat",
-      "title": "Competitive Moat",
-      "headline": "Full-sentence takeaway",
-      "switching_costs": "Switching costs description",
-      "data_advantage": "Data network effects",
-      "network_effect": "Standard network effects",
-      "flywheel": "Virtuous cycle flywheel",
-      "long_term_strategy": "Long term Moat strategy",
+      "type": "success_metrics",
+      "title": "Success Metrics",
+      "headline": "Full-sentence takeaway as title",
+      "north_star_metric": "North Star metric target",
+      "primary_metrics": ["Metric 1", "Metric 2"],
+      "guardrail_metrics": ["Guardrail 1"],
+      "counter_metrics": ["Counter 1"],
+      "expected_results": "Expected result figures",
       "speaker_notes": "Talk track"
     }},
     {{
       "slide_number": 10,
-      "type": "executive_recommendation",
-      "title": "Executive Recommendation",
-      "headline": "Full-sentence takeaway",
-      "decision": "Core decision requested",
-      "top_priorities": ["Priority 1", "Priority 2"],
-      "investment_required": "Required resources/budget",
-      "expected_roi": "Estimated return on investment",
-      "next_steps": ["Next step 1", "Next step 2"],
-      "closing_message": "Strong final statement",
+      "type": "risk_mitigation",
+      "title": "Risk Mitigation",
+      "headline": "Full-sentence takeaway as title",
+      "operational_risks": ["Risk 1", "Risk 2"],
+      "technical_risks": ["Risk 1", "Risk 2"],
+      "mitigation_strategies": ["Strategy 1", "Strategy 2"],
+      "contingency_plan": "Backup plan",
       "speaker_notes": "Talk track"
     }}
   ]
@@ -249,141 +244,144 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
         return create_fallback_presentation(strategy_data)
 
 def create_fallback_presentation(strategy_data: dict) -> dict:
-    """Generates a professional 10-slide McKinsey-style fallback presentation if LLM fails."""
-    product_name = strategy_data.get("product_name", "Quick Commerce Platform")
+    """Generates a professional 10-slide PM-style fallback presentation if LLM fails."""
+    product_name = strategy_data.get("product_name", "Platform")
     
     slides = [
         {
             "slide_number": 1,
-            "type": "executive_summary",
-            "title": "Executive Summary",
-            "headline": f"Optimizing Category Discovery on {product_name} to unlock high-margin growth.",
-            "problem": "Users stick strictly to grocery categories and avoid high-margin non-grocery segments (Beauty, Electronics).",
-            "why_now": "Stagnant grocery margins and increasing user acquisition costs demand basket value optimization.",
-            "recommendation": "Deploy a personalized contextual cross-sell engine and restructure category tabs.",
-            "business_impact": "Expected +18% Average Order Value (AOV) and +5% gross margins in 90 days.",
-            "speaker_notes": "Welcome team. Today we discuss the critical challenge of category discovery on our quick commerce platform and our path to higher profitability."
+            "type": "market_gap",
+            "title": "The Market Gap",
+            "headline": f"Competitors lack trust in non-grocery segments, presenting a gap for {product_name}.",
+            "competitor_summary": "Competitors focus on grocery velocity but fail to provide authenticity guarantees for high-value items.",
+            "market_gap": "Immediate delivery of verified, authentic beauty and electronics.",
+            "white_space": "Contextual in-cart discovery of non-grocery items.",
+            "opportunities": ["Increase AOV via high-margin items", "Establish trust with origin guarantees"],
+            "strategic_advantage": "Leveraging existing 10-minute delivery network.",
+            "speaker_notes": "The market gap lies in trust, not speed. Competitors haven't solved it."
         },
         {
             "slide_number": 2,
-            "type": "customer_problem",
-            "title": "Customer Problem",
-            "headline": "Users suffer from high friction and lack of trust in non-grocery categories.",
+            "type": "problem_statement",
+            "title": "Problem Statement",
+            "headline": "Users strictly purchase groceries and avoid high-margin non-grocery segments.",
             "top_3_user_pains": [
-                "Counterfeit and warranty concerns for high-value electronics.",
-                "Freshness and authenticity doubts for cosmetics and beauty products.",
-                "Cluttered application navigation burying non-grocery listings."
+                "Counterfeit and warranty concerns for high-value items.",
+                "Cluttered app navigation burying non-grocery categories.",
+                "High mental friction to switch purchasing habits."
             ],
             "customer_quotes": [
                 "I only buy milk here because I don't trust the electronics warranty.",
                 "It is too hard to find face cream, the search just lists snacks."
             ],
-            "behavior_patterns": "Users open the app with high intent for groceries but exhibit a reflex checkout flow that bypasses other tabs.",
-            "jobs_to_be_done": "When ordering daily groceries, I want to discover and purchase trust-verified beauty items in the same cart, so that I can save delivery fees and time.",
-            "key_takeaway": "Friction isn't just about interface clicks; it's a fundamental deficit in product trust.",
-            "speaker_notes": "Our users are in a habit loop. They buy milk and check out immediately. We need to intercept this flow with high-trust category cues."
+            "behavior_patterns": "Users exhibit a reflex checkout flow that bypasses non-grocery tabs.",
+            "jobs_to_be_done": "When ordering groceries, I want to discover and purchase trust-verified beauty items in the same cart.",
+            "key_takeaway": "Friction is rooted in a fundamental deficit in product trust.",
+            "speaker_notes": "Our users are in a habit loop. They buy milk and check out immediately."
         },
         {
             "slide_number": 3,
-            "type": "root_cause_analysis",
-            "title": "Root Cause Analysis (5 Whys)",
-            "headline": "Distrust in platform quality stems from lack of verifiable origin and poor delivery care.",
-            "root_cause_chain": [
-                "Grocery intent dominates -> Non-grocery is hidden -> Low category sales.",
-                "Low sales -> Reduced supplier listing -> Limited product selection.",
-                "Limited selection -> Users buy elsewhere -> Platform doesn't build trust."
-            ],
-            "proven_facts": "82% of users buy only food; non-grocery items represent less than 6% of active catalog views.",
-            "unproven_assumptions": "Assumed users prefer specialized platforms (Myntra, Amazon) solely due to price.",
-            "key_insight": "Breaking the habit loop requires surfacing trust elements at the exact point of grocery selection.",
-            "speaker_notes": "Why don't they explore? Because they don't trust us for these items. By tracing the 5 Whys, we see that origin verification is key."
+            "type": "user_research",
+            "title": "User Research & Evidence",
+            "headline": "82% of users ignore non-grocery items due to low perceived authenticity.",
+            "research_methods": ["User Interviews (N=50)", "Checkout Funnel Analytics", "Competitor Teardowns"],
+            "validated_assumptions": ["Users want faster delivery for high-value items but don't trust quick commerce."],
+            "false_assumptions": ["Users prefer specialized platforms solely due to price."],
+            "key_evidence": "Non-grocery items represent less than 6% of active catalog views despite being 30% of SKU count.",
+            "insight_summary": "Trust elements must be surfaced at the exact point of grocery selection to break the habit loop.",
+            "speaker_notes": "Research indicates that price isn't the issue; trust and visibility are."
         },
         {
             "slide_number": 4,
-            "type": "competitive_landscape",
-            "title": "Competitive Landscape",
-            "headline": "Competitors succeed by blending specialized verticals into quick-delivery models.",
-            "competitors": [
-                {"name": "Blinkit", "strength": "Wide selection & quick delivery", "weakness": "Variable quality in electronics"},
-                {"name": "Zepto", "strength": "Fast deliveries (under 10 mins)", "weakness": "High reliance on grocery SKU volume"},
-                {"name": "Nykaa/Amazon", "strength": "Established product trust and warranties", "weakness": "Slower delivery speeds (1-2 days)"}
-            ],
-            "whitespace_opportunity": "Offering verified quick-delivery for beauty and electronics with immediate instant return options.",
-            "key_takeaway": "We can win by matching specialized trust with our unbeatable 10-minute delivery promise.",
-            "speaker_notes": "Competitors are moving fast, but their weakness is delivery speed or high-intent focus. Our whitespace lies in verified instant-delivery."
+            "type": "target_segment",
+            "title": "Target Segment",
+            "headline": "Focusing on 'Engaged Explorers': High-frequency grocery buyers with disposable income.",
+            "segment_name": "Engaged Explorers",
+            "demographics": "Ages 24-35, Urban Tier-1 cities, High average order value.",
+            "psychographics": "Value convenience but are highly skeptical of product authenticity online.",
+            "primary_needs": ["10-minute delivery", "100% genuine products with easy returns"],
+            "segment_size": "Represents 25% of current active user base but 40% of potential GMV.",
+            "speaker_notes": "We are targeting our most frequent buyers who currently split their wallets."
         },
         {
             "slide_number": 5,
-            "type": "strategic_alternatives",
-            "title": "Strategic Alternatives",
-            "headline": "Contextual cross-selling outweighs full category redesigns in ROI and time-to-market.",
-            "alternatives": [
-                {"name": "Complete UI Redesign", "pros": "Modern looks", "cons": "High dev effort, disrupts user muscle memory", "decision": "Rejected"},
-                {"name": "Contextual In-Cart Cross-Sell", "pros": "Zero disruption, high conversion", "cons": "Needs smart recommendation engine", "decision": "Selected"}
+            "type": "breakdown",
+            "title": "Understanding the Breakdown",
+            "headline": "The current platform architecture inherently hides high-margin categories.",
+            "root_causes": [
+                "Grocery intent dominates session time.",
+                "Low non-grocery sales reduce supplier listings.",
+                "Lack of trust guarantees reduces conversion."
             ],
-            "tradeoff_analysis": "Selecting in-cart cross-sell minimizes developmental risk while directly targeting checkout habit loops.",
-            "speaker_notes": "We evaluated a total redesign, but rejected it to prevent disrupting active users. Instead, we are deploying contextual cross-sells."
+            "current_process": "Users manually navigate to hidden category tabs, which 90% never open.",
+            "friction_points": ["Hidden navigation", "No visible warranties", "Unrelated search results"],
+            "impact_of_breakdown": "Estimated $15M annualized missed GMV opportunity.",
+            "speaker_notes": "The breakdown occurs because we hide the very items that drive margin."
         },
         {
             "slide_number": 6,
             "type": "proposed_solution",
-            "title": "Proposed MVP: Smart Cross-Sell Hub",
-            "headline": "An intelligent, trust-verified recommendation engine integrated into the cart checkout.",
-            "mvp_features": [
-                "Verifiable origin badges (e.g., '100% Original Brand Verified').",
-                "Dynamic category suggestions based on grocery basket profiles.",
-                "Zero-friction instant returns at the doorstep."
-            ],
-            "ux_wireframe_spec": "A sticky bottom drawer on the cart page displaying 3 verified items tailored to the user's current items.",
-            "success_criteria": "A click-through rate (CTR) of >12% and conversion rate of >4% on recommended products.",
-            "speaker_notes": "Here is the MVP. It features verified brand badges and doorstep returns to eliminate buyer anxiety."
+            "title": "Proposed Solution",
+            "headline": "Deploying a contextual cross-sell hub with verifiable origin badges directly in the cart.",
+            "conservative": "Add banner ads for non-grocery items on the homepage.",
+            "innovative": "Personalized, AI-driven 'Smart Cart' that auto-suggests complementary beauty/electronics.",
+            "moonshot": "Separate premium app dedicated to 10-minute electronics and beauty.",
+            "recommended": "Innovative 'Smart Cart' with origin badges.",
+            "reason": "Balances low disruption with high targeted conversion.",
+            "speaker_notes": "We recommend the Smart Cart to intercept the user where intent is highest."
         },
         {
             "slide_number": 7,
-            "type": "kpi_framework",
-            "title": "KPI & Metrics Framework",
-            "headline": "North Star metric shifts from active orders to cross-category basket penetration.",
-            "north_star_metric": "Cross-Category Basket Penetration (% of orders with non-grocery items)",
-            "key_metrics": [
-                {"metric": "Non-Grocery Conversion Rate", "target": "4.5%", "justification": "Benchmarks show in-cart recommendations drive high conversions."},
-                {"metric": "Average Order Value (AOV)", "target": "+15%", "justification": "Adding higher-value beauty items increases checkout basket size."}
+            "type": "product_prototype",
+            "title": "Product Prototype & Integration",
+            "headline": "A sticky bottom drawer in the cart featuring tailored, verified items.",
+            "key_features": [
+                "Verifiable origin badges (e.g., '100% Original').",
+                "Dynamic category suggestions based on current basket.",
+                "One-click 'Add & Checkout' flow."
             ],
-            "speaker_notes": "We are aligning the team around basket penetration. If we get users to buy one non-grocery item, their lifetime value doubles."
+            "user_flow": "User adds grocery -> Enters Cart -> Drawer suggests 3 relevant items -> 1-click add.",
+            "ui_ux_changes": "New cart component, updated product card with trust badges.",
+            "integration_points": ["Recommendation Engine API", "Inventory syncing API"],
+            "speaker_notes": "The prototype focuses on zero-friction addition with high trust signals."
         },
         {
             "slide_number": 8,
-            "type": "rice_prioritization",
-            "title": "Implementation Prioritization",
-            "headline": "In-cart recommendations offer the highest impact-to-effort ratio.",
-            "solutions": [
-                {"name": "In-Cart Recommendations", "reach": "90%", "impact": "High", "confidence": "80%", "effort": "Low", "rice_score": "240"},
-                {"name": "Homepage Brand Banners", "reach": "50%", "impact": "Medium", "confidence": "70%", "effort": "Medium", "rice_score": "120"}
-            ],
-            "resource_allocation": "Focus 70% of engineering bandwidth on refining the contextual recommendations algorithm.",
-            "speaker_notes": "Our RICE scoring clearly identifies in-cart suggestions as the highest-impact launch solution."
+            "type": "technical_implementation",
+            "title": "Technical Implementation",
+            "headline": "A 6-week rollout prioritizing the recommendation algorithm and dark store syncing.",
+            "phase_1": "W1-W2: Algorithm tuning and UI development.",
+            "phase_2": "W3-W4: Dark store inventory API integration and testing.",
+            "phase_3": "W5-W6: A/B beta launch and general availability.",
+            "dependencies": ["Real-time inventory accuracy across 500+ stores."],
+            "timeline": "6 weeks from kickoff to general availability.",
+            "speaker_notes": "The critical path is ensuring inventory accuracy so we don't disappoint users."
         },
         {
             "slide_number": 9,
-            "type": "risks_and_mitigations",
-            "title": "Risks & Mitigations",
-            "headline": "Delivery delays and inventory mismatches present the highest operational risks.",
-            "risks": [
-                {"risk": "Inventory mismatch at local dark stores", "impact": "High", "mitigation": "Real-time stock syncing before displaying recommendations."},
-                {"risk": "Increased delivery rider burden", "impact": "Medium", "mitigation": "Limit weight of cross-sold items dynamically in the recommendations engine."}
-            ],
-            "operational_dependencies": "Requires dark store inventory API integration with the recommendation engine.",
-            "speaker_notes": "We must mitigate out-of-stock experiences. The recommendations engine will automatically hide items with fewer than 3 units in stock."
+            "type": "success_metrics",
+            "title": "Success Metrics",
+            "headline": "Targeting a 15% increase in Average Order Value via cross-category penetration.",
+            "north_star_metric": "Cross-Category Basket Penetration (% of orders with non-grocery items)",
+            "primary_metrics": ["Non-Grocery Conversion Rate (Target: >4%)", "AOV Increase (Target: +15%)"],
+            "guardrail_metrics": ["Cart Abandonment Rate (Must stay flat)"],
+            "counter_metrics": ["Increase in Customer Support tickets regarding returns"],
+            "expected_results": "Estimated +5% gross margin within 90 days of launch.",
+            "speaker_notes": "Our North Star is getting users to buy across categories in a single order."
         },
         {
             "slide_number": 10,
-            "type": "financial_roi",
-            "title": "Financial Impact & Timeline",
-            "headline": "Projected to break even in Month 3, driving long-term gross margin expansion.",
-            "timeline": "Phase 1: Dev (W1-W3) -> Phase 2: Beta Launch (W4) -> Phase 3: General Availability (W6)",
-            "break_even_point": "Month 3 post-launch",
-            "investment_required": "$45,000 engineering and dark-store branding cost.",
-            "roi_justification": "Unlocking high-margin categories offsets customer acquisition costs, stabilizing long-term unit economics.",
-            "speaker_notes": "With a minimal $45k investment, we break even in month 3. I request approval to move to development phase."
+            "type": "risk_mitigation",
+            "title": "Risk Mitigation",
+            "headline": "Proactively addressing inventory mismatches and rider capacity constraints.",
+            "operational_risks": ["Inventory mismatch at local dark stores", "Rider weight limits exceeded"],
+            "technical_risks": ["Latency increase during cart checkout", "Recommendation engine irrelevance"],
+            "mitigation_strategies": [
+                "Real-time stock syncing; hide items with <3 units.",
+                "Dynamic weight-limit checks before recommending heavy items."
+            ],
+            "contingency_plan": "Fallback to static, lightweight popular item recommendations if API latency spikes.",
+            "speaker_notes": "We have mitigations in place to protect the core grocery experience."
         }
     ]
     

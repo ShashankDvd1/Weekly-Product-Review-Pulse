@@ -55,5 +55,13 @@ Follow this sequence before proposing any product solution:
   * Set the background fill of each slide dynamically to a modern dark slate (`#0d111d`) or matching theme.
   * Programmatically create rectangle shapes to serve as top accent borders, colored in the analyzed brand's primary theme color (e.g. Swiggy Orange, Zepto Purple, Swiggy Instamart Orange).
   * Create and position distinct styled text boxes (e.g. Georgia Bold 18pt for titles, Arial 12pt light-gray for bullet bodies) to display synthesized case study data dynamically.
-
-
+* **Slide Structure (10-Slide Standard Arc)**: Always structure presentation data using this exact 10-slide outline:
+  1. The Market Gap, 2. Problem Statement, 3. User Research & Evidence, 4. Target Segment, 5. Understanding the Breakdown, 6. Proposed Solution, 7. Product Prototype & Integration, 8. Technical Implementation, 9. Success Metrics, 10. Risk Mitigation.
+* **Content Rules**:
+  * Slide titles MUST be the key message/takeaway (e.g. "Users abandon carts due to warranty fears", not "Problem Statement").
+  * Max 10 slides total. Tone must be professional, analytical, and data-driven.
+  * The Fellow's name must NEVER appear in the deck.
+  * Hyperlink all supporting research artifacts.
+* **Typography & Styling**:
+  * Minimum Font Size: Google Slides/PPT (14pt), Figma (26px), Canva (22px).
+  * Ensure high contrast and color-blind safe palettes.
