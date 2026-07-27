@@ -312,7 +312,7 @@ class PipelineOrchestrator:
             from_date = "2024-01-01"
             to_date = datetime.now().strftime("%Y-%m-%d")
 
-        TARGET_GENUINE_REVIEWS = 250
+        TARGET_GENUINE_REVIEWS = 150
         MAX_RETRIES = 2
         
         current_from_date = from_date
@@ -334,7 +334,7 @@ class PipelineOrchestrator:
                 if play_store_package:
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=5000)
+                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=300)
                         if not df_play.empty:
                             df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
@@ -346,7 +346,7 @@ class PipelineOrchestrator:
                 if app_store_id:
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=100)
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=4)
                         if not df_app.empty:
                             df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
@@ -369,7 +369,7 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=5000)
+                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=300)
                         if not df_play.empty:
                             df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, package)
@@ -380,7 +380,7 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=100)
+                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=4)
                         if not df_app.empty:
                             df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
@@ -410,11 +410,16 @@ class PipelineOrchestrator:
             
             all_signals.extend(batch_signals)
             
-            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(all_signals)} cumulative signals...")
-            from reasoning.quality_filter import assess_review_quality_batch
-            assessed_signals = assess_review_quality_batch(all_signals)
+            self._log_progress(f"🔄 Deduplicating {len(all_signals)} cumulative signals...")
+            from processing.deduplication import semantic_deduplicate
+            unique_signals = semantic_deduplicate(all_signals)
+            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
             
-            accepted_signals_pre = [
+            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(unique_signals)} reviews...")
+            from reasoning.quality_filter import assess_review_quality_batch
+            assessed_signals = assess_review_quality_batch(unique_signals)
+            
+            accepted_signals = [
                 s for s in assessed_signals 
                 if getattr(s, 'quality_category', QualityCategory.DISCARD) in [
                     QualityCategory.MEDIUM_SIGNAL, 
@@ -422,15 +427,11 @@ class PipelineOrchestrator:
                     QualityCategory.GOLD_INSIGHT
                 ]
             ]
-            self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals_pre)}")
             
-            self._log_progress(f"🔄 Deduplicating {len(accepted_signals_pre)} high-signal reviews...")
-            from processing.deduplication import semantic_deduplicate
-            unique_signals = semantic_deduplicate(accepted_signals_pre)
-            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
+            self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals)}")
             
-            if len(unique_signals) >= TARGET_GENUINE_REVIEWS:
-                self.signals = unique_signals
+            if len(accepted_signals) >= TARGET_GENUINE_REVIEWS:
+                self.signals = accepted_signals
                 self._log_progress(f"✅ Reached target of {TARGET_GENUINE_REVIEWS} genuine reviews. Proceeding to analysis.")
                 break
             elif attempt < MAX_RETRIES:
