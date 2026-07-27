@@ -34,6 +34,16 @@ def get_embedding_model() -> SentenceTransformer:
     global _embedding_model
     if _embedding_model is None:
         logger.info(f"Loading embedding model: {EMBEDDING_MODEL}...")
+        
+        # Configure torch to use 1 thread and disable gradients BEFORE loading model to save memory
+        try:
+            import torch
+            torch.set_num_threads(1)
+            torch.set_grad_enabled(False)
+            logger.info("Configured PyTorch for single-threaded CPU execution (saves memory).")
+        except Exception as e:
+            logger.warning(f"Failed to configure PyTorch threads: {e}")
+
         try:
             # Try offline loading first to avoid hanging on update checks in sandboxed environments
             _embedding_model = SentenceTransformer(EMBEDDING_MODEL, local_files_only=True)
@@ -48,7 +58,15 @@ def get_embedding_model() -> SentenceTransformer:
 def generate_embeddings(texts: list[str]) -> list[list[float]]:
     """Generate embeddings for a list of texts."""
     model = get_embedding_model()
-    embeddings = model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
+    import gc
+    try:
+        import torch
+        with torch.no_grad():
+            embeddings = model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
+    except Exception:
+        embeddings = model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
+        
+    gc.collect()
     return embeddings.tolist()
 
 
