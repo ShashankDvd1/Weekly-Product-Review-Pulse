@@ -190,6 +190,15 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
         slide_obj = updated_slides[idx]
         slide_id = slide_obj.get('objectId')
 
+        # Clear default placeholder textboxes on the first slide
+        if idx == 0:
+            for el in slide_obj.get('pageElements', []):
+                style_requests.append({
+                    'deleteObject': {
+                        'objectId': el.get('objectId')
+                    }
+                })
+
         # Set slide background to dark slate
         style_requests.append({
             'updatePageProperties': {

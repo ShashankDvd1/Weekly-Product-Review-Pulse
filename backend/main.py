@@ -505,7 +505,7 @@ def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
 async def upload_survey_data(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     """Uploads survey CSV, analyzes it against Phase 1 insights, and resumes Phase 2."""
     orchestrator = get_orchestrator()
-    if orchestrator.strategy_status != "awaiting_survey" or not orchestrator.strategy_deep_dive:
+    if orchestrator.strategy_status not in ["awaiting_survey", "completed"] or not orchestrator.strategy_deep_dive:
         raise HTTPException(status_code=400, detail="Phase 1 must be completed before uploading a survey.")
 
     import pandas as pd

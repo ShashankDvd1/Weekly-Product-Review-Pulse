@@ -78,6 +78,7 @@ class PipelineOrchestrator:
         self.mvp_case_study = None
         self.strategy_deep_dive = None
         self.board_presentation = None
+        self.active_problem_statement = None
         self.strategy_status = "idle"  # idle, running, completed, failed
         self.strategy_logs = []
         self.strategy_completed_steps = 0
@@ -90,7 +91,7 @@ class PipelineOrchestrator:
             import os
             import json
             cache_path = os.path.join("data", "strategy_cache.json")
-            if os.path.exists(cache_path):
+            if os.path.exists(cache_path) and os.path.getsize(cache_path) > 0:
                 with open(cache_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     self.strategy_deep_dive = data.get("strategy_deep_dive")
@@ -152,9 +153,9 @@ class PipelineOrchestrator:
                     self.opportunities = [GrowthOpportunity.model_validate(o) for o in pc.get("opportunities", [])]
                     self.hypotheses = [Hypothesis.model_validate(h) for h in pc.get("hypotheses", [])]
                     
-                    from core.schemas import OptimizedInterviewScript
+                    from core.schemas import InterviewScriptOutput
                     script_data = pc.get("interview_script")
-                    self.interview_script = OptimizedInterviewScript.model_validate(script_data) if script_data else None
+                    self.interview_script = InterviewScriptOutput.model_validate(script_data) if script_data else None
                     
                     summary_data = pc.get("executive_summary")
                     self.executive_summary = ExecutiveSummary.model_validate(summary_data) if summary_data else None
