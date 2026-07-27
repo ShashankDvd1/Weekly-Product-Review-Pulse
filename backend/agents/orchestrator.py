@@ -447,17 +447,17 @@ class PipelineOrchestrator:
 
     # ── Analysis Phase ─────────────────────────
     def analyze_all(self, problem_statement: Optional[str] = None) -> dict:
-            """
-            Run the complete AI analysis pipeline on collected signals.
-            """
-            from reasoning.behavior_analyzer import detect_themes, detect_category_barriers, analyze_sentiment_batch
-            from reasoning.persona_generator import generate_personas
-            from reasoning.jtbd_analyzer import analyze_jtbd
-            from reasoning.opportunity_miner import identify_opportunities
-            from reasoning.research_copilot import generate_hypotheses, generate_interview_questions
-            from output.report_generator import generate_executive_summary, generate_category_discovery_report
-    
-            if not self.signals:
+        """
+        Run the complete AI analysis pipeline on collected signals.
+        """
+        from reasoning.behavior_analyzer import detect_themes, detect_category_barriers, analyze_sentiment_batch
+        from reasoning.persona_generator import generate_personas
+        from reasoning.jtbd_analyzer import analyze_jtbd
+        from reasoning.opportunity_miner import identify_opportunities
+        from reasoning.research_copilot import generate_hypotheses, generate_interview_questions
+        from output.report_generator import generate_executive_summary, generate_category_discovery_report
+
+        if not self.signals:
             return {"error": "No signals to analyze. Run collect_all() first."}
 
         self.active_problem_statement = problem_statement
