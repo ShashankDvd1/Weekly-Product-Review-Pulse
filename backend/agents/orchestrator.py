@@ -22,26 +22,7 @@ from core.schemas import (
     Hypothesis, OptimizedInterviewQuestion, InterviewScriptOutput, ExecutiveSummary,
     FullPipelineRequest, QualityCategory
 )
-from ingestion.play_store import fetch_play_store_reviews
-from ingestion.app_store import fetch_app_store_reviews
-from ingestion.reddit import collect_reddit_data
-from ingestion.normalizer import (
-    normalize_play_store_reviews,
-    normalize_app_store_reviews,
-    normalize_reddit_data,
-    merge_and_deduplicate,
-)
-from processing.pii_scrubber import scrub_pii_from_text
-from reasoning.behavior_analyzer import detect_themes, detect_category_barriers, analyze_sentiment_batch
-from reasoning.persona_generator import generate_personas
-from reasoning.jtbd_analyzer import analyze_jtbd
-from reasoning.opportunity_miner import identify_opportunities
-from reasoning.research_copilot import generate_hypotheses, generate_interview_questions
-from output.report_generator import generate_executive_summary, generate_category_discovery_report
-from output.evidence_builder import (
-    compute_source_distribution, compute_sentiment_summary,
-    compute_category_mention_counts, compute_behavioral_signal_counts,
-)
+# Heavy ingestion, reasoning, and output modules are lazy-loaded inside methods to save startup memory.
 
 logger = logging.getLogger(__name__)
 
@@ -301,6 +282,16 @@ class PipelineOrchestrator:
         Collect data, deduplicate, and run the Intelligent Review Quality Filter.
         If valid genuine reviews < target, dynamically expand the date range and retry.
         """
+        from ingestion.play_store import fetch_play_store_reviews
+        from ingestion.app_store import fetch_app_store_reviews
+        from ingestion.reddit import collect_reddit_data
+        from ingestion.normalizer import (
+            normalize_play_store_reviews,
+            normalize_app_store_reviews,
+            normalize_reddit_data,
+        )
+        from processing.pii_scrubber import scrub_pii_from_text
+
         if apps is None:
             apps = ["zepto", "blinkit", "swiggy_instamart"]
 
@@ -456,10 +447,17 @@ class PipelineOrchestrator:
 
     # ── Analysis Phase ─────────────────────────
     def analyze_all(self, problem_statement: Optional[str] = None) -> dict:
-        """
-        Run the complete AI analysis pipeline on collected signals.
-        """
-        if not self.signals:
+            """
+            Run the complete AI analysis pipeline on collected signals.
+            """
+            from reasoning.behavior_analyzer import detect_themes, detect_category_barriers, analyze_sentiment_batch
+            from reasoning.persona_generator import generate_personas
+            from reasoning.jtbd_analyzer import analyze_jtbd
+            from reasoning.opportunity_miner import identify_opportunities
+            from reasoning.research_copilot import generate_hypotheses, generate_interview_questions
+            from output.report_generator import generate_executive_summary, generate_category_discovery_report
+    
+            if not self.signals:
             return {"error": "No signals to analyze. Run collect_all() first."}
 
         self.active_problem_statement = problem_statement
@@ -660,6 +658,10 @@ class PipelineOrchestrator:
     # ── Results ──────────────────────────────
     def get_full_results(self) -> dict:
         """Get all analysis results as a serializable dict."""
+        from output.evidence_builder import (
+            compute_source_distribution, compute_sentiment_summary,
+            compute_category_mention_counts, compute_behavioral_signal_counts,
+        )
         return {
             "status": self._status,
             "progress": self._progress,
@@ -683,6 +685,9 @@ class PipelineOrchestrator:
 
     def get_dashboard_overview(self) -> dict:
         """Get data for the dashboard overview page."""
+        from output.evidence_builder import (
+            compute_source_distribution, compute_sentiment_summary,
+        )
         dates = []
         for s in self.signals:
             if s.date:
