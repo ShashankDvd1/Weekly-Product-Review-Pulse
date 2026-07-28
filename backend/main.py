@@ -102,6 +102,9 @@ def run_full_pipeline(request: FullPipelineRequest, background_tasks: Background
                 pass
         reset_orchestrator()
         orchestrator = get_orchestrator()
+        orchestrator._status = "collecting"
+        import datetime
+        orchestrator._progress = [f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 🚀 Ingestion pipeline initialized. Booting NLP engines..."]
         background_tasks.add_task(orchestrator.run_full_pipeline, request)
         return {
             "status": "started",
