@@ -310,7 +310,6 @@ class PipelineOrchestrator:
         current_to_date = to_date
         
         self.collection_results = []
-        self._progress = []
         all_signals = []
         
         from core.schemas import QualityCategory
@@ -627,6 +626,7 @@ class PipelineOrchestrator:
             pass
 
         self._status = "collecting"
+        self._progress = [f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Ingestion pipeline initialized. Booting NLP engines..."]
         try:
             # Collect
             self.collect_all(
