@@ -18,6 +18,10 @@ const Dashboard = () => {
       intervalId = setInterval(async () => {
         try {
           const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+          if (!res.ok) {
+            // Ignore temporary gateway timeouts/502s during spikes
+            return;
+          }
           const statusData = await res.json();
           setPipelineStatus(statusData.status);
           setPipelineLogs(statusData.progress || []);
@@ -85,13 +89,19 @@ const Dashboard = () => {
 
   async function fetchDashboardData() {
     try {
-      // Check if pipeline is running in the background
-      const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
-      const statusData = await statusRes.json();
-      if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
-        setPipelineRunning(true);
-        setPipelineStatus(statusData.status);
-        setPipelineLogs(statusData.progress || []);
+      // Check if pipeline is running in the background (wrapped in inner try-catch)
+      try {
+        const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
+            setPipelineRunning(true);
+            setPipelineStatus(statusData.status);
+            setPipelineLogs(statusData.progress || []);
+          }
+        }
+      } catch (statusErr) {
+        console.warn("Failed to check active background pipeline status:", statusErr);
       }
 
       const response = await fetch(`${getBackendUrl()}/api/v2/dashboard/overview`);
@@ -265,14 +275,14 @@ const Dashboard = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Target Apps</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.zepto} onChange={(e) => setSelectedApps(prev => ({ ...prev, zepto: e.target.checked }))} /> Zepto
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.zepto} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, zepto: e.target.checked }))} /> Zepto
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.blinkit} onChange={(e) => setSelectedApps(prev => ({ ...prev, blinkit: e.target.checked }))} /> Blinkit
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.blinkit} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, blinkit: e.target.checked }))} /> Blinkit
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.swiggy_instamart} onChange={(e) => setSelectedApps(prev => ({ ...prev, swiggy_instamart: e.target.checked }))} /> Swiggy Instamart
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
+                    <input type="checkbox" checked={selectedApps.swiggy_instamart} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, swiggy_instamart: e.target.checked }))} /> Swiggy Instamart
                   </label>
                 </div>
               </div>
