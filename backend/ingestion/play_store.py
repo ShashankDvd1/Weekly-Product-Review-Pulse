@@ -13,16 +13,30 @@ def fetch_play_store_reviews(package_name: str, from_date: str, to_date: str, la
     except ValueError:
         raise ValueError("Dates must be in YYYY-MM-DD format")
 
-    # The google_play_scraper library has a bug where continuation_token stops working
-    # after 2 pages (398 reviews) when using Sort.NEWEST. However, it can internally
-    # handle pagination if we simply pass the full max_reviews into count!
-    all_results, _ = reviews(
-        package_name,
-        lang=lang,
-        country=country,
-        sort=Sort.NEWEST,
-        count=max_reviews
-    )
+    # Google Play Scraper does not paginate reliably via token for Sort.NEWEST,
+    # so we scale the count dynamically in a loop until we reach reviews older than from_dt.
+    current_count = max_reviews
+    all_results = []
+    
+    while True:
+        results, _ = reviews(
+            package_name,
+            lang=lang,
+            country=country,
+            sort=Sort.NEWEST,
+            count=current_count
+        )
+        if not results:
+            break
+            
+        all_results = results
+        # If the last review we got is older than from_dt, or we reached the end of the catalog,
+        # or we hit a reasonable safety limit (e.g. 2500 reviews), we stop.
+        if results[-1]['at'] < from_dt or len(results) < current_count or current_count >= 2500:
+            break
+            
+        current_count += 500
+
 
     if not all_results:
         return pd.DataFrame()
