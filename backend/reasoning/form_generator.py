@@ -133,8 +133,8 @@ def get_google_credentials():
         except Exception as e:
             print(f"Warning: Could not load user token: {e}")
 
-    # 2. Check client_secret.json (only fallback if token.json doesn't exist)
-    if not os.path.exists(GOOGLE_TOKEN_FILE) and os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
+    # 2. Check client_secret.json (fallback if token.json doesn't exist or failed)
+    if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
         try:
             from google_auth_oauthlib.flow import InstalledAppFlow
             flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CLIENT_SECRET_FILE, GOOGLE_API_SCOPES)

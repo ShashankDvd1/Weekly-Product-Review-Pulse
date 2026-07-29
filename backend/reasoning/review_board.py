@@ -3,6 +3,7 @@ import logging
 from typing import Optional
 from core.llm_client import get_llm_client
 from core.schemas import BoardEvaluation, VivaQuestion, VivaAnswerEvaluation
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,10 @@ You consist of three virtual reviewers:
 3. Startup Founder / Investor: Evaluates Market Size, Moats, Scale, Pricing, and Investor Interest.
 
 You must critically evaluate the generated product ideas, score them out of 10 for all requested categories, identify weaknesses, and draft improvements.
-Your response MUST be a single, valid JSON object matching the requested schema. Do not output markdown around the JSON, only the JSON itself."""
+Your response MUST be a single, valid JSON object matching the requested schema. Do not output markdown around the JSON, only the JSON itself.
+
+{ANTI_HALLUCINATION_RULES}
+"""
 
 
 def generate_board_evaluation(

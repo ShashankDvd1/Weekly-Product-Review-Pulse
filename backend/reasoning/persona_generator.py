@@ -13,6 +13,7 @@ from typing import Optional
 
 from core.llm_client import get_llm_client, count_tokens
 from core.schemas import UnifiedSignal, Persona
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,8 @@ Think like an ethnographer who spent 6 months observing these users, not a marke
 
 CRITICAL: Every claim in the persona must be traceable to actual user signals. Include representative quotes.
 Always output valid JSON.
+
+{ANTI_HALLUCINATION_RULES}
 """
 
 

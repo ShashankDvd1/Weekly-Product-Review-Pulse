@@ -1,0 +1,2724 @@
+{
+  "status": "complete",
+  "progress": [
+    "[08:55:09] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
+    "[08:55:46] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2025-01-01 To: 2026-07-15)",
+    "[08:55:46] \ud83d\udcf1 Collecting Play Store reviews for Blinkit...",
+    "[08:55:47]   \u2705 300 Play Store reviews for Blinkit",
+    "[08:55:47] \ud83c\udf4e Collecting App Store reviews for Blinkit...",
+    "[08:55:51]   \u26a0\ufe0f 0 App Store reviews found in selected date range for Blinkit",
+    "[08:55:51] \ud83d\udd04 Deduplicating 300 cumulative signals...",
+    "[08:56:05] \u2705 Current unique dataset: 202 signals",
+    "[08:56:05] \ud83e\udde0 Running Intelligent Quality Filter on 202 reviews...",
+    "[08:56:05] \ud83c\udfc6 Accepted high-signal genuine reviews: 60",
+    "[08:56:05] \u26a0\ufe0f Only 60 valid reviews found (Target: 150). Expanding date range backward...",
+    "[08:56:05] \n\ud83d\ude80 Collection Attempt 2/3 (From: 2024-10-03 To: 2025-01-01)",
+    "[08:56:05] \ud83d\udcf1 Collecting Play Store reviews for Blinkit...",
+    "[08:56:06]   \u2705 300 Play Store reviews for Blinkit",
+    "[08:56:06] \ud83c\udf4e Collecting App Store reviews for Blinkit...",
+    "[08:56:08]   \u26a0\ufe0f 0 App Store reviews found in selected date range for Blinkit",
+    "[08:56:08] \ud83d\udd04 Deduplicating 600 cumulative signals...",
+    "[08:56:17] \u2705 Current unique dataset: 202 signals",
+    "[08:56:17] \ud83e\udde0 Running Intelligent Quality Filter on 202 reviews...",
+    "[08:56:17] \ud83c\udfc6 Accepted high-signal genuine reviews: 60",
+    "[08:56:17] \u26a0\ufe0f Only 60 valid reviews found (Target: 150). Expanding date range backward...",
+    "[08:56:17] \n\ud83d\ude80 Collection Attempt 3/3 (From: 2024-07-05 To: 2024-10-03)",
+    "[08:56:17] \ud83d\udcf1 Collecting Play Store reviews for Blinkit...",
+    "[08:56:17]   \u2705 300 Play Store reviews for Blinkit",
+    "[08:56:17] \ud83c\udf4e Collecting App Store reviews for Blinkit...",
+    "[08:56:19]   \u26a0\ufe0f 0 App Store reviews found in selected date range for Blinkit",
+    "[08:56:19] \ud83d\udd04 Deduplicating 900 cumulative signals...",
+    "[08:56:29] \u2705 Current unique dataset: 202 signals",
+    "[08:56:29] \ud83e\udde0 Running Intelligent Quality Filter on 202 reviews...",
+    "[08:56:29] \ud83c\udfc6 Accepted high-signal genuine reviews: 60",
+    "[08:56:29] \u26a0\ufe0f Reached max retries. Proceeding with 60 valid reviews.",
+    "[08:56:29] \ud83d\udd12 Scrubbing PII from final 60 accepted signals...",
+    "[08:56:30] \ud83c\udfad Running parallel ingestion analysis stages...",
+    "[08:56:30] \ud83c\udfad Running sentiment analysis...",
+    "[08:56:30]   \u2705 Sentiment analysis complete",
+    "[08:56:30] \ud83d\udd0d Detecting themes...",
+    "[08:56:30] \ud83d\udea7 Detecting category exploration barriers...",
+    "[08:56:30] \ud83d\udc64 Generating user personas...",
+    "[08:56:30] \ud83c\udfaf Extracting Jobs-To-Be-Done...",
+    "[08:56:33]   \u2705 4 personas generated",
+    "[08:56:35]   \u2705 11 jobs extracted",
+    "[08:57:17]   \u2705 5 themes detected",
+    "[08:58:00]   \u2705 7 category barriers detected",
+    "[08:58:00] \ud83d\udca1 Identifying growth opportunities...",
+    "[08:58:28]   \u2705 8 opportunities identified",
+    "[08:58:28] \ud83d\udd2c Generating research hypotheses...",
+    "[08:58:28] \ud83d\udcca Generating executive summary...",
+    "[08:58:41]   \u2705 9 hypotheses generated",
+    "[08:58:41] \ud83d\udccb Generating interview questions...",
+    "[08:59:03]   \u2705 Executive summary generated",
+    "[08:59:42]   \u2705 15 optimized questions generated",
+    "[08:59:42] \ud83c\udf89 Analysis pipeline complete!"
+  ],
+  "signals": [
+    {
+      "unified_id": "876e78d35ac04361d7e3cab63b357d1b",
+      "source": "play_store",
+      "source_id": "47b987e57764",
+      "app_name": "Blinkit",
+      "content": "very poor service...we order one thing and they deliver something else",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-28T08:51:58",
+      "author_anon": "Kav***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 11,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "very poor service...we order one thing and they de...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "796d0fbef77f29d518423f69e5b27392",
+      "source": "play_store",
+      "source_id": "977dbc65836d",
+      "app_name": "Blinkit",
+      "content": "very helpful But some things, like pet clothes, are not available on Blinkit.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T08:26:06",
+      "author_anon": "Nit***",
+      "categories_mentioned": [
+        "pet_care"
+      ],
+      "behavioral_signals": [],
+      "word_count": 13,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "very helpful But some things, like pet clothes, ar...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "6b74d5bc5a2a964e2b6a0562f2cd03e5",
+      "source": "play_store",
+      "source_id": "b0f3c1421328",
+      "app_name": "Blinkit",
+      "content": "Emargency delivery. Good support. Value for money & Friendly attitude.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T08:17:38",
+      "author_anon": "Tam***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 10,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Emargency delivery. Good support. Value for money ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "d0568f9a5ce07819cdd8c2e576bb84a4",
+      "source": "play_store",
+      "source_id": "061266a1b2e0",
+      "app_name": "Blinkit",
+      "content": "They deliver products very late, delivery partners stops at some place, deliberately delivering late orders.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-28T07:42:30",
+      "author_anon": "Mee***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 15,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "They deliver products very late, delivery partners...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "4388d84f8ef635440860fed0b28e92f0",
+      "source": "play_store",
+      "source_id": "097772779df4",
+      "app_name": "Blinkit",
+      "content": "<PERSON> He 2 Baze Raat Me DELIVERY Karte Hain inko To <PERSON> Shuru <PERSON>",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T02:24:26",
+      "author_anon": "Azi***",
+      "categories_mentioned": [
+        "health"
+      ],
+      "behavioral_signals": [],
+      "word_count": 24,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Bahot Khatarnaak Log He 2 Baze Raat Me DELIVERY Ka...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "142eabc404c9055610a1c4549cbfe680",
+      "source": "play_store",
+      "source_id": "851a8978b813",
+      "app_name": "Blinkit",
+      "content": "it's one of the most convenient apps ever. But I had one suggestion, it would be great if we could have scheduled delivery options so it becomes even more convenient. kudos to the team for their constant efforts!",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T01:57:20",
+      "author_anon": "Jom***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "convenience_driver"
+      ],
+      "word_count": 38,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "it's one of the most convenient apps ever. But I h...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "2b8baf5735fc8b35269901e72c9c812c",
+      "source": "play_store",
+      "source_id": "297d744d057c",
+      "app_name": "Blinkit",
+      "content": "blinkit per scam <PERSON> raha hai main sabse request <PERSON> is app per koi bhi <PERSON> return ki guarantee lete hain per yah return nahin lete aapse yah baat bhi nahin karenge aur baat karenge to aapko bhi <PERSON> rakhenge main sach mein <PERSON> abhi tak Apne rs 2000 is app per koi bhi app mat Apne paise kharab karne ho to please chalaea per bahut ganda scam <PERSON> raha hai yaar",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-28T01:48:19",
+      "author_anon": "Shu***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 79,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "blinkit per scam ho raha hai main sabse request Ka...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "6dced43b74ea61318057b0576d148d18",
+      "source": "play_store",
+      "source_id": "f2aee92a6d12",
+      "app_name": "Blinkit",
+      "content": "<PERSON> sahi hai but <PERSON> blinkit mai nutrujona fash wash kafi cheej nhi milti hai istamart mai 12 baje ke bad kuch nhi milta",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T00:58:28",
+      "author_anon": "nou***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 27,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "instamart se sahi hai but ek dikkat hai blinkit ma...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "162788167e5e59fb5c663fc32368b40b",
+      "source": "play_store",
+      "source_id": "03bb69cd75b8",
+      "app_name": "Blinkit",
+      "content": "great...awesome service specially medicine very easy and convenient.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-28T00:55:52",
+      "author_anon": "she***",
+      "categories_mentioned": [
+        "health"
+      ],
+      "behavioral_signals": [
+        "convenience_driver"
+      ],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "great...awesome service specially medicine very ea...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "11d030448bfc86ac675a8b2d25ad6f79",
+      "source": "play_store",
+      "source_id": "61c6fead8a78",
+      "app_name": "Blinkit",
+      "content": "the store is just 980 m away from my home i ordered too many things many times sometimes i got freebies with the orders the delivery is fast reliable and it never let down thank you blinkit and blinkit delivery partners",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T23:22:13",
+      "author_anon": "Yas***",
+      "categories_mentioned": [
+        "home_kitchen"
+      ],
+      "behavioral_signals": [],
+      "word_count": 41,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "the store is just 980 m away from my home i ordere...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "c9be9d56ecca06c0e6f2c6b707a47134",
+      "source": "play_store",
+      "source_id": "301653e61691",
+      "app_name": "Blinkit",
+      "content": "blinkit Is a very convenient app. it's very good for daily essential.",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T23:11:14",
+      "author_anon": "Mez***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "habit_loop",
+        "convenience_driver"
+      ],
+      "word_count": 12,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "blinkit Is a very convenient app. it's very good f...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "5cb9df85d95f9d013dfe6739e9501785",
+      "source": "play_store",
+      "source_id": "e29227c946ff",
+      "app_name": "Blinkit",
+      "content": "super blinkit within 5 minutes lo delevery complete chesthunaru",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T23:09:16",
+      "author_anon": "NAG***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "super blinkit within 5 minutes lo delevery complet...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "97e220ede9651197670616397779964d",
+      "source": "play_store",
+      "source_id": "0373835d371a",
+      "app_name": "Blinkit",
+      "content": "<PERSON> he iske paas bhi ise load mat karo",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T23:00:21",
+      "author_anon": "Sha***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 11,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Sirf Dublycat Maal he iske paas bhi ise load mat k...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "99f3defce5c8a5ae0480c59cb6de7f09",
+      "source": "play_store",
+      "source_id": "1fe9aed42dc5",
+      "app_name": "Blinkit",
+      "content": "Shri Ganpati apartment room number 3 ground floor near <PERSON> vitawa Thane",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T22:56:55",
+      "author_anon": "Raj***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 13,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Shri Ganpati apartment room number 3 ground floor ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "e2be5e31733be89747e4443eeaf5bf83",
+      "source": "play_store",
+      "source_id": "0877aa7e2353",
+      "app_name": "Blinkit",
+      "content": "i have selected 3 article which one Free product but free product not received. this is not good for customer point of view.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T22:51:58",
+      "author_anon": "Rud***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 23,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "i have selected 3 article which one Free product b...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "1b93ca556122ee9b48045e7f44ee1151",
+      "source": "play_store",
+      "source_id": "151395ba17f4",
+      "app_name": "Blinkit",
+      "content": "well it was good app to order groceries",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T22:45:09",
+      "author_anon": "Esh***",
+      "categories_mentioned": [
+        "grocery"
+      ],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "well it was good app to order groceries",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "8e5104eddeb2b78f4f88ae898a07168e",
+      "source": "play_store",
+      "source_id": "897b4ec70935",
+      "app_name": "Blinkit",
+      "content": "it's good I enjoy the delivery drivers are the best .today experience was my best experience I got delivery from deepak he was the best devilery partner till today .i really appreciate his work",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T22:40:49",
+      "author_anon": "Shu***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 34,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "it's good I enjoy the delivery drivers are the bes...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "8a49ed8a2fd479da2f6a2ea0e937e970",
+      "source": "play_store",
+      "source_id": "598a52070a7e",
+      "app_name": "Blinkit",
+      "content": "all time when i ordered i received it really with in time",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T22:28:03",
+      "author_anon": "raj***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 12,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "all time when i ordered i received it really with ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "88bb8abb1832cc32af546d3cf40d2a82",
+      "source": "play_store",
+      "source_id": "4fd72d3d43ea",
+      "app_name": "Blinkit",
+      "content": "I ordered first time on this app now very fast delivery and good packaging..",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T22:19:41",
+      "author_anon": "Pra***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "convenience_driver"
+      ],
+      "word_count": 14,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I ordered first time on this app now very fast del...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "f2531c273bf4ef254ca3493b93ecc5b6",
+      "source": "play_store",
+      "source_id": "56629bb0de76",
+      "app_name": "Blinkit",
+      "content": "helped me when I needed the most mainly for taking printouts for assignments \ud83d\ude05\ud83d\udc4d",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T22:01:53",
+      "author_anon": "Pra***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 14,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "helped me when I needed the most mainly for taking...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "4f74233434283961ac6d5284492572dd",
+      "source": "play_store",
+      "source_id": "5cd5b47f4a90",
+      "app_name": "Blinkit",
+      "content": "It was one of the best platforms. Some delivery boys are a bit problematic.",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T21:57:07",
+      "author_anon": "Ank***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 14,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 70,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "It was one of the best platforms. Some delivery bo...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "58fe46407fdc6a59ff3ecf6cb958e5ed",
+      "source": "play_store",
+      "source_id": "1eb44d12d196",
+      "app_name": "Blinkit",
+      "content": "it best delivery app I have ever seen",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T21:52:05",
+      "author_anon": "Kar***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "it best delivery app I have ever seen",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "9de332b6dd8610b15097d8b0b73e01ad",
+      "source": "play_store",
+      "source_id": "9a65f4612c95",
+      "app_name": "Blinkit",
+      "content": "we are very unpleasant with the delivery boy.. No blinkit carry bag with boy rudely replied <PERSON> bags are usually out of stock by the evening.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T21:46:58",
+      "author_anon": "SDE***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 26,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "we are very unpleasant with the delivery boy.. No ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "298941493dd4ffdc8473776683d17199",
+      "source": "play_store",
+      "source_id": "4e9100626530",
+      "app_name": "Blinkit",
+      "content": "Customer care executives are mannerless. sometimes they do send products without any seal, after raising complaint they don't bother to resolve",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T21:29:10",
+      "author_anon": "Pri***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 21,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 70,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Customer care executives are mannerless. sometimes...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "7e1926f0a9157f0b9b9a4c8453b478e8",
+      "source": "play_store",
+      "source_id": "34059b974232",
+      "app_name": "Blinkit",
+      "content": "wow I just like the fast delivery and cheapest items like I m ording from Amazon Flipkart like every item blinkit have phone smart watch and all electronics \ud83e\udee1\ud83e\udee1\ud83e\udee1",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T21:26:20",
+      "author_anon": "Roh***",
+      "categories_mentioned": [
+        "electronics"
+      ],
+      "behavioral_signals": [
+        "convenience_driver"
+      ],
+      "word_count": 29,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "wow I just like the fast delivery and cheapest ite...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "95d4c003d2b0523cdf77304e10b8c0d2",
+      "source": "play_store",
+      "source_id": "28289ff23ae3",
+      "app_name": "Blinkit",
+      "content": "super speed delivery, very use full, i use regularly Thank you Blinkit.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T20:56:12",
+      "author_anon": "Nay***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "habit_loop"
+      ],
+      "word_count": 12,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "super speed delivery, very use full, i use regular...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "8945e1efbf08e22e8b57db44074d92c7",
+      "source": "play_store",
+      "source_id": "03a801aa3235",
+      "app_name": "Blinkit",
+      "content": "very good experience of placing order but I don't have experience of customers help desk",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T20:51:39",
+      "author_anon": "Omk***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 15,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "very good experience of placing order but I don't ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "4d2c07bd3bcb9521e0f4d7b4beaf7b71",
+      "source": "play_store",
+      "source_id": "43a87c0a07ce",
+      "app_name": "Blinkit",
+      "content": "I love blink it service, unexpected bahut hi <PERSON> order delivered Ho gaela",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T20:43:59",
+      "author_anon": "Asm***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 14,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I love blink it service, unexpected bahut hi jaldi...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "7d0697ea52efd1960b36a8954835285e",
+      "source": "play_store",
+      "source_id": "57beae3f4a80",
+      "app_name": "Blinkit",
+      "content": "Only delivery guy was rude, rest was good",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T20:38:24",
+      "author_anon": "Sri***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Only delivery guy was rude, rest was good",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "b0b35cdaf5eff0de75d97f0a27bdebf8",
+      "source": "play_store",
+      "source_id": "d586ca2c6881",
+      "app_name": "Blinkit",
+      "content": "2 products order kiye the online payment se 1 product bheja hain in cheaters ne",
+      "title": null,
+      "rating": 2,
+      "sentiment_score": -0.4,
+      "date": "2026-07-27T20:37:49",
+      "author_anon": "Cha***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 15,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "2 products order kiye the online payment se 1 prod...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "5c40b55e62d0a0517bff1044d6a532fb",
+      "source": "play_store",
+      "source_id": "bca05c1d90dd",
+      "app_name": "Blinkit",
+      "content": "all is good but the help feature isn't that much helpful. I bought an umbrella which came faulty and then when I reported about it I says something went wrong the whole timeee\ud83d\ude2d\ud83d\ude2d\ud83d\ude2d.... curse yuo blinkit",
+      "title": null,
+      "rating": 3,
+      "sentiment_score": 0.0,
+      "date": "2026-07-27T20:36:30",
+      "author_anon": "Adi***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 36,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "all is good but the help feature isn't that much h...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "e82738256fc710446ca0b213c6731067",
+      "source": "play_store",
+      "source_id": "a3597ab8593a",
+      "app_name": "Blinkit",
+      "content": "I had ordered eggs worth 311 rupees, I order from blinkit most of the time but today when I had ordered 30 tray eggs the eggs were visiblygone day with bugs and rotten eggs, this is not the first time too as I had once the same this when I order. I had even reached the coaster care AI and it gave me 311 rupees worth of bloody coupons, not even refunding me properly. poor experienceand quality.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T20:31:18",
+      "author_anon": "Shi***",
+      "categories_mentioned": [
+        "dairy_bread"
+      ],
+      "behavioral_signals": [],
+      "word_count": 77,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 100,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I had ordered eggs worth 311 rupees, I order from ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "5e4bb86ed1f43e5e566220c70f7d1c3a",
+      "source": "play_store",
+      "source_id": "0283a76fa439",
+      "app_name": "Blinkit",
+      "content": "some times it take too much time to open",
+      "title": null,
+      "rating": 3,
+      "sentiment_score": 0.0,
+      "date": "2026-07-27T20:28:58",
+      "author_anon": "Fai***",
+      "categories_mentioned": [
+        "stationery"
+      ],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "some times it take too much time to open",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "4190a54118d356469b40eb1c6711de73",
+      "source": "play_store",
+      "source_id": "a6b99f23f12e",
+      "app_name": "Blinkit",
+      "content": "good experience you get a free consultation with doctor when you have to order any medicines I feel thankful for this app .",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T20:17:06",
+      "author_anon": "Mur***",
+      "categories_mentioned": [
+        "health"
+      ],
+      "behavioral_signals": [],
+      "word_count": 23,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "good experience you get a free consultation with d...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "d9a97acdc28eb56359f451d90e5a277d",
+      "source": "play_store",
+      "source_id": "a61789bad4eb",
+      "app_name": "Blinkit",
+      "content": "delivery comes not but given time but comes late",
+      "title": null,
+      "rating": 2,
+      "sentiment_score": -0.4,
+      "date": "2026-07-27T20:11:44",
+      "author_anon": "sha***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "delivery comes not but given time but comes late",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "2d31d1cfb3c9708ded7dab4e5ae645ad",
+      "source": "play_store",
+      "source_id": "0b5125831e7f",
+      "app_name": "Blinkit",
+      "content": "People in the next street getting the orders delivered to them. But don't know why the app saying it is unserviceable area.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T20:06:36",
+      "author_anon": "Pra***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "discovery_gap"
+      ],
+      "word_count": 22,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "People in the next street getting the orders deliv...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "f7cc1dcb6f7671ba2a83bd4e597f8e8e",
+      "source": "play_store",
+      "source_id": "439cb84762a7",
+      "app_name": "Blinkit",
+      "content": "I ordered a product on Blinkit on 10th July. Due to an issue with the product, I returned it immediately. They stated I would receive a refund by 15th July. The status shows 'refund processed,' but I haven't received it yet. Contacting customer support has not provided any proper help. Can I get some clarity on this, or is this a fraudulent app?\"",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T20:06:30",
+      "author_anon": "Ale***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 63,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 100,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I ordered a product on Blinkit on 10th July. Due t...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "903eae9bdb81dc332529793926392f47",
+      "source": "play_store",
+      "source_id": "f18179d38eb3",
+      "app_name": "Blinkit",
+      "content": "I love this app so much because of fast delevery and lowest price and free delivery. it is available on west bengal, malda also in malda there are smooth delevery and the employee are very kind",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T19:52:00",
+      "author_anon": "Aya***",
+      "categories_mentioned": [
+        "grocery"
+      ],
+      "behavioral_signals": [
+        "price_sensitivity"
+      ],
+      "word_count": 36,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 100,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I love this app so much because of fast delevery a...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "43e8a0f622c5487aaeabfa23b13b0a9a",
+      "source": "play_store",
+      "source_id": "fd4beef92bd7",
+      "app_name": "Blinkit",
+      "content": "I ll see after receiving order i heart about it it is awesome",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T19:49:57",
+      "author_anon": "Mut***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 13,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 70,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I ll see after receiving order i heart about it it...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "98a1fc07c4a71313c9e3f3ca464612be",
+      "source": "play_store",
+      "source_id": "510ffc8c8de8",
+      "app_name": "Blinkit",
+      "content": "need delivery times at 24 hours and also fresh quality always",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T19:45:55",
+      "author_anon": "ALO***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 11,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "need delivery times at 24 hours and also fresh qua...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "63c245857bebf0bd0f870ad92bbe2276",
+      "source": "play_store",
+      "source_id": "ad73930efee9",
+      "app_name": "Blinkit",
+      "content": "Everything was excellent. The delivery was fast, the items were fresh and well-packed, and the overall service was outstanding. I had a great experience. Keep up the good work!\u2728\ud83d\ude0a",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T19:24:51",
+      "author_anon": "Ank***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 29,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Everything was excellent. The delivery was fast, t...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "afe99ee56db79623c4645b9b71f4be1e",
+      "source": "play_store",
+      "source_id": "47a96437ba36",
+      "app_name": "Blinkit",
+      "content": "I love blinkit service.Always on time and quality products.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T19:22:38",
+      "author_anon": "Roo***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I love blinkit service.Always on time and quality ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "0facd73a8827fa0220914183bc408265",
+      "source": "play_store",
+      "source_id": "b5c41f69e3c8",
+      "app_name": "Blinkit",
+      "content": "some time I got delivery one hours later",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T19:21:52",
+      "author_anon": "Moh***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "some time I got delivery one hours later",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "6910845792634b9bc52c270620e7f56b",
+      "source": "play_store",
+      "source_id": "4b2a651351ec",
+      "app_name": "Blinkit",
+      "content": "Ok after shipping is available in my area this is the best app ive ever come to, all products are available and they deliver order easily too by far the best grocery app experience for me\ud83d\udcaf before bb was hassle for me blinkit seems daily option for me now grateful for it",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T19:20:38",
+      "author_anon": "Ana***",
+      "categories_mentioned": [
+        "grocery"
+      ],
+      "behavioral_signals": [
+        "habit_loop"
+      ],
+      "word_count": 52,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 90,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Ok after shipping is available in my area this is ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "2a7def8a4da8e82c5f563994a1edb3c9",
+      "source": "play_store",
+      "source_id": "e7815a98d732",
+      "app_name": "Blinkit",
+      "content": "Cheap management, i had never received any refunds",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T19:17:45",
+      "author_anon": "Iml***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "Cheap management, i had never received any refunds",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "b1bdbe81812293121484d9140eeafb7d",
+      "source": "play_store",
+      "source_id": "942a91aa170b",
+      "app_name": "Blinkit",
+      "content": "if return option will available in blinkit so .......",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T19:15:14",
+      "author_anon": "Ayu***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "if return option will available in blinkit so .......",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "ca259b50f41741cdc2a16c6ea60f7c47",
+      "source": "play_store",
+      "source_id": "5671b8f82989",
+      "app_name": "Blinkit",
+      "content": "pretty good app for emergency supplies and cravings, but i gotta pay a lot for delivery charges sometimes like maybe even a 100 rupees if it's raining but otherwise, it has good service. I've faced no difficulties till date, almost been a year now. App layout is good and easy to understand, no complications at all. I'd just suggest a little something - pls don't make the delivery partners deliver under 10 mins, they rush a lot for delivering that way and I've seen a few getting into accidents.",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T19:03:03",
+      "author_anon": "Sou***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "convenience_driver",
+        "emergency_trigger"
+      ],
+      "word_count": 89,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "pretty good app for emergency supplies and craving...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "327bf31034aed7e66fa064f37334d920",
+      "source": "play_store",
+      "source_id": "1b392897c210",
+      "app_name": "Blinkit",
+      "content": "One of the worst application, I have used. I have order things but chose wrong city and address. They are not even option to cancel the order.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T18:46:19",
+      "author_anon": "Raj***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 27,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 40,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "One of the worst application, I have used. I have ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "07b0059f8c50551c7c9d84d96e517e8b",
+      "source": "play_store",
+      "source_id": "18beb442ebe8",
+      "app_name": "Blinkit",
+      "content": "it is very useful app no words to explain",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T18:43:43",
+      "author_anon": "Rin***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "it is very useful app no words to explain",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "cc8bd8f4e904c3fc48e9f14382ad964b",
+      "source": "play_store",
+      "source_id": "d349b20998e3",
+      "app_name": "Blinkit",
+      "content": "I am very happy with the app but i would be more happy if it was delivered in the deolali camp as well.",
+      "title": null,
+      "rating": 4,
+      "sentiment_score": 0.4,
+      "date": "2026-07-27T18:10:34",
+      "author_anon": "yog***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 23,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I am very happy with the app but i would be more h...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "a460d66fad1eab803c163ebbac070e6b",
+      "source": "play_store",
+      "source_id": "de8adc534a13",
+      "app_name": "Blinkit",
+      "content": "very slow and poor service so late my first order and not good product and drinks are very bad quality",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T18:07:32",
+      "author_anon": "Ans***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "trust_issue"
+      ],
+      "word_count": 20,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 70,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "very slow and poor service so late my first order ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "7fb8599626b551ec8be9c4dbba54c659",
+      "source": "play_store",
+      "source_id": "391670e28c1b",
+      "app_name": "Blinkit",
+      "content": "order black tresseme and recieved white old conditioner bottle",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T17:57:53",
+      "author_anon": "Ash***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 9,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "order black tresseme and recieved white old condit...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "6f6de5892fdadd17f9de4c6ed6bab477",
+      "source": "play_store",
+      "source_id": "06dea7cd9255",
+      "app_name": "Blinkit",
+      "content": "\u092e\u0948\u0928\u0947 4 \u091a\u0940\u0928\u0940 \u0911\u0930\u094d\u0921\u0930 \u0915\u093f\u092f\u093e \u0930\u0947\u091f 228+29 k namak total amount 250 offer 50 cut bacha 205 final price payment pura liya but 1 chini kam diya aur bola gaya out of stock hai paisa wallet me wapas aa <PERSON> fraude kiya paisa nahi diya chor hai blinkit",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T17:45:10",
+      "author_anon": "Md ***",
+      "categories_mentioned": [
+        "grocery"
+      ],
+      "behavioral_signals": [
+        "price_sensitivity"
+      ],
+      "word_count": 49,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "\u092e\u0948\u0928\u0947 4 \u091a\u0940\u0928\u0940 \u0911\u0930\u094d\u0921\u0930 \u0915\u093f\u092f\u093e \u0930\u0947\u091f 228+29 k namak total am...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "753e98159be25a21114dd90ad49ce8f3",
+      "source": "play_store",
+      "source_id": "c5e82e90c502",
+      "app_name": "Blinkit",
+      "content": "\u092a\u093e\u0928\u0940 \u0917\u093f\u0930 \u0930\u0939\u093e \u0939\u0948 \u0906\u092a \u0915\u093e \u092c\u0948\u0917 \u0916\u0930\u093e\u092c \u0939\u094b \u091a\u0941\u0915\u093e \u0925\u093e \u092a\u0942\u0930\u093e \u0938\u092e\u093e\u0928 \u092a\u093e\u0928\u0940 \u092e\u0947\u0902 \u092d\u0940\u0917\u093e \u092e\u093f\u0932\u093e \u0916\u0930\u093e\u092c \u0938\u0930\u094d\u0935\u093f\u0938",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T17:40:55",
+      "author_anon": "rak***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 19,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "\u092a\u093e\u0928\u0940 \u0917\u093f\u0930 \u0930\u0939\u093e \u0939\u0948 \u0906\u092a \u0915\u093e \u092c\u0948\u0917 \u0916\u0930\u093e\u092c \u0939\u094b \u091a\u0941\u0915\u093e \u0925\u093e \u092a\u0942\u0930\u093e \u0938\u092e\u093e...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "7341602f35ada5e321bec5e6e61228b7",
+      "source": "play_store",
+      "source_id": "42c4912aeaac",
+      "app_name": "Blinkit",
+      "content": "return policy is horrible. I am fed up with this return and refund policies.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T17:37:08",
+      "author_anon": "Ris***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 14,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "return policy is horrible. I am fed up with this r...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "9e3a03d522f2cd216da26d8b5af02070",
+      "source": "play_store",
+      "source_id": "72b7dc5f9576",
+      "app_name": "Blinkit",
+      "content": "DKDAILYBLOGS UK05 \u0915\u0940 \u0924\u0930\u092b \u0938\u0947 \u092c\u0939\u0941\u0924 \u092c\u0939\u0941\u0924 \u0927\u0928\u094d\u092f\u0935\u093e\u0926 \u0905\u0928\u091c\u093e\u0928\u0947 \u0936\u0939\u0930 \u092e\u0947\u0902 <PERSON> \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0964\u092e\u0948\u0902 \u0915\u0908 \u092c\u093e\u0930 \u0905\u0928\u091c\u093e\u0928\u0947 \u0936\u0939\u0930 \u092e\u0947\u0902 \u0917\u092f\u093e \u0939\u0942\u0902, \u0914\u0930 \u092e\u0948\u0902\u0928\u0947 \u092f\u0939\u0940 \u0938\u0947 \u0939\u0940 \u0938\u093e\u092e\u093e\u0928 \u092e\u0902\u0917\u093e\u092f\u093e \u0939\u0948\u0964",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T17:24:50",
+      "author_anon": "DKD***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "habit_loop"
+      ],
+      "word_count": 32,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 80,
+      "quality_category": "High Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "DKDAILYBLOGS UK05 \u0915\u0940 \u0924\u0930\u092b \u0938\u0947 \u092c\u0939\u0941\u0924 \u092c\u0939\u0941\u0924 \u0927\u0928\u094d\u092f\u0935\u093e\u0926 \u0905\u0928\u091c\u093e...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "ada2e9fb2c7f6bf712109caf03e774bb",
+      "source": "play_store",
+      "source_id": "6e652fec3584",
+      "app_name": "Blinkit",
+      "content": "it's very comfortable to order medicine and doctors are available at the time, The doctor called me and prescribed me, what a service Great work blinkit.",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T17:02:20",
+      "author_anon": "Ros***",
+      "categories_mentioned": [
+        "health"
+      ],
+      "behavioral_signals": [],
+      "word_count": 26,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "it's very comfortable to order medicine and doctor...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "9f69b7a0174482a3a892067d09d5858a",
+      "source": "play_store",
+      "source_id": "e406d5f53645",
+      "app_name": "Blinkit",
+      "content": "best service for the blinkit greet service and",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T17:01:06",
+      "author_anon": "Kir***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 8,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "best service for the blinkit greet service and",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "a84d5143c6305c477b15aad43459858e",
+      "source": "play_store",
+      "source_id": "9da64cf5d083",
+      "app_name": "Blinkit",
+      "content": "It's amazing. I don't order for myself cause my area is not supported yet, but I order for my little nephew, who is thousands of km away. Loved it!!",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-07-27T16:56:16",
+      "author_anon": "Par***",
+      "categories_mentioned": [],
+      "behavioral_signals": [],
+      "word_count": 29,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 40,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "It's amazing. I don't order for myself cause my ar...",
+        "context": "Rule-based fast extraction"
+      }
+    },
+    {
+      "unified_id": "0ebc3e13ec16130bbc70c297e637ea58",
+      "source": "play_store",
+      "source_id": "b9bca4024ede",
+      "app_name": "Blinkit",
+      "content": "I received spoiled milk . I mailed you with my order id but there is no response.",
+      "title": null,
+      "rating": 1,
+      "sentiment_score": -0.8,
+      "date": "2026-07-27T16:55:03",
+      "author_anon": "Dr.***",
+      "categories_mentioned": [
+        "grocery",
+        "dairy_bread"
+      ],
+      "behavioral_signals": [],
+      "word_count": 17,
+      "url": null,
+      "metadata": {
+        "package_name": "com.grofers.customerapp"
+      },
+      "quality_score": 50,
+      "quality_category": "Medium Signal",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "I received spoiled milk . I mailed you with my ord...",
+        "context": "Rule-based fast extraction"
+      }
+    }
+  ],
+  "themes": [
+    {
+      "theme_id": "theme_81ad28ba",
+      "title": "Inconsistent Delivery Experience",
+      "summary": "Users experience inconsistent delivery times, with some receiving orders on time and others receiving them late or not at all.",
+      "category": "Delivery",
+      "sentiment": "negative",
+      "mention_count": 15,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "They deliver products very late, delivery partners stops at some place, deliberately delivering late orders.",
+        "delivery comes not but given time but comes late",
+        "some time I got delivery one hours later"
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "Blinkit"
+      ],
+      "first_seen": "2026-07-29T03:27:17.934454",
+      "trend": "stable"
+    },
+    {
+      "theme_id": "theme_8e132ae3",
+      "title": "Poor Quality Products",
+      "summary": "Users receive spoiled or damaged products, including milk and other essentials.",
+      "category": "Quality",
+      "sentiment": "negative",
+      "mention_count": 5,
+      "source_distribution": {},
+      "confidence": 0.6,
+      "confidence_level": "medium",
+      "supporting_quotes": [
+        "I received spoiled milk . I mailed you with my order id but there is no response.",
+        "order black tresseme and recieved white old conditioner bottle",
+        "\u092a\u093e\u0928\u0940 \u0917\u093f\u0930 \u0930\u0939\u093e \u0939\u0948 \u0906\u092a \u0915\u093e \u092c\u0948\u0917 \u0916\u0930\u093e\u092c \u0939\u094b \u091a\u0941\u0915\u093e \u0925\u093e \u092a\u0942\u0930\u093e \u0938\u092e\u093e\u0928 \u092a\u093e\u0928\u0940 \u092e\u0947\u0902 \u092d\u0940\u0917\u093e \u092e\u093f\u0932\u093e \u0916\u0930\u093e\u092c \u0938\u0930\u094d\u0935\u093f\u0938"
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "Blinkit"
+      ],
+      "first_seen": "2026-07-29T03:27:17.936066",
+      "trend": "stable"
+    },
+    {
+      "theme_id": "theme_a3cbba5f",
+      "title": "Lack of Return Policy",
+      "summary": "Users experience difficulties with returning or refunding products, with some being told that return options are not available.",
+      "category": "Support",
+      "sentiment": "negative",
+      "mention_count": 4,
+      "source_distribution": {},
+      "confidence": 0.6,
+      "confidence_level": "medium",
+      "supporting_quotes": [
+        "return policy is horrible. I am fed up with this return and refund policies.",
+        "I had ordered eggs worth 311 rupees, I order from blinkit most of the time but today when I had ordered 30 tray eggs the eggs were visiblygone day with bugs and rotten eggs, this is not the first time too as I had once the same this when I order. I had even reached the coaster care AI and it gave me 311 rupees worth of bloody coupons, not even refunding me properly. poor experienceand quality.",
+        "\u092e\u0948\u0928\u0947 4 \u091a\u0940\u0928\u0940 \u0911\u0930\u094d\u0921\u0930 \u0915\u093f\u092f\u093e \u0930\u0947\u091f 228+29 k namak total amount 250 offer 50 cut bacha 205 final price payment pura liya but 1 chini kam diya aur bola gaya out of stock hai paisa wallet me wapas aa <PERSON> fraude kiya paisa nahi diya chor hai blinkit"
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "Blinkit"
+      ],
+      "first_seen": "2026-07-29T03:27:17.937125",
+      "trend": "stable"
+    },
+    {
+      "theme_id": "theme_375d6c3a",
+      "title": "Convenient and Fast Delivery",
+      "summary": "Users appreciate the convenience and speed of delivery, with some receiving orders within minutes.",
+      "category": "Delivery",
+      "sentiment": "positive",
+      "mention_count": 15,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "super blinkit within 5 minutes lo delevery complete chesthunaru",
+        "all time when i ordered i received it really with in time",
+        "I love blink it service,Always on time and quality products."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "Blinkit"
+      ],
+      "first_seen": "2026-07-29T03:27:17.938188",
+      "trend": "stable"
+    },
+    {
+      "theme_id": "theme_dd91d445",
+      "title": "Limited Product Selection",
+      "summary": "Users experience difficulties finding certain products or categories on the app.",
+      "category": "Selection",
+      "sentiment": "negative",
+      "mention_count": 5,
+      "source_distribution": {},
+      "confidence": 0.6,
+      "confidence_level": "medium",
+      "supporting_quotes": [
+        "some things, like pet clothes, are not available on Blinkit.",
+        "I don't have experience of customers help desk",
+        "if return option will available in blinkit so ......."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "Blinkit"
+      ],
+      "first_seen": "2026-07-29T03:27:17.940705",
+      "trend": "stable"
+    }
+  ],
+  "barriers": [
+    {
+      "barrier_id": "barrier_14ebf6a7",
+      "category": "Beauty",
+      "barrier_type": "quality_concern",
+      "description": "Users are concerned about receiving low-quality or counterfeit beauty products, which may be a result of the app's inability to verify product authenticity.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "nutrujona fash wash kafi cheej nhi milti hai",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Implement a product verification process to ensure that beauty products meet quality standards.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_036499f6",
+      "category": "Electronics",
+      "barrier_type": "price_perception",
+      "description": "Users perceive electronics as being too expensive on the app, which may be due to high delivery charges or lack of discounts.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "wow I just like the fast delivery and cheapest items like I m ording from Amazon Flipkart like every item blinkit have phone smart watch and all electronics",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Offer discounts or promotions on electronics to make them more competitive with other retailers.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_3bf8d835",
+      "category": "Home & Kitchen",
+      "barrier_type": "selection",
+      "description": "Users are not finding a wide enough selection of home and kitchen products on the app, which may be due to limited inventory or poor categorization.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "some things, like pet clothes, are not available on Blinkit",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Increase inventory and improve categorization to make it easier for users to find what they need.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_c9b9463e",
+      "category": "Baby Care",
+      "barrier_type": "convenience",
+      "description": "Users are not finding it convenient to order baby care products on the app, which may be due to lack of delivery options or poor packaging.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "I ordered first time on this app now very fast delivery and good packaging",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Improve delivery options and packaging to make it easier for users to receive their baby care products.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_af6c2ed3",
+      "category": "Pet Care",
+      "barrier_type": "selection",
+      "description": "Users are not finding a wide enough selection of pet care products on the app, which may be due to limited inventory or poor categorization.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "some things, like pet clothes, are not available on Blinkit",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Increase inventory and improve categorization to make it easier for users to find what they need.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_867c93fb",
+      "category": "Stationery",
+      "barrier_type": "convenience",
+      "description": "Users are not finding it convenient to order stationery products on the app, which may be due to lack of delivery options or poor packaging.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "I ordered first time on this app now very fast delivery and good packaging",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Improve delivery options and packaging to make it easier for users to receive their stationery products.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    },
+    {
+      "barrier_id": "barrier_5685bc93",
+      "category": "Toys",
+      "barrier_type": "selection",
+      "description": "Users are not finding a wide enough selection of toys on the app, which may be due to limited inventory or poor categorization.",
+      "signal_count": 1,
+      "confidence": 0.5,
+      "confidence_level": "medium",
+      "supporting_evidence": [
+        {
+          "source": "play_store",
+          "text": "some things, like pet clothes, are not available on Blinkit",
+          "date": null,
+          "rating": null,
+          "url": null,
+          "app_name": null
+        }
+      ],
+      "recommended_intervention": "Increase inventory and improve categorization to make it easier for users to find what they need.",
+      "apps_affected": [
+        "Blinkit"
+      ]
+    }
+  ],
+  "personas": [
+    {
+      "persona_id": "persona_5fec2621",
+      "name": "The Pantry Stocker",
+      "description": "A busy household manager who relies on quick commerce for daily essentials, often ordering in bulk to stock their pantry.",
+      "shopping_habits": "frequency: daily, routines: orders in bulk for pantry staples like rice, pasta, and canned goods, channels: primarily uses the app for grocery shopping",
+      "motivations": [
+        "convenience",
+        "time-saving",
+        "affordability"
+      ],
+      "barriers": [
+        "limited availability of certain products",
+        "delivery issues",
+        "return policy"
+      ],
+      "preferred_categories": [
+        "groceries",
+        "pantry staples"
+      ],
+      "avoided_categories": [
+        "beauty",
+        "electronics"
+      ],
+      "apps_used": [
+        "Blinkit",
+        "Zomato"
+      ],
+      "signal_count": 17,
+      "representative_quotes": [
+        "it's one of the most convenient apps ever.",
+        "I love blinkit service, always on time and quality products.",
+        "I ordered first time on this app now very fast delivery and good packaging.."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "persona_id": "persona_52720a85",
+      "name": "The Emergency-Only Purchaser",
+      "description": "A user who only resorts to quick commerce for emergency situations, such as running out of essentials or unexpected guests.",
+      "shopping_habits": "frequency: rare, routines: orders only when absolutely necessary, often at the last minute, channels: uses the app for emergency supplies and cravings",
+      "motivations": [
+        "convenience",
+        "emergency situations",
+        "cravings"
+      ],
+      "barriers": [
+        "delivery charges",
+        "limited availability of certain products",
+        "return policy"
+      ],
+      "preferred_categories": [
+        "emergency supplies",
+        "snacks"
+      ],
+      "avoided_categories": [
+        "groceries",
+        "pantry staples"
+      ],
+      "apps_used": [
+        "Blinkit",
+        "Swiggy"
+      ],
+      "signal_count": 10,
+      "representative_quotes": [
+        "pretty good app for emergency supplies and cravings,",
+        "I love this app so much because of fast delivery and lowest price and free delivery.",
+        "I ordered a product on Blinkit on 10th July. Due to an issue with the product, I returned it immediately."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "persona_id": "persona_fa78cf49",
+      "name": "The Curious Explorer",
+      "description": "A user who actively explores new categories and products on quick commerce apps, often discovering new favorites.",
+      "shopping_habits": "frequency: regular, routines: orders from a variety of categories, including beauty, electronics, and home goods, channels: uses the app for discovery and exploration",
+      "motivations": [
+        "discovery",
+        "exploration",
+        "trying new products"
+      ],
+      "barriers": [
+        "limited availability of certain products",
+        "delivery issues",
+        "return policy"
+      ],
+      "preferred_categories": [
+        "beauty",
+        "electronics",
+        "home goods"
+      ],
+      "avoided_categories": [
+        "groceries",
+        "pantry staples"
+      ],
+      "apps_used": [
+        "Blinkit",
+        "Amazon"
+      ],
+      "signal_count": 12,
+      "representative_quotes": [
+        "wow I just like the fast delivery and cheapest items like I m ording from Amazon Flipkart like every item blinkit have phone smart watch and all electronics",
+        "it's very comfortable to order medicine and doctors are available at the time, The doctor called me and prescribed me, what a service Great work blinkit.",
+        "It's amazing. I don't order for myself cause my area is not supported yet, but I order for my little nephew, who is thousands of km away. Loved it!!"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "persona_id": "persona_303ccb65",
+      "name": "The Non-Grocery Skeptic",
+      "description": "A user who is hesitant to order non-grocery items on quick commerce apps due to concerns about quality and authenticity.",
+      "shopping_habits": "frequency: rare, routines: orders primarily groceries and pantry staples, with occasional non-grocery items, channels: uses the app for groceries and pantry staples",
+      "motivations": [
+        "convenience",
+        "affordability",
+        "quality concerns"
+      ],
+      "barriers": [
+        "limited availability of certain products",
+        "delivery issues",
+        "return policy"
+      ],
+      "preferred_categories": [
+        "groceries",
+        "pantry staples"
+      ],
+      "avoided_categories": [
+        "beauty",
+        "electronics",
+        "home goods"
+      ],
+      "apps_used": [
+        "Blinkit",
+        "BigBasket"
+      ],
+      "signal_count": 8,
+      "representative_quotes": [
+        "some things, like pet clothes, are not available on Blinkit.",
+        "I received spoiled milk. I mailed you with my order id but there is no response.",
+        "I don't have experience of customers help desk"
+      ],
+      "confidence": 0.7
+    }
+  ],
+  "jobs": [
+    {
+      "jtbd_id": "jtbd_3bf7ce2c",
+      "job_statement": "When I need emergency supplies, I want to quickly order them, so I can get what I need right away.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for emergency supplies, but sometimes face difficulties with delivery charges and late delivery.",
+      "gaps": [
+        "late delivery",
+        "high delivery charges",
+        "inconvenient return policy"
+      ],
+      "opportunity_score": 8.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "pretty good app for emergency supplies and cravings",
+        "I love blinkit service, always on time and quality products"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_49d87cd6",
+      "job_statement": "When I'm in an unfamiliar area, I want to be able to order essentials, so I can get what I need without hassle.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit in unfamiliar areas, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "difficult delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 8.0,
+      "signal_count": 3,
+      "related_persona": null,
+      "supporting_quotes": [
+        "I am very happy with the app but i would be more happy if it was delivered in the deolali camp as well"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_c381c68f",
+      "job_statement": "When I'm looking for a way to order medicine, I want to be able to do so quickly and easily, so I can get the treatment I need.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for medicine ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 8.0,
+      "signal_count": 3,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_9dad0c8b",
+      "job_statement": "When I'm looking for a convenient way to order groceries, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 6,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's one of the most convenient apps ever",
+        "super speed delivery, very use full, i use regularly",
+        "Ok after shipping is available in my area this is the best app ive ever come to"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_90dfebbe",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "super blinkit within 5 minutes lo delevery complete chesthunaru",
+        "it's very comfortable to order medicine and doctors are available at the time"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_e79d12ba",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_357ff23a",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_6c1e0734",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_edae95d1",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_dcad15bc",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    },
+    {
+      "jtbd_id": "jtbd_a9d3f2b9",
+      "job_statement": "When I'm looking for a way to order groceries without having to physically go to the store, I want to be able to do so quickly and easily, so I can save time.",
+      "category": "functional",
+      "current_solution": "Users currently use Blinkit for grocery ordering, but sometimes face difficulties with delivery and return policies.",
+      "gaps": [
+        "late delivery",
+        "inconvenient return policy",
+        "lack of product availability"
+      ],
+      "opportunity_score": 7.5,
+      "signal_count": 4,
+      "related_persona": null,
+      "supporting_quotes": [
+        "it's very comfortable to order medicine and doctors are available at the time",
+        "The doctor called me and prescribed me, what a service Great work blinkit"
+      ]
+    }
+  ],
+  "opportunities": [
+    {
+      "opportunity_id": "opp_cfae1a8c",
+      "title": "Verified Product Authenticity for Beauty Products",
+      "description": "Implement a product verification system to ensure beauty products are authentic, addressing the Non-Grocery Skeptic's quality concerns.",
+      "category": "Feature",
+      "impact": "high",
+      "effort": "medium",
+      "confidence": 0.7,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Non-Grocery Skeptic",
+      "recommended_experiment": "A/B test: 20% of users see a verified badge on beauty products, 80% do not. Measure increase in purchase rate and customer satisfaction.",
+      "apps_affected": [
+        "Beauty"
+      ]
+    },
+    {
+      "opportunity_id": "opp_6cbe341a",
+      "title": "Enhanced Product Filtering and Categorization",
+      "description": "Improve product filtering and categorization for Home & Kitchen, Pet Care, and Toys, addressing selection barriers and improving user experience.",
+      "category": "Feature",
+      "impact": "high",
+      "effort": "medium",
+      "confidence": 0.6,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Curious Explorer",
+      "recommended_experiment": "Pilot: Implement new filtering and categorization system for Home & Kitchen. Measure increase in product discovery and purchase rate.",
+      "apps_affected": [
+        "Home & Kitchen",
+        "Pet Care",
+        "Toys"
+      ]
+    },
+    {
+      "opportunity_id": "opp_b9d26b3f",
+      "title": "Emergency Supplies Job-to-be-Done Support",
+      "description": "Improve the user experience for emergency supplies, addressing the Job: When I need emergency supplies, I want to quickly order them, so I can get what I need right away.",
+      "category": "Feature",
+      "impact": "high",
+      "effort": "medium",
+      "confidence": 0.8,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Pantry Stocker",
+      "recommended_experiment": "Pilot: Implement emergency supplies feature. Measure increase in customer satisfaction and delivery rate.",
+      "apps_affected": [
+        "All"
+      ]
+    },
+    {
+      "opportunity_id": "opp_8a90810a",
+      "title": "Return Policy and Refund Process Improvements",
+      "description": "Simplify and improve return policy and refund process, addressing the Lack of Return Policy theme and improving customer satisfaction.",
+      "category": "Feature",
+      "impact": "medium",
+      "effort": "low",
+      "confidence": 0.6,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Pantry Stocker",
+      "recommended_experiment": "A/B test: 20% of users see a simplified return policy, 80% do not. Measure increase in customer satisfaction and return rate.",
+      "apps_affected": [
+        "All"
+      ]
+    },
+    {
+      "opportunity_id": "opp_9263fa6c",
+      "title": "Price Transparency and Discounts for Electronics",
+      "description": "Improve price transparency and offer discounts for electronics, addressing the Electronics \u2192 price_perception barrier and improving user experience.",
+      "category": "Feature",
+      "impact": "medium",
+      "effort": "low",
+      "confidence": 0.5,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Curious Explorer",
+      "recommended_experiment": "A/B test: 20% of users see discounted electronics, 80% do not. Measure increase in purchase rate and customer satisfaction.",
+      "apps_affected": [
+        "Electronics"
+      ]
+    },
+    {
+      "opportunity_id": "opp_5b1e6e78",
+      "title": "Real-Time Order Tracking and Estimated Delivery Time",
+      "description": "Implement real-time order tracking and estimated delivery time, addressing the Inconsistent Delivery Experience theme and improving user experience.",
+      "category": "Feature",
+      "impact": "medium",
+      "effort": "medium",
+      "confidence": 0.8,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Pantry Stocker",
+      "recommended_experiment": "Pilot: Implement real-time order tracking and estimated delivery time. Measure increase in customer satisfaction and delivery rate.",
+      "apps_affected": [
+        "All"
+      ]
+    },
+    {
+      "opportunity_id": "opp_d582d10e",
+      "title": "Convenient Delivery Options for Baby Care and Pet Care",
+      "description": "Offer convenient delivery options for baby care and pet care products, addressing the Baby Care \u2192 convenience and Pet Care \u2192 convenience barriers and improving user experience.",
+      "category": "Feature",
+      "impact": "medium",
+      "effort": "medium",
+      "confidence": 0.5,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Pantry Stocker",
+      "recommended_experiment": "Pilot: Implement convenient delivery options for baby care and pet care products. Measure increase in customer satisfaction and delivery rate.",
+      "apps_affected": [
+        "Baby Care",
+        "Pet Care"
+      ]
+    },
+    {
+      "opportunity_id": "opp_48d4f65b",
+      "title": "Stationery Product Filtering and Categorization",
+      "description": "Improve product filtering and categorization for stationery products, addressing the Stationery \u2192 convenience barrier and improving user experience.",
+      "category": "Feature",
+      "impact": "low",
+      "effort": "low",
+      "confidence": 0.5,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": "Curious Explorer",
+      "recommended_experiment": "Pilot: Implement new filtering and categorization system for stationery products. Measure increase in product discovery and purchase rate.",
+      "apps_affected": [
+        "Stationery"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "hyp_cfd66809",
+      "statement": "We believe that implementing a product verification system for beauty products will increase user trust in the app because it addresses the Non-Grocery Skeptic's quality concerns.",
+      "rationale": "Users are concerned about receiving low-quality or counterfeit beauty products, which may be a result of the app's inability to verify product authenticity. Implementing a product verification system can alleviate these concerns and increase user trust.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "User interview",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_6f2177fd",
+      "statement": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+      "rationale": "Users are not finding a wide enough selection of home and kitchen products, pet care products, and toys on the app, which may be due to limited inventory or poor categorization. Improving product filtering and categorization can help users find what they need more easily.",
+      "evidence_count": 3,
+      "confidence": 0.5,
+      "validation_method": "A/B test",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_3e3095f6",
+      "statement": "We believe that offering discounts for electronics will increase sales because it addresses the Electronics \u2192 price_perception barrier and improves user experience.",
+      "rationale": "Users perceive electronics as being too expensive on the app, which may be due to high delivery charges or lack of discounts. Offering discounts can make electronics more appealing to users and increase sales.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "Survey",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_51b14f85",
+      "statement": "We believe that implementing real-time order tracking and estimated delivery time will increase user satisfaction because it addresses the Inconsistent Delivery Experience theme and improves user experience.",
+      "rationale": "Users experience inconsistent delivery times, with some receiving orders on time and others receiving them late or not at all. Implementing real-time order tracking and estimated delivery time can help users better plan and manage their deliveries.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "Prototype test",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_8cd1ba0b",
+      "statement": "We believe that improving product categorization for Baby Care will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+      "rationale": "Users are not finding it convenient to order baby care products on the app, which may be due to lack of delivery options or poor packaging. Improving product categorization can help users find what they need more easily.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "User interview",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_f0b63275",
+      "statement": "We believe that offering a wider selection of pet care products will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+      "rationale": "Users are not finding a wide enough selection of pet care products on the app, which may be due to limited inventory or poor categorization. Offering a wider selection can help users find what they need more easily.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "Survey",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_54fc8b85",
+      "statement": "We believe that improving product filtering and categorization for Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+      "rationale": "Users are not finding a wide enough selection of toys on the app, which may be due to limited inventory or poor categorization. Improving product filtering and categorization can help users find what they need more easily.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "A/B test",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_2be528ff",
+      "statement": "We believe that offering a wider selection of home and kitchen products will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+      "rationale": "Users are not finding a wide enough selection of home and kitchen products on the app, which may be due to limited inventory or poor categorization. Offering a wider selection can help users find what they need more easily.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "Prototype test",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "hyp_477a903c",
+      "statement": "We believe that improving product categorization for Stationery will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+      "rationale": "Users are not finding it convenient to order stationery products on the app, which may be due to lack of delivery options or poor packaging. Improving product categorization can help users find what they need more easily.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "User interview",
+      "related_barrier": null,
+      "related_opportunity": null
+    }
+  ],
+  "interview_script": {
+    "optimized_script": [
+      {
+        "original_question": "Q1. Can you tell me about a recent time when you ordered groceries or household essentials from our app? What motivated you to make that purchase?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "Can you describe a recent grocery or household essentials purchase from our app? What triggered that purchase?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q2. Have you ever ordered something from our app that you didn't end up needing? If so, what happened to the item?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "Have you ever ordered something from our app that you ended up returning or not using? What happened to the item?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q3. How do you typically discover new products or categories on our app? Can you walk me through your thought process?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "How do you usually find new products or categories on our app? Can you walk me through your process?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q4. What makes you hesitant to order non-grocery items from our app? Can you give me an example of a time when you felt uncertain about a product?",
+        "issues": [
+          "Leading"
+        ],
+        "optimized_question": "What concerns do you have when ordering non-grocery items from our app? Can you give me an example of a time when you felt uncertain about a product?",
+        "validated_hypothesis": "We believe that implementing a product verification system for beauty products will increase user trust in the app because it addresses the Non-Grocery Skeptic's quality concerns.",
+        "decision_supported": "Quality concerns"
+      },
+      {
+        "original_question": "Q5. Have you ever received a beauty product from our app that didn't meet your expectations? If so, what happened?",
+        "issues": [
+          "Too narrow"
+        ],
+        "optimized_question": "Have you ever received a product from our app that didn't meet your expectations? If so, what happened?",
+        "validated_hypothesis": "We believe that implementing a product verification system for beauty products will increase user trust in the app because it addresses the Non-Grocery Skeptic's quality concerns.",
+        "decision_supported": "Quality concerns"
+      },
+      {
+        "original_question": "Q6. Can you tell me about a time when you felt that an electronics product was overpriced on our app? What made you feel that way?",
+        "issues": [
+          "Too narrow"
+        ],
+        "optimized_question": "Have you ever felt that a product on our app was overpriced? If so, what made you feel that way?",
+        "validated_hypothesis": "We believe that offering discounts for electronics will increase sales because it addresses the Electronics \u2192 price_perception barrier and improves user experience.",
+        "decision_supported": "Price perception barrier"
+      },
+      {
+        "original_question": "Q7. What do you look for when searching for home and kitchen products on our app? Have you ever had trouble finding what you needed?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "What do you look for when searching for home and kitchen products on our app? Have you ever had trouble finding what you needed?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q8. Can you walk me through your experience ordering baby care products from our app? What was easy or difficult about the process?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "Can you walk me through your experience ordering baby care products from our app? What was easy or difficult about the process?",
+        "validated_hypothesis": "We believe that improving product categorization for Baby Care will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+        "decision_supported": "Selection barrier and user experience"
+      },
+      {
+        "original_question": "Q9. Have you ever tried to order pet care products from our app but couldn't find what you needed? If so, what happened?",
+        "issues": [
+          "Too narrow"
+        ],
+        "optimized_question": "Have you ever tried to order pet care products from our app but couldn't find what you needed? If so, what happened?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q10. Can you tell me about a time when you received a stationery product from our app that was inconvenient to use? What made it inconvenient?",
+        "issues": [
+          "Too narrow"
+        ],
+        "optimized_question": "Have you ever received a product from our app that was inconvenient to use? If so, what made it inconvenient?",
+        "validated_hypothesis": "We believe that implementing a product verification system for beauty products will increase user trust in the app because it addresses the Non-Grocery Skeptic's quality concerns.",
+        "decision_supported": "Quality concerns"
+      },
+      {
+        "original_question": "Q11. How do you feel about the idea of a product verification system for beauty products on our app? Can you explain your thoughts?",
+        "issues": [
+          "Too broad",
+          "Leading"
+        ],
+        "optimized_question": "What are your thoughts on implementing a product verification system for beauty products on our app?",
+        "validated_hypothesis": "We believe that implementing a product verification system for beauty products will increase user trust in the app because it addresses the Non-Grocery Skeptic's quality concerns.",
+        "decision_supported": "Quality concerns"
+      },
+      {
+        "original_question": "Q12. If you were looking for a new home and kitchen product on our app, what features would you want to see to make your search easier?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "What features would you want to see when searching for home and kitchen products on our app?",
+        "validated_hypothesis": "We believe that improving product filtering and categorization for Home & Kitchen, Pet Care, and Toys will increase user satisfaction because it addresses selection barriers and improves user experience.",
+        "decision_supported": "Selection barriers and user experience"
+      },
+      {
+        "original_question": "Q13. Would you be more likely to order electronics from our app if we offered discounts? Can you explain your reasoning?",
+        "issues": [
+          "Too broad",
+          "Leading"
+        ],
+        "optimized_question": "Would discounts influence your decision to order electronics from our app? Can you explain your reasoning?",
+        "validated_hypothesis": "We believe that offering discounts for electronics will increase sales because it addresses the Electronics \u2192 price_perception barrier and improves user experience.",
+        "decision_supported": "Price perception barrier"
+      },
+      {
+        "original_question": "Q14. Can you tell me about a time when you felt uncertain about the delivery status of an order from our app? How did you resolve the issue?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "Have you ever felt uncertain about the delivery status of an order from our app? If so, how did you resolve the issue?",
+        "validated_hypothesis": "We believe that implementing real-time order tracking and estimated delivery time will increase user satisfaction because it addresses the Inconsistent Delivery Experience theme and improves user experience.",
+        "decision_supported": "Inconsistent delivery experience"
+      },
+      {
+        "original_question": "Q15. If you were looking for baby care products on our app, what features would you want to see to make your search easier?",
+        "issues": [
+          "Too broad"
+        ],
+        "optimized_question": "What features would you want to see when searching for baby care products on our app?",
+        "validated_hypothesis": "We believe that improving product categorization for Baby Care will increase user satisfaction because it addresses the selection barrier and improves user experience.",
+        "decision_supported": "Selection barrier and user experience"
+      }
+    ],
+    "removed_questions": [
+      {
+        "question": "Q5. Have you ever received a beauty product from our app that didn't meet your expectations? If so, what happened?",
+        "reason": "Too narrow"
+      },
+      {
+        "question": "Q6. Can you tell me about a time when you felt that an electronics product was overpriced on our app? What made you feel that way?",
+        "reason": "Too narrow"
+      },
+      {
+        "question": "Q9. Have you ever tried to order pet care products from our app but couldn't find what you needed? If so, what happened?",
+        "reason": "Too narrow"
+      }
+    ],
+    "missing_questions": [],
+    "estimated_duration": "15-20 minutes",
+    "quality_score": 0,
+    "recommendations": []
+  },
+  "executive_summary": {
+    "summary": "{'text': 'Our Quick Commerce Category Discovery Analysis reveals a complex user landscape with 4 distinct personas and 5 top themes. The analysis of 60 signals from the Play Store indicates a 60% positive sentiment, with users praising the convenience and speed of delivery. However, we also identified 7 category barriers, including concerns about product quality and authenticity. To address these challenges, we recommend prioritizing opportunities that improve user experience and increase trust in the platform.', 'metrics': {'signals_analyzed': 60, 'positive_sentiment_pct': 60.0, 'category_barriers': 7}}",
+    "key_findings": [
+      "Users experience inconsistent delivery times, with some receiving orders on time and others receiving them late or not at all.",
+      "60% of users have a positive sentiment towards Quick Commerce, citing convenience and speed of delivery.",
+      "7 category barriers were identified, including concerns about product quality and authenticity.",
+      "4 distinct personas were generated, including The Pantry Stocker and The Non-Grocery Skeptic.",
+      "The top jobs-to-be-done include emergency supplies, ordering essentials in unfamiliar areas, and convenient grocery ordering."
+    ],
+    "top_opportunities": [
+      "Verified Product Authenticity for Beauty Products: Implement a product verification system to ensure beauty products are authentic.",
+      "Enhanced Product Filtering and Categorization: Improve product filtering and categorization for Home & Kitchen, Pet Care, and Toys.",
+      "Emergency Supplies Job-to-be-Done Support: Improve the user experience for emergency supplies, addressing the Job: When I need emergency supplies, I want to quickly order them, so I can get what I need right away."
+    ],
+    "recommended_actions": [
+      "Develop a product verification system for beauty products to address concerns about authenticity.",
+      "Improve product filtering and categorization for Home & Kitchen, Pet Care, and Toys to increase user satisfaction.",
+      "Enhance the user experience for emergency supplies by simplifying the ordering process and improving delivery times."
+    ],
+    "data_coverage": {
+      "total_signals": 60,
+      "sources": {
+        "play_store": 60
+      },
+      "sentiment": {
+        "avg": 0.15,
+        "positive_pct": 60.0,
+        "negative_pct": 36.7,
+        "neutral_pct": 3.3,
+        "count": 60
+      },
+      "themes_detected": 5,
+      "barriers_detected": 7,
+      "personas_generated": 4,
+      "jobs_extracted": 11,
+      "opportunities_found": 8
+    },
+    "generated_at": "2026-07-29T03:29:03.339227"
+  },
+  "collection_results": []
+}

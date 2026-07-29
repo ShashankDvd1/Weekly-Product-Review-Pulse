@@ -13,6 +13,7 @@ from typing import Optional
 
 from core.llm_client import get_llm_client
 from core.schemas import UnifiedSignal, JTBD, JTBDCategory
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 from reasoning.behavior_analyzer import validate_quotes
 logger = logging.getLogger(__name__)
@@ -56,6 +57,8 @@ Also identify:
 
 CRITICAL: Ground every job in real user evidence. No hypothetical jobs.
 Always output valid JSON.
+
+{ANTI_HALLUCINATION_RULES}
 """
 
 

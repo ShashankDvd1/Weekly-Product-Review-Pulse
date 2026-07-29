@@ -16,6 +16,7 @@ from core.schemas import (
     Theme, CategoryBarrier, Persona, JTBD,
     GrowthOpportunity, UnifiedSignal,
 )
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,8 @@ Think like a PM who needs to convince the CEO with evidence, not opinions.
 
 CRITICAL: Every opportunity must tie back to specific themes, barriers, or jobs.
 Always output valid JSON.
+
+{ANTI_HALLUCINATION_RULES}
 """
 
 

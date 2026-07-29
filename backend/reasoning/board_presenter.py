@@ -2,6 +2,7 @@ import json
 import logging
 from core.llm_client import LLMClient
 from core.config import LLM_MODEL_REASONING, LLM_TEMPERATURE_ANALYTICAL
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,11 @@ Below are the completed steps of the Strategy Deep Dive:
    - "primary_color": matching brand color (e.g. Blinkit: "#ffc20e", Zepto: "#5c2c90", Swiggy: "#fc8019")
    - "secondary_color": matching secondary accent (e.g. Blinkit: "#3182ce", Zepto: "#e28743", Swiggy: "#8a3ab9")
 9. Every recommendation must synthesize and include: Evidence, Business impact, Tradeoff, Risk, Implementation effort, and Confidence.
-10. Return strictly a JSON object with the fields specified below. Do not output any formatting outside of the JSON block. No markdown backticks.
+10. CRITICAL ANTI-HALLUCINATION RULE: If the input data contains survey statistics, percentages, user metrics, or user quotes, you MUST preserve them EXACTLY as they are. DO NOT manipulate, smooth, or use LLM reasoning to alter any numerical data or survey findings.
+11. Return strictly a JSON object with the fields specified below. Do not output any formatting outside of the JSON block. No markdown backticks.
+
+{ANTI_HALLUCINATION_RULES}
+
 
 # JSON SCHEMA
 Return a JSON object in this format:

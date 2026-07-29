@@ -12,6 +12,7 @@ in the actual scraped data context.
 import json
 import logging
 from core.llm_client import get_llm_client
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +38,10 @@ Every recommendation must answer:
 - Why hasn't someone already solved it?
 - Why will users care?
 - What evidence supports this?
+You must respond in a single valid JSON object matching the requested schema. Do not output markdown around the JSON.
 
-You must respond in a single valid JSON object matching the requested schema. Do not output markdown around the JSON."""
+{ANTI_HALLUCINATION_RULES}
+"""
 
 
 def _build_context(signals, themes, barriers, personas, opportunities, problem_statement: str = None) -> str:

@@ -21,6 +21,7 @@ import uuid
 from core.llm_client import get_llm_client, count_tokens
 from core.schemas import UnifiedSignal, Theme, CategoryBarrier, ConfidenceLevel, SentimentLabel, BarrierType, EvidenceItem
 from core.config import GROQ_MAX_TPM, CATEGORY_BARRIER_TYPES
+from core.prompts import ANTI_HALLUCINATION_RULES
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,7 @@ def validate_quotes(quotes: list[str], signals: list[UnifiedSignal]) -> list[str
 
 
 
-BEHAVIOR_SYSTEM_PROMPT = """You are a Senior Product Manager at a Quick Commerce company (like Zepto, Blinkit, or Swiggy Instamart).
+BEHAVIOR_SYSTEM_PROMPT = f"""You are a Senior Product Manager at a Quick Commerce company (like Zepto, Blinkit, or Swiggy Instamart).
 
 Your expertise is in understanding consumer behavior — specifically WHY users behave the way they do when using quick commerce apps.
 
@@ -95,6 +96,8 @@ CRITICAL RULES:
 - Identify contradicting evidence when it exists
 - Be specific, not generic. "Users want better UX" is useless. "Users only open the app when they run out of milk because the homepage doesn't surface new categories" is actionable.
 - Always output valid JSON
+
+{ANTI_HALLUCINATION_RULES}
 """
 
 

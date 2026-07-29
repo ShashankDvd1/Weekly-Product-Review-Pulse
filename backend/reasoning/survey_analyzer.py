@@ -41,6 +41,11 @@ User Survey Data (CSV Rows):
 Analyze the survey data against the Phase 1 insights. 
 Generate a JSON output containing a Validation Matrix that maps each original hypothesis/assumption to its survey validation outcome.
 
+CRITICAL DATA PRESERVATION RULES:
+1. You MUST use the User Survey Data EXACTLY as it is uploaded.
+2. DO NOT manipulate, smooth, estimate, hallucinate, or alter ANY numerical statistics, percentages, data points, or quotes from the survey.
+3. Your analysis must only reflect the actual data provided. Do not use LLM reasoning to invent or modify the survey findings.
+
 Return ONLY a valid JSON object matching this schema:
 {{
   "validation_matrix": [
