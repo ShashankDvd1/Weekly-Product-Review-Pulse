@@ -164,6 +164,13 @@ class PipelineOrchestrator:
         # Extract existing steps from the deep dive state
         existing_steps = self.strategy_deep_dive.get("steps", {}) if self.strategy_deep_dive else {}
         
+        # If running Phase 2, we must clear subsequent steps (14, 15, 16) and board presentation to force re-evaluation with survey validation data
+        if target_phase == 2:
+            self.board_presentation = None
+            for step_id in ["step_14", "step_15", "step_16"]:
+                if step_id in existing_steps:
+                    existing_steps.pop(step_id)
+        
         # Track completed steps by ID to prevent double-counting
         self.strategy_completed_steps_set = {
             s_id for s_id, s in existing_steps.items() if s.get("status") == "complete"
@@ -219,7 +226,11 @@ class PipelineOrchestrator:
                 target_phase=target_phase,
                 survey_context=self.strategy_deep_dive.get("survey_validation") if self.strategy_deep_dive else None
             )
+            # Preserve survey validation metadata when overwriting self.strategy_deep_dive
+            survey_validation = self.strategy_deep_dive.get("survey_validation") if self.strategy_deep_dive else None
             self.strategy_deep_dive = result
+            if survey_validation:
+                self.strategy_deep_dive["survey_validation"] = survey_validation
             
             if target_phase == 1:
                 self.strategy_status = "awaiting_survey"
