@@ -233,7 +233,10 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
 
     strategy_steps_text = "\n\n".join(steps_context_list)
 
-    prompt = PROMPT_TEMPLATE.format(strategy_steps=strategy_steps_text)
+    prompt = PROMPT_TEMPLATE.format(
+        strategy_steps=strategy_steps_text,
+        ANTI_HALLUCINATION_RULES=ANTI_HALLUCINATION_RULES
+    )
     
     # Run LLM query using deep reasoning model
     try:
