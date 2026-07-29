@@ -24,10 +24,7 @@ def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: 
             import time
             time.sleep(1.0)  # Sleep between pages to avoid Apple RSS rate limiting
             
-        if page == 1:
-            url = f"https://itunes.apple.com/{country}/rss/customerreviews/id={app_id}/xml"
-        else:
-            url = f"https://itunes.apple.com/{country}/rss/customerreviews/page={page}/sortBy=mostRecent/id={app_id}/xml"
+        url = f"https://itunes.apple.com/{country}/rss/customerreviews/page={page}/sortBy=mostRecent/id={app_id}/xml"
             
         try:
             response = requests.get(url, headers=headers, timeout=10)
