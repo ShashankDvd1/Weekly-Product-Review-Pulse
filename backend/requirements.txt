@@ -22,3 +22,9 @@ groq>=0.4.2
 
 # ── MCP Protocol ──
 mcp>=1.0.0
+
+# ── Google APIs (Docs & Slides Exports) ──
+google-api-python-client>=2.116.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
