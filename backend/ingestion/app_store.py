@@ -16,7 +16,7 @@ def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: 
     all_reviews = []
 
     for page in range(1, max_pages + 1):
-        url = f"https://itunes.apple.com/{country}/rss/customerreviews/id={app_id}/sortBy=mostRecent/page={page}/json"
+        url = f"https://itunes.apple.com/{country}/rss/customerreviews/page={page}/sortBy=mostRecent/id={app_id}/json"
         response = requests.get(url)
         if response.status_code != 200:
             break
