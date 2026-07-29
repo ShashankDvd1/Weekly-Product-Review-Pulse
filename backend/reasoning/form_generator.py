@@ -136,6 +136,19 @@ def get_google_credentials():
     # 2. Check client_secret.json (fallback if token.json doesn't exist or failed)
     if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
         try:
+            import webbrowser
+            import subprocess
+            
+            def powershell_open(url, new=0, autoraise=True):
+                try:
+                    # Explicitly run Start-Process in PowerShell to open browser on host OS
+                    subprocess.run(["powershell", "-Command", f"Start-Process '{url}'"], shell=True)
+                    return True
+                except Exception:
+                    return False
+            
+            webbrowser.open = powershell_open
+            
             from google_auth_oauthlib.flow import InstalledAppFlow
             flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CLIENT_SECRET_FILE, GOOGLE_API_SCOPES)
             creds = flow.run_local_server(port=0)
