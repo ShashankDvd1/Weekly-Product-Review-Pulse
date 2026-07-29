@@ -326,7 +326,6 @@ class PipelineOrchestrator:
                         self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
                         df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=300)
                         if not df_play.empty:
-                            df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} custom Play Store reviews")
@@ -338,7 +337,6 @@ class PipelineOrchestrator:
                         self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
                         df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=4)
                         if not df_app.empty:
-                            df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
@@ -361,7 +359,6 @@ class PipelineOrchestrator:
                         self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
                         df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=300)
                         if not df_play.empty:
-                            df_play["content"] = df_play["content"].apply(scrub_pii_from_text)
                             normalized = normalize_play_store_reviews(df_play, app_name, package)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} Play Store reviews for {app_name}")
@@ -372,7 +369,6 @@ class PipelineOrchestrator:
                         self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
                         df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=4)
                         if not df_app.empty:
-                            df_app["content"] = df_app["content"].apply(scrub_pii_from_text)
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
                             batch_signals.extend(normalized)
                             self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
@@ -390,8 +386,6 @@ class PipelineOrchestrator:
                         search_terms=reddit_search_terms,
                     )
                     if reddit_signals:
-                        for sig in reddit_signals:
-                            sig["content"] = scrub_pii_from_text(sig["content"])
                         normalized = normalize_reddit_data(reddit_signals)
                         batch_signals.extend(normalized)
                         self._log_progress(f"  ✅ {len(normalized)} Reddit signals collected")
@@ -441,6 +435,12 @@ class PipelineOrchestrator:
             else:
                 self._log_progress(f"⚠️ Reached max retries. Proceeding with {len(accepted_signals)} valid reviews.")
                 self.signals = accepted_signals
+                
+        # Scrub PII only from final accepted high-signal reviews to save 90%+ CPU processing time on Free Tier
+        if self.signals:
+            self._log_progress(f"🔒 Scrubbing PII from final {len(self.signals)} accepted signals...")
+            for sig in self.signals:
+                sig.content = scrub_pii_from_text(sig.content)
                 
         return self.signals
 
