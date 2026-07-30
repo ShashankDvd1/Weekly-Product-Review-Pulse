@@ -629,7 +629,7 @@ const renderActiveSlideContent = (activeSlide, brandColor) => {
           </div>
         </div>
       );
-    default:
+    default: {
       // Fallback to standard key-value rendering
       const skipKeys = ["title", "headline", "slide_number", "type", "speaker_notes"];
       const entries = Object.entries(activeSlide).filter(([k]) => !skipKeys.includes(k));
@@ -656,6 +656,7 @@ const renderActiveSlideContent = (activeSlide, brandColor) => {
           </div>
         </div>
       );
+    }
   }
 };
 
