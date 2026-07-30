@@ -23,6 +23,7 @@ Follow this sequence before proposing any product solution:
 * Distinguish between correlation and causation.
 * If evidence is weak or limited (e.g. small sample sizes), explicitly declare the uncertainty.
 * **Framework Selection Rule**: Before analyzing data or writing a report, determine which analytical frameworks are appropriate for the available evidence. Only use a framework if it uncovers new, evidence-backed insights. If multiple frameworks produce overlapping conclusions, keep only the one that provides the greatest analytical value. Avoid framework-driven analysis; prefer evidence-driven analysis.
+* **Problem Statement Dominance Rule**: All multi-agent research stages (from Planning to Audit) must accept and align their synthesis directly to the active business `problem_statement`. Reject or flag generic, unrelated feedback (such as general delivery complaints, customer support issues, or refund disputes) unless they directly evidence a friction pattern relevant to the target problem statement. Every agent output — themes, barriers, hypotheses, personas, RICE scores, and slides — must trace back to the problem statement as the north star.
 
 ## Presentation & Writing Style
 * Build arguments that are logically impossible to dismiss. Each slide/report section must address one core question.
@@ -56,8 +57,17 @@ Follow this sequence before proposing any product solution:
   * Set the background fill of each slide dynamically to a modern dark slate (`#0d111d`) or matching theme.
   * Programmatically create rectangle shapes to serve as top accent borders, colored in the analyzed brand's primary theme color (e.g. Swiggy Orange, Zepto Purple, Swiggy Instamart Orange).
   * Create and position distinct styled text boxes (e.g. Georgia Bold 18pt for titles, Arial 12pt light-gray for bullet bodies) to display synthesized case study data dynamically.
-* **Slide Structure (10-Slide Standard Arc)**: Always structure presentation data using this exact 10-slide outline:
-  1. The Market Gap, 2. Problem Statement, 3. User Research & Evidence, 4. Target Segment, 5. Understanding the Breakdown, 6. Proposed Solution, 7. Product Prototype & Integration, 8. Technical Implementation, 9. Success Metrics, 10. Risk Mitigation.
+* **Slide Structure (10-Slide McKinsey Arc)**: Always structure presentation data using this exact 10-slide outline — every presentation deck generated must contain exactly these slides in this order:
+  1. **Market Gap & Problem** (`type: market_gap`) — Platform comparison table, market size stats, why solve this first
+  2. **User Research & Sentiment** (`type: user_research`) — Analyzed review counts, pain rate %, sentiment breakdown (neg/neutral/pos), cited verbatims
+  3. **Segment Personas & User Journey** (`type: personas_journey`) — 2 primary personas (name, trust pattern, unmet need, behavioral trap, quote) + 5-stage habit loop journey
+  4. **Problem Framing Canvas** (`type: problem_framing`) — 4-panel canvas: True Problem / Target Cohort / Evidence / Value Generated + Why Now urgency
+  5. **Hypotheses & RICE Framework** (`type: hypotheses_rice`) — Competing hypotheses with H1 marked CHOSEN, RICE scoring table across all hypotheses, winning rationale
+  6. **Solution Comparison** (`type: solution_comparison`) — S1–S4 cards with CHOSEN/REJECTED status and top-border color coding, vs-comparison justifications
+  7. **MVP Prototype Specification** (`type: mvp_spec`) — Screen mapping spec, trust cue pills, live prototype link
+  8. **System Data Flow & Edge Cases** (`type: data_flow_edges`) — Review engine pipeline, cross-sell engine, behavioral nudges, edge case mitigations
+  9. **North Star & Leading Indicators** (`type: metrics_indicators`) — North Star metric banner with target shift, 2x2 leading indicator cards with below-target action plans
+  10. **Failure Modes & Mitigations** (`type: failure_mitigations`) — Failure table with CRIT/HIGH/MED severity badges, guardrails threshold table, closing resilience statement
 * **Content Rules**:
   * Slide titles MUST be the key message/takeaway (e.g. "Users abandon carts due to warranty fears", not "Problem Statement").
   * Max 10 slides total. Tone must be professional, analytical, and data-driven.
