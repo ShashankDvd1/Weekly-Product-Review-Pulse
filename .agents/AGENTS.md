@@ -63,6 +63,11 @@ Follow this sequence before proposing any product solution:
   * Max 10 slides total. Tone must be professional, analytical, and data-driven.
   * The Fellow's name must NEVER appear in the deck.
   * Hyperlink all supporting research artifacts.
+  * **High-Density Self-Explanatory Bullets**: Bullet points on slides must be highly detailed and written in multi-sentence form. Each bullet point must explicitly link:
+    1. A core customer behavioral finding or friction point.
+    2. Direct quantitative metrics or qualitative quote evidence (e.g., "34% of users drop out at checkout because of hidden shipping fees").
+    3. The direct strategic implication or product recommendation.
+    Avoid generic placeholders, short phrases, or hand-waving statements (e.g., "investigation is required").
 * **Typography & Styling**:
   * Minimum Font Size: Google Slides/PPT (14pt), Figma (26px), Canva (22px).
   * Ensure high contrast and color-blind safe palettes.

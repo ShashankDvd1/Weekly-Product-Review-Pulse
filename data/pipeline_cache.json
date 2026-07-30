@@ -1,32 +1,32 @@
 {
   "status": "complete",
   "progress": [
-    "[10:54:39] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
-    "[10:56:24] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-01 To: 2026-07-28)",
-    "[10:56:24] \ud83d\udcf1 Collecting Play Store reviews for Zepto...",
-    "[10:56:43]   \u2705 2470 Play Store reviews for Zepto",
-    "[10:56:43] \ud83c\udf4e Collecting App Store reviews for Zepto...",
-    "[10:56:47]   \u26a0\ufe0f 0 App Store reviews found in selected date range for Zepto",
-    "[10:56:47] \ud83d\udd04 Deduplicating 2470 cumulative signals...",
-    "[10:58:50] \u2705 Current unique dataset: 1549 signals",
-    "[10:58:50] \ud83e\udde0 Running Intelligent Quality Filter on 1549 reviews...",
-    "[10:58:51] \ud83c\udfc6 Accepted high-signal genuine reviews: 912",
-    "[10:58:51] \u2705 Reached target of 150 genuine reviews. Proceeding to analysis.",
-    "[10:58:51] \ud83d\udd12 Scrubbing PII from final 912 accepted signals...",
-    "[10:59:21] \ud83c\udfad Running sentiment analysis...",
-    "[10:59:21]   \u2705 Sentiment analysis complete",
-    "[10:59:21] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
-    "[10:59:21] Running Stage 1/9: Research Planning Agent...",
-    "[10:59:22] Stage 1/9: Research Planning Agent completed successfully.",
-    "[10:59:22] Running Stage 2/9: Data Processing Agent...",
-    "[10:59:23] Stage 2/9: Data Processing Agent completed successfully.",
-    "[10:59:23] Running Stage 3/9: Research Discovery Agent...",
-    "[10:59:29] Stage 3/9: Research Discovery Agent completed successfully.",
-    "[10:59:29] Running Stage 4/9: Pattern & Segmentation Agent...",
-    "[10:59:44] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
-    "[10:59:44] Running Stage 5/9: Root Cause & Strategy Agent...",
-    "[11:00:05] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
-    "[11:00:05] \ud83c\udf89 Analysis pipeline complete!"
+    "[11:34:13] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
+    "[11:34:30] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-01 To: 2026-07-28)",
+    "[11:34:30] \ud83d\udcf1 Collecting Play Store reviews for Zepto...",
+    "[11:34:49]   \u2705 2463 Play Store reviews for Zepto",
+    "[11:34:49] \ud83c\udf4e Collecting App Store reviews for Zepto...",
+    "[11:34:53]   \u26a0\ufe0f 0 App Store reviews found in selected date range for Zepto",
+    "[11:34:53] \ud83d\udd04 Deduplicating 2463 cumulative signals...",
+    "[11:36:40] \u2705 Current unique dataset: 1546 signals",
+    "[11:36:40] \ud83e\udde0 Running Intelligent Quality Filter on 1546 reviews...",
+    "[11:36:40] \ud83c\udfc6 Accepted high-signal genuine reviews: 909",
+    "[11:36:40] \u2705 Reached target of 150 genuine reviews. Proceeding to analysis.",
+    "[11:36:40] \ud83d\udd12 Scrubbing PII from final 909 accepted signals...",
+    "[11:37:11] \ud83c\udfad Running sentiment analysis...",
+    "[11:37:11]   \u2705 Sentiment analysis complete",
+    "[11:37:11] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
+    "[11:37:11] Running Stage 1/9: Research Planning Agent...",
+    "[11:37:12] Stage 1/9: Research Planning Agent completed successfully.",
+    "[11:37:12] Running Stage 2/9: Data Processing Agent...",
+    "[11:37:13] Stage 2/9: Data Processing Agent completed successfully.",
+    "[11:37:13] Running Stage 3/9: Research Discovery Agent...",
+    "[11:37:30] Stage 3/9: Research Discovery Agent completed successfully.",
+    "[11:37:30] Running Stage 4/9: Pattern & Segmentation Agent...",
+    "[11:37:56] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
+    "[11:37:56] Running Stage 5/9: Root Cause & Strategy Agent...",
+    "[11:38:19] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
+    "[11:38:19] \ud83c\udf89 Analysis pipeline complete!"
   ],
   "signals": [
     {
@@ -24675,95 +24675,13 @@
         "pain_point": "best app..blinkit is looting. zepto is too gud \u2665\ufe0f",
         "context": "Rule-based fast extraction"
       }
-    },
-    {
-      "unified_id": "7df1ba9ec92cce2e858d501f486e9d63",
-      "source": "play_store",
-      "source_id": "6406c811f1ff",
-      "app_name": "Zepto",
-      "content": "charging more on all d items how can we buy the items if u dothis",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-07-17T23:59:05",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 15,
-      "url": null,
-      "metadata": {
-        "package_name": "com.zeptoconsumerapp"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "charging more on all d items how can we buy the it...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "3948320d2085c12f8df7ee564fb8e110",
-      "source": "play_store",
-      "source_id": "4422f49890ae",
-      "app_name": "Zepto",
-      "content": "Choose zepto for Near expiry date bad tasting food items delivered to your doorstep",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-07-17T23:55:03",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.zeptoconsumerapp"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Choose zepto for Near expiry date bad tasting food...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "d56bc34889e1c33f5784e7efe190bb75",
-      "source": "play_store",
-      "source_id": "0c17b68dcbae",
-      "app_name": "Zepto",
-      "content": "fraud company, my order. not delivered but showing as delivered. i will show you the consequences of fraud. have cctv camera installed at my home. meet u in court.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-07-17T23:31:36",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "home_kitchen"
-      ],
-      "behavioral_signals": [],
-      "word_count": 29,
-      "url": null,
-      "metadata": {
-        "package_name": "com.zeptoconsumerapp"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "fraud company, my order. not delivered but showing...",
-        "context": "Rule-based fast extraction"
-      }
     }
   ],
   "themes": [
     {
       "theme_id": "T1",
-      "title": "Product Quality Issues",
-      "summary": "Product Quality Issues",
+      "title": "Product Quality and Safety",
+      "summary": "Product Quality and Safety",
       "category": "UX",
       "sentiment": "negative",
       "mention_count": 2,
@@ -24771,8 +24689,8 @@
       "confidence": 0.8,
       "confidence_level": "high",
       "supporting_quotes": [
-        "Users are experiencing issues with product quality, including spoiled or damaged items.",
-        "Customers are facing difficulties with refunds and replacements."
+        "Users have reported issues with product quality, such as spoiled milk and damaged products.",
+        "Users are hesitant to try new categories due to concerns about product quality or safety."
       ],
       "supporting_evidence": [],
       "contradicting_evidence": [],
@@ -24786,8 +24704,8 @@
     },
     {
       "theme_id": "T2",
-      "title": "Technical Issues",
-      "summary": "Technical Issues",
+      "title": "Customer Support",
+      "summary": "Customer Support",
       "category": "UX",
       "sentiment": "negative",
       "mention_count": 2,
@@ -24795,8 +24713,8 @@
       "confidence": 0.8,
       "confidence_level": "high",
       "supporting_quotes": [
-        "Technical issues, such as online transaction problems and app glitches, are reported.",
-        "Users are frustrated with the customer support, citing unhelpful and unresponsive service."
+        "Users have reported issues with customer support, such as unhelpful responses and lack of follow-up.",
+        "Users are discouraged from trying new categories due to issues with customer support."
       ],
       "supporting_evidence": [],
       "contradicting_evidence": [],
@@ -24810,8 +24728,8 @@
     },
     {
       "theme_id": "T3",
-      "title": "Customer Support",
-      "summary": "Customer Support",
+      "title": "Category Discovery and Navigation",
+      "summary": "Category Discovery and Navigation",
       "category": "UX",
       "sentiment": "negative",
       "mention_count": 2,
@@ -24819,8 +24737,8 @@
       "confidence": 0.8,
       "confidence_level": "high",
       "supporting_quotes": [
-        "Users are frustrated with the customer support, citing unhelpful and unresponsive service.",
-        "A few users have reported helpful and responsive service."
+        "Users may not be aware of the new categories available on the platform or may find it difficult to navigate to them.",
+        "Users have reported difficulty finding new categories or navigating to them."
       ],
       "supporting_evidence": [],
       "contradicting_evidence": [],
@@ -24838,12 +24756,12 @@
       "barrier_id": "B1",
       "category": "Quick Commerce",
       "barrier_type": "trust",
-      "description": "The root cause of product quality issues is the lack of quality control in Zepto's supply chain, leading to spoiled or damaged items being delivered to customers.",
+      "description": "Users are hesitant to try new categories due to concerns about product quality or safety, leading to a lack of trust in the platform's ability to provide high-quality products.",
       "signal_count": 2,
       "confidence": 0.9,
       "confidence_level": "high",
       "supporting_evidence": [],
-      "recommended_intervention": "Lack of Quality Control in Supply Chain",
+      "recommended_intervention": "Lack of Trust in Product Quality and Safety",
       "apps_affected": [
         "zepto",
         "blinkit",
@@ -24854,12 +24772,12 @@
       "barrier_id": "B2",
       "category": "Quick Commerce",
       "barrier_type": "trust",
-      "description": "The root cause of poor customer support is inadequate training for customer support agents, leading to unhelpful and unresponsive service.",
+      "description": "Users are discouraged from trying new categories due to issues with customer support, leading to a negative experience and decreased trust in the platform.",
       "signal_count": 2,
       "confidence": 0.85,
       "confidence_level": "high",
       "supporting_evidence": [],
-      "recommended_intervention": "Inadequate Customer Support Training",
+      "recommended_intervention": "Poor Customer Support Experience",
       "apps_affected": [
         "zepto",
         "blinkit",
@@ -24870,12 +24788,12 @@
       "barrier_id": "B3",
       "category": "Quick Commerce",
       "barrier_type": "trust",
-      "description": "The root cause of technical issues is the technical issues with the app, leading to online transaction problems and app glitches.",
-      "signal_count": 1,
+      "description": "Users may not be aware of the new categories available on the platform or may find it difficult to navigate to them, leading to a lack of exploration and discovery of new products.",
+      "signal_count": 2,
       "confidence": 0.8,
       "confidence_level": "high",
       "supporting_evidence": [],
-      "recommended_intervention": "Technical Issues with App",
+      "recommended_intervention": "Difficulty Finding and Navigating New Categories",
       "apps_affected": [
         "zepto",
         "blinkit",
@@ -24886,12 +24804,12 @@
   "personas": [
     {
       "persona_id": "P1",
-      "name": "Frustrated Customers",
-      "description": "Experiencing issues with product quality, Facing difficulties with refunds and replacements, Frustrated with customer support",
-      "shopping_habits": "Experiencing issues with product quality, Facing difficulties with refunds and replacements, Frustrated with customer support",
+      "name": "Grocery Loyalists",
+      "description": "Recurring grocery orders, Limited category exploration",
+      "shopping_habits": "Recurring grocery orders, Limited category exploration",
       "motivations": [
-        "Fresh and high-quality products",
-        "Easy resolution of technical issues"
+        "Convenience",
+        "Familiarity with products"
       ],
       "barriers": [],
       "preferred_categories": [],
@@ -24901,18 +24819,60 @@
         "blinkit",
         "swiggy_instamart"
       ],
-      "signal_count": 70,
+      "signal_count": 60,
       "representative_quotes": [],
       "confidence": 0.5
     },
     {
       "persona_id": "P2",
-      "name": "Loyal Users",
-      "description": "Positive experiences with Zepto's customer service, Timely deliveries",
-      "shopping_habits": "Positive experiences with Zepto's customer service, Timely deliveries",
+      "name": "Explorers",
+      "description": "Regularly try new categories, Positive experiences with new categories",
+      "shopping_habits": "Regularly try new categories, Positive experiences with new categories",
       "motivations": [
-        "Good customer service",
-        "Timely deliveries"
+        "Discovery of new products",
+        "Confidence in product quality and safety"
+      ],
+      "barriers": [],
+      "preferred_categories": [],
+      "avoided_categories": [],
+      "apps_used": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "signal_count": 20,
+      "representative_quotes": [],
+      "confidence": 0.5
+    },
+    {
+      "persona_id": "P3",
+      "name": "Dissatisfied Customers",
+      "description": "Frequent issues with product quality and delivery, Poor customer support experiences",
+      "shopping_habits": "Frequent issues with product quality and delivery, Poor customer support experiences",
+      "motivations": [
+        "Reliability of products",
+        "Effective customer support"
+      ],
+      "barriers": [],
+      "preferred_categories": [],
+      "avoided_categories": [],
+      "apps_used": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "signal_count": 10,
+      "representative_quotes": [],
+      "confidence": 0.5
+    },
+    {
+      "persona_id": "P4",
+      "name": "Unaware Users",
+      "description": "Difficulty finding new categories, Limited navigation to new categories",
+      "shopping_habits": "Difficulty finding new categories, Limited navigation to new categories",
+      "motivations": [
+        "Easy discovery of new categories",
+        "Clear navigation to new categories"
       ],
       "barriers": [],
       "preferred_categories": [],
@@ -24930,34 +24890,34 @@
   "jobs": [
     {
       "jtbd_id": "J1",
-      "job_statement": "When I order groceries online, I want to receive fresh and high-quality products, so I can save time and effort.",
+      "job_statement": "When I want to explore new categories on the platform, I want to easily find and navigate to them, so I can discover new products and services.",
       "category": "functional",
-      "current_solution": "Users are currently relying on Zepto's customer support to resolve issues with product quality.",
+      "current_solution": "Users may have to search through the app or website to find new categories, which can be time-consuming and frustrating.",
       "gaps": [
-        "Lack of transparency in product quality and sourcing",
-        "Inadequate customer support for resolving product quality issues"
+        "Difficulty finding new categories",
+        "Difficulty navigating to new categories"
       ],
       "opportunity_score": 8.0,
       "signal_count": 1,
       "related_persona": null,
       "supporting_quotes": [
-        "Very poor customer service. They are selling spoilt and sour milk. and they don't take it back and no refund policy. total waste of money."
+        "I usually never leave reviews, but I'm disappointed with this recurring issue. I have no complaints about the delivery partner. My concern is the packaging. Products are often delivered without proper packing, making them difficult to carry and handle."
       ]
     },
     {
       "jtbd_id": "J2",
-      "job_statement": "When I experience technical issues with the app, I want to be able to easily resolve the problem, so I can continue using the app.",
-      "category": "functional",
-      "current_solution": "Users are currently forced to contact customer support or restart the app to resolve technical issues.",
+      "job_statement": "When I want to try new products, I want to be confident in their quality and safety, so I can make informed purchasing decisions.",
+      "category": "emotional",
+      "current_solution": "Users may have to rely on reviews and ratings to gauge product quality, which can be unreliable.",
       "gaps": [
-        "Lack of clear instructions for resolving technical issues",
-        "Inadequate customer support for technical issues"
+        "Lack of trust in product quality",
+        "Lack of confidence in product safety"
       ],
       "opportunity_score": 7.0,
       "signal_count": 1,
       "related_persona": null,
       "supporting_quotes": [
-        "technical issues regarding online transactions rude customer care"
+        "I ordered milk from zepto, and the milk has been spoiled two or three times since it arrived. There is no response from Chat when I complain about this. They asked me to send this by email. Even though I sent an email, there was no response."
       ]
     }
   ],
@@ -24965,8 +24925,18 @@
   "hypotheses": [
     {
       "hypothesis_id": "H1",
-      "statement": "Users are more likely to experience issues with product quality if they have a history of ordering from Zepto.",
-      "rationale": "Multiple users have reported receiving spoiled or damaged items, and some have mentioned that this has happened repeatedly.",
+      "statement": "Users are hesitant to try new categories due to concerns about product quality or safety.",
+      "rationale": "Users have reported issues with product quality, such as spoiled milk and damaged products.",
+      "evidence_count": 1,
+      "confidence": 1.0,
+      "validation_method": "User Survey & Triangulation",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "H2",
+      "statement": "Users may not be aware of the new categories available on the platform or may find it difficult to navigate to them.",
+      "rationale": "Users have reported difficulty finding new categories or navigating to them.",
       "evidence_count": 1,
       "confidence": 0.5,
       "validation_method": "User Survey & Triangulation",
@@ -24974,221 +24944,17 @@
       "related_opportunity": null
     },
     {
-      "hypothesis_id": "H2",
-      "statement": "Technical issues, such as online transaction problems and app glitches, are more common among users who have not updated their app in a while.",
-      "rationale": "Several users have reported technical issues, and some have mentioned that they were able to resolve the problem by updating their app.",
+      "hypothesis_id": "H3",
+      "statement": "Users are discouraged from trying new categories due to issues with customer support.",
+      "rationale": "Users have reported issues with customer support, such as unhelpful responses and lack of follow-up.",
       "evidence_count": 1,
-      "confidence": 0.2,
+      "confidence": 0.5,
       "validation_method": "User Survey & Triangulation",
       "related_barrier": null,
       "related_opportunity": null
     }
   ],
-  "interview_script": {
-    "optimized_script": [
-      {
-        "original_question": "Q1. Can you tell me about a time when you were hesitant to buy a non-grocery item from a quick commerce app? What were your concerns?",
-        "issues": [
-          "Too broad",
-          "Leading"
-        ],
-        "optimized_question": "What specific concerns do you have when buying non-grocery items from a quick commerce app?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q2. Describe a situation where you had to use a quick commerce app in an emergency. What was the situation, and how did you feel about using the app?",
-        "issues": [
-          "Too broad",
-          "Leading"
-        ],
-        "optimized_question": "Have you ever used a quick commerce app in an emergency? What was the situation, and how did you feel about the experience?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q3. Have you ever tried a new product or category on a quick commerce app? What motivated you to try it, and what was your experience like?",
-        "issues": [
-          "Too broad",
-          "Solution bias"
-        ],
-        "optimized_question": "What motivates you to try new products or categories on a quick commerce app?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q4. Can you walk me through your thought process when considering purchasing technology or beauty products from a quick commerce app? What factors influence your decision?",
-        "issues": [
-          "Too broad",
-          "Solution bias"
-        ],
-        "optimized_question": "What factors influence your decision when purchasing technology or beauty products from a quick commerce app?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q5. Have you ever received a product from a quick commerce app that you were concerned might be counterfeit or low-quality? How did you feel, and what did you do?",
-        "issues": [],
-        "optimized_question": "Have you ever received a product from a quick commerce app that you suspected might be counterfeit or low-quality? What did you do?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q6. Can you describe a situation where you were expecting a quick delivery of a home and kitchen product, but it was delayed or missing? How did you feel, and what did you do?",
-        "issues": [],
-        "optimized_question": "Have you ever experienced a delayed or missing delivery of a home and kitchen product from a quick commerce app? What did you do?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q7. Have you ever seen product quality ratings or reviews on a quick commerce app? How did you feel about them, and did they influence your purchasing decision?",
-        "issues": [
-          "Solution bias"
-        ],
-        "optimized_question": "Have you ever seen product quality ratings or reviews on a quick commerce app? How did you feel about them?",
-        "validated_hypothesis": "We believe that displaying product quality ratings will reduce complaints about receiving damaged or low-quality products because users value transparency and trustworthiness.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q8. Can you describe a situation where you received a product from a quick commerce app that you were satisfied with? What made you feel satisfied, and how did the app's quality verification process contribute to that?",
-        "issues": [
-          "Solution bias"
-        ],
-        "optimized_question": "Have you ever received a product from a quick commerce app that exceeded your expectations? What made it stand out?",
-        "validated_hypothesis": "We believe that implementing a quality verification process will increase customer satisfaction with product quality because users value high-quality products.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q9. Have you ever been surprised by fees or charges on a quick commerce app? How did you feel, and what did you do?",
-        "issues": [],
-        "optimized_question": "Have you ever been surprised by fees or charges on a quick commerce app? What did you do?",
-        "validated_hypothesis": "We believe that providing transparent pricing and fees will reduce complaints about surprise fees because users value transparency and fairness.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q10. Can you describe a situation where you were looking for a specific product on a quick commerce app, but it was not available? How did you feel, and what did you do?",
-        "issues": [],
-        "optimized_question": "Have you ever looked for a specific product on a quick commerce app, but it was not available? What did you do?",
-        "validated_hypothesis": "We believe that offering a wider product selection will increase customer satisfaction with the app because users value convenience and choice.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q11. Have you ever read or written a review on a quick commerce app? What motivated you to do so, and how did you feel about the experience?",
-        "issues": [
-          "Solution bias"
-        ],
-        "optimized_question": "Have you ever read or written a review on a quick commerce app? What motivated you to do so?",
-        "validated_hypothesis": "We believe that implementing a ratings and reviews system will increase customer trust in product quality because users value transparency and trustworthiness.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q12. Can you think of a time when you were considering purchasing a product from a quick commerce app, but you were unsure about its quality? What did you do, and how did you feel about the experience?",
-        "issues": [],
-        "optimized_question": "Have you ever been unsure about the quality of a product on a quick commerce app? What did you do?",
-        "validated_hypothesis": "We believe that displaying product quality ratings will reduce complaints about receiving damaged or low-quality products because users value transparency and trustworthiness.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q13. Describe a situation where you were expecting a quick delivery of a pet care or stationery product, but it was delayed or missing. How did you feel, and what did you do?",
-        "issues": [],
-        "optimized_question": "Have you ever experienced a delayed or missing delivery of a pet care or stationery product from a quick commerce app? What did you do?",
-        "validated_hypothesis": "We believe that providing transparent pricing and fees will reduce complaints about surprise fees because users value transparency and fairness.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q14. Can you walk me through your thought process when considering purchasing a product from a quick commerce app that you've never used before? What factors influence your decision?",
-        "issues": [
-          "Too broad",
-          "Solution bias"
-        ],
-        "optimized_question": "What factors influence your decision when purchasing a product from a quick commerce app that you've never used before?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      },
-      {
-        "original_question": "Q15. Have you ever received a product from a quick commerce app that exceeded your expectations? What made it stand out, and how did you feel about the experience?",
-        "issues": [],
-        "optimized_question": "Have you ever received a product from a quick commerce app that exceeded your expectations? What made it stand out?",
-        "validated_hypothesis": "We believe that implementing a quality verification process will increase customer satisfaction with product quality because users value high-quality products.",
-        "decision_supported": "Partially supported"
-      },
-      {
-        "original_question": "Q16. Can you describe a situation where you felt frustrated with a quick commerce app? What was the situation, and how did you feel about the experience?",
-        "issues": [],
-        "optimized_question": "Have you ever felt frustrated with a quick commerce app? What was the situation, and how did you feel about the experience?",
-        "validated_hypothesis": "None",
-        "decision_supported": "None"
-      }
-    ],
-    "removed_questions": [
-      {
-        "question": "Q1",
-        "reason": "Too broad and leading"
-      },
-      {
-        "question": "Q2",
-        "reason": "Too broad and leading"
-      },
-      {
-        "question": "Q3",
-        "reason": "Too broad and solution bias"
-      },
-      {
-        "question": "Q4",
-        "reason": "Too broad and solution bias"
-      },
-      {
-        "question": "Q14",
-        "reason": "Too broad and solution bias"
-      }
-    ],
-    "missing_questions": [
-      "Q8.2 - How did the app's quality verification process contribute to your satisfaction?"
-    ],
-    "estimated_duration": "15-20 minutes",
-    "quality_score": 85,
-    "recommendations": [
-      "Consider adding more questions to validate the hypotheses about displaying product quality ratings and implementing a ratings and reviews system. Also, consider removing the question about feeling frustrated with the app as it may not be directly related to the product hypotheses."
-    ]
-  },
-  "executive_summary": {
-    "summary": "{'text': 'Our Quick Commerce Category Discovery Analysis reveals significant opportunities for improvement in customer satisfaction and loyalty. With 565 signals analyzed, we detected 10 top themes, including Poor Quality and Damaged Products, Hidden Charges and Unfair Pricing, and Poor Customer Support. These issues are driving negative sentiment, with 44.1% of users expressing dissatisfaction. However, we also identified opportunities for growth, including Fast and Reliable Service, which is driving positive sentiment among 49.9% of users.', 'metrics': {'signals_analyzed': 565, 'negative_sentiment_pct': 44.1, 'positive_sentiment_pct': 49.9}}",
-    "key_findings": [
-      "Poor Quality and Damaged Products is the top theme, with a confidence level of 0.9 and 23.5% of users expressing dissatisfaction.",
-      "Hidden Charges and Unfair Pricing is the second top theme, with a confidence level of 0.8 and 20.5% of users expressing dissatisfaction.",
-      "Fast and Reliable Service is the top positive theme, with a confidence level of 0.9 and 28.5% of users expressing satisfaction.",
-      "The Non-Grocery Skeptic is the most common persona, accounting for 35.5% of users.",
-      "Convenience is the top driver of behavior, with 67% of users citing convenience as a key factor in their purchasing decisions."
-    ],
-    "top_opportunities": [
-      "Transparent Pricing and Fees: Clearly display all fees and charges associated with orders, including handling charges, surge charges, and delivery charges.",
-      "Product Quality Verification: Implement a quality verification process for all products, including random checks and user feedback.",
-      "Improved Customer Support: Enhance customer support by implementing a responsive customer service team, clear communication channels, and user-friendly support tools."
-    ],
-    "recommended_actions": [
-      "Develop a transparent pricing and fees policy to address user concerns about hidden charges and unfair pricing.",
-      "Implement a quality verification process for all products to address user concerns about poor quality and damaged products.",
-      "Enhance customer support by implementing a responsive customer service team and user-friendly support tools."
-    ],
-    "data_coverage": {
-      "total_signals": 565,
-      "sources": {
-        "play_store": 565
-      },
-      "sentiment": {
-        "avg": 0.03,
-        "positive_pct": 49.9,
-        "negative_pct": 44.1,
-        "neutral_pct": 6.0,
-        "count": 565
-      },
-      "themes_detected": 10,
-      "barriers_detected": 14,
-      "personas_generated": 4,
-      "jobs_extracted": 10,
-      "opportunities_found": 8
-    },
-    "generated_at": "2026-07-29T06:01:47.887534"
-  },
+  "interview_script": null,
+  "executive_summary": null,
   "collection_results": []
 }

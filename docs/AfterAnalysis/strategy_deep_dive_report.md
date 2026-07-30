@@ -1,0 +1,175 @@
+# Strategy Deep Dive Report\n\n## Problem Discovery Plan\n\n- **Dataset Types**:
+  - App Store Reviews
+- **Quality Assessment**: The dataset appears to be a collection of user reviews from the App Store. The quality is generally good, but there are some instances of profanity and grammatical errors. The sample size is relatively small (599 signals), which may limit the generalizability of the findings. There is also a potential bias towards users who have had a negative experience, as they are more likely to leave a review.
+- **Selected Frameworks**:
+  - 5 Whys
+  - Issue Tree
+  - Metrics
+- **Confidence Assessment**: Medium\n\n---\n\n## Data Processing & Stats\n\n- **Sanitized Stats**:
+  - **Total Records**: 599
+  - **Avg Quality Score**: 3.0
+- **Data Quality Report**: Data appears clean, but average rating is low. Further investigation is required.
+- **Anomalies Detected**:
+\n\n---\n\n## Research Discoveries\n\n- **Observed Patterns**:
+  - Users appreciate the fast delivery and convenience of the Blinkit app.
+  - Users are frustrated with the high prices and lack of discounts on the app.
+  - Users experience issues with the app's customer support and return policy.
+  - Users are dissatisfied with the quality of products and packaging.
+  - Users are concerned about the app's handling and delivery charges.
+- **Anomalies**:
+  - Some users report receiving unhygienic products, while others praise the app's packaging and product quality.
+  - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive.
+- **Representative Quotes**:
+  - **Quote**: very bad whenever I order pomegranate, Banana I always get rotten ones .. no fresh items got delivered
+  - **Source**: play_store
+  - **Quote**: I have very good experience with blinkit executives as well as customer care support. I had talked with Aabidaa who is very polite and co- operative.
+  - **Source**: play_store
+- **Contradictions**:
+  - Users who praise the app's delivery speed and convenience often mention that they are frustrated with the high prices and lack of discounts.
+  - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive, but some users have had positive experiences with customer support.
+- **Hypotheses**:
+  - **Hypothesis**: Users are more likely to use the app if they receive discounts and promotions.
+  - **Evidence**: Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower.
+  - **Confidence**: Medium
+  - **Hypothesis**: Users are more likely to use the app if they have a positive experience with customer support.
+  - **Evidence**: Users who mention that they have had positive experiences with customer support are more likely to rate the app higher.
+  - **Confidence**: Medium
+- **Jobs To Be Done**:
+  - **Job Statement**: When I need to purchase groceries or other items quickly, I want to be able to do so easily and conveniently, so I can save time and effort.
+  - **Category**: functional
+  - **Current Solution**: Using the Blinkit app to place an order and receive delivery.
+  - **Gaps**:
+    - Lack of discounts and promotions
+    - Poor customer support
+  - **Opportunity Score**: 8.0
+  - **Supporting Quotes**:
+    - just a wonderful app all you need is delivered at your door step
+  - **Job Statement**: When I have a problem with my order or need to return a product, I want to be able to easily and quickly resolve the issue, so I can avoid frustration and inconvenience.
+  - **Category**: emotional
+  - **Current Solution**: Contacting customer support through the app or phone.
+  - **Gaps**:
+    - Unhelpful or unresponsive customer support
+    - Difficult return and refund process
+  - **Opportunity Score**: 7.5
+  - **Supporting Quotes**:
+    - bad experiance for Return ,& refund, they all are illetrate & without common scence person\n\n---\n\n## Root Causes\n\n- **Validated Root Causes**:
+  - **Root Cause Id**: RC1
+  - **Cause Title**: Poor Customer Support
+  - **Explanation**: The root cause of the issue is the unhelpful and unresponsive customer support team, leading to frustration and a negative experience for users.
+  - **Supporting Evidence**:
+    - Users experience issues with customer support
+    - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive
+  - **Alternative Explanations**:
+    - Users may be misinformed about the support process or have unrealistic expectations
+  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
+  - **Impact Score**: 9.0
+  - **Root Cause Id**: RC2
+  - **Cause Title**: Inconsistent Product Quality
+  - **Explanation**: The root cause of the issue is the inconsistent quality of products, leading to dissatisfaction and a negative experience for users.
+  - **Supporting Evidence**:
+    - Users are dissatisfied with the quality of products and packaging
+    - Some users report receiving unhygienic products
+  - **Alternative Explanations**:
+    - Users may have unrealistic expectations about product quality or be misinformed about the product
+  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
+  - **Impact Score**: 8.5
+  - **Root Cause Id**: RC3
+  - **Cause Title**: Lack of Discounts and Promotions
+  - **Explanation**: The root cause of the issue is the lack of discounts and promotions, leading to frustration and a negative experience for users.
+  - **Supporting Evidence**:
+    - Users are frustrated with the high prices and lack of discounts on the app
+    - Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower
+  - **Alternative Explanations**:
+    - Users may be price-sensitive or have unrealistic expectations about prices
+  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
+  - **Impact Score**: 8.0\n\n---\n\n## Traceability Map\n\n- **Traceability Map**:
+  - **Solution**: Proactive Customer Support
+  - **Root Cause**: RC1
+  - **Supporting Patterns**:
+    - Users experience issues with customer support
+    - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive
+  - **Raw Evidence Source**: play_store
+  - **Status**: Verified
+  - **Solution**: Product Quality Assurance
+  - **Root Cause**: RC2
+  - **Supporting Patterns**:
+    - Users are dissatisfied with the quality of products and packaging
+    - Some users report receiving unhygienic products
+  - **Raw Evidence Source**: play_store
+  - **Status**: Verified
+  - **Solution**: Dynamic Pricing and Promotions
+  - **Root Cause**: RC3
+  - **Supporting Patterns**:
+    - Users are frustrated with the high prices and lack of discounts on the app
+    - Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower
+  - **Raw Evidence Source**: play_store
+  - **Status**: Verified
+- **Untraceable Items**:
+\n\n---\n\n## Prioritized Solutions\n\n- **Prioritized Solutions**:
+  - **Solution Name**: Contextual Smart Cart Drawer
+  - **Problem Addressed**: Counterfeit/Warranty trust gap in electronics/beauty
+  - **Supporting Evidence**:
+    - Evidence reference from data
+  - **Expected Kpi Lift**: +15% Category Penetration
+  - **Engineering Effort**: Medium
+  - **Implementation Risk**: Risk of technical debt and maintenance
+  - **Rice Score**:
+    - **Reach**: 8000
+    - **Impact**: 3.0
+    - **Confidence**: 0.8
+    - **Effort**: 1.2
+    - **Total**: 20160
+  - **Alternative Approaches**:
+    - Alternative 1: Implement a separate warranty page
+  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of counterfeit products and provides a seamless user experience.
+  - **Solution Name**: Proactive Customer Support
+  - **Problem Addressed**: Poor Customer Support
+  - **Supporting Evidence**:
+    - Users experience issues with customer support
+  - **Expected Kpi Lift**: +10% Customer Satisfaction
+  - **Engineering Effort**: Low
+  - **Implementation Risk**: Risk of change management
+  - **Rice Score**:
+    - **Reach**: 6000
+    - **Impact**: 3.5
+    - **Confidence**: 0.9
+    - **Effort**: 0.8
+    - **Total**: 18840
+  - **Alternative Approaches**:
+    - Alternative 2: Implement a chatbot
+  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of poor customer support and provides a positive user experience.
+  - **Solution Name**: Product Quality Assurance
+  - **Problem Addressed**: Inconsistent Product Quality
+  - **Supporting Evidence**:
+    - Users are dissatisfied with the quality of products and packaging
+  - **Expected Kpi Lift**: +12% Customer Satisfaction
+  - **Engineering Effort**: High
+  - **Implementation Risk**: Risk of supply chain disruption
+  - **Rice Score**:
+    - **Reach**: 4000
+    - **Impact**: 4.0
+    - **Confidence**: 0.7
+    - **Effort**: 1.5
+    - **Total**: 16800
+  - **Alternative Approaches**:
+    - Alternative 3: Implement a quality control process
+  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of inconsistent product quality and provides a positive user experience.
+  - **Solution Name**: Dynamic Pricing and Promotions
+  - **Problem Addressed**: Lack of Discounts and Promotions
+  - **Supporting Evidence**:
+    - Users are frustrated with the high prices and lack of discounts on the app
+  - **Expected Kpi Lift**: +8% Sales
+  - **Engineering Effort**: Medium
+  - **Implementation Risk**: Risk of price sensitivity
+  - **Rice Score**:
+    - **Reach**: 5000
+    - **Impact**: 3.5
+    - **Confidence**: 0.8
+    - **Effort**: 1.1
+    - **Total**: 17300
+  - **Alternative Approaches**:
+    - Alternative 4: Implement a loyalty program
+  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of lack of discounts and promotions and provides a positive user experience.\n\n---\n\n

@@ -5,7 +5,7 @@ class DataProcessingAgent(BaseAgent):
     def __init__(self):
         super().__init__("Data Processing Agent")
 
-    def process(self, signals: list[UnifiedSignal]) -> dict:
+    def process(self, signals: list[UnifiedSignal], problem_statement: str = None) -> dict:
         """
         Processes and normalizes dataset statistics, identifying missing fields or metadata.
         """
@@ -35,7 +35,11 @@ class DataProcessingAgent(BaseAgent):
         system_prompt = """
 You are a Lead Data Analyst. Review the data quality metrics and generate a structured data processing output.
 Highlight any anomalies or gaps in data attributes (e.g. missing metadata, skewed score distributions).
+"""
+        if problem_statement:
+            system_prompt += f"\nFOCUS RULE: Evaluate dataset cleanliness, anomalies, and bias specifically through the lens of investigating the problem statement:\n{problem_statement}\n"
 
+        system_prompt += """
 Return strictly a JSON object with this schema:
 {
   "sanitized_stats": {
@@ -50,9 +54,11 @@ Return strictly a JSON object with this schema:
         user_prompt = f"""
 Data Quality Metrics:
 {json_dumps(quality_report)}
-
-Produce the Data Processing report.
 """
+        if problem_statement:
+            user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
+
+        user_prompt += "\nProduce the Data Processing report.\n"
         
         # Simple helper since json isn't imported
         import json

@@ -6,7 +6,7 @@ class ResearchPlanningAgent(BaseAgent):
     def __init__(self):
         super().__init__("Research Planning Agent")
 
-    def plan(self, signals: list[UnifiedSignal]) -> dict:
+    def plan(self, signals: list[UnifiedSignal], problem_statement: str = None) -> dict:
         """
         Analyze the dataset properties and select frameworks to generate a research plan.
         """
@@ -22,9 +22,13 @@ Your job is to inspect the dataset properties (total size, sources, sample conte
 
 Framework Selection Rule:
 Only select/use a framework if it uncovers new, evidence-backed insights based on the available data. 
-Do not automatically generate frameworks (e.g. Personas, JTBD, SWOT, SWOT, etc.). If the evidence doesn't support them, skip them.
+Do not automatically generate frameworks (e.g. Personas, JTBD, SWOT, etc.). If the evidence doesn't support them, skip them.
 If multiple frameworks produce overlapping conclusions, keep only the one that provides the greatest analytical value.
+"""
+        if problem_statement:
+            system_prompt += f"\nFOCUS RULE: Your entire research planning MUST align with and investigate this specific problem statement:\n{problem_statement}\nPrioritize frameworks and quality metrics that specifically help solve this strategic goal.\n"
 
+        system_prompt += """
 Return strictly a JSON object with this schema:
 {
   "dataset_types": ["e.g. App Store Reviews", "Reddit Posts", "User Surveys"],
@@ -39,7 +43,9 @@ Dataset Properties:
 - Total Signal Count: {len(signals)}
 - Sample Signals:
 {json.dumps(samples, indent=2)}
-
-Generate the Research Plan.
 """
+        if problem_statement:
+            user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
+
+        user_prompt += "\nGenerate the Research Plan.\n"
         return self.generate_json(system_prompt, user_prompt)

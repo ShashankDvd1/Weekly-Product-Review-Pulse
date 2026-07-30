@@ -5,7 +5,7 @@ class PatternSegmentationAgent(BaseAgent):
     def __init__(self):
         super().__init__("Pattern & Segmentation Agent")
 
-    def segment(self, discovery_data: dict) -> dict:
+    def segment(self, discovery_data: dict, problem_statement: str = None) -> dict:
         """
         Cluster user behaviors and patterns into natural segments and prioritize themes.
         """
@@ -14,7 +14,11 @@ You are a Lead Data Scientist and Consumer Insights expert.
 Your job is to cluster the observed patterns and user behaviors into distinct customer segments and prioritize the key themes.
 
 Do not use pre-defined PM templates (like generic persona names). Cluster users naturally based on the patterns.
+"""
+        if problem_statement:
+            system_prompt += f"\nFOCUS RULE: Your entire segmentation, theme prioritization, and growth opportunities extraction MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize user segments, themes, and growth opportunities that are directly relevant to this specific problem.\n"
 
+        system_prompt += """
 Return strictly a JSON object with this schema:
 {
   "user_segments": [
@@ -48,7 +52,9 @@ Return strictly a JSON object with this schema:
         user_prompt = f"""
 Discovery Data:
 {json.dumps(discovery_data, indent=2)}
-
-Generate the segmentation and prioritized themes.
 """
+        if problem_statement:
+            user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
+
+        user_prompt += "\nGenerate the segmentation and prioritized themes.\n"
         return self.generate_json(system_prompt, user_prompt)

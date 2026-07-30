@@ -6,7 +6,7 @@ class ResearchDiscoveryAgent(BaseAgent):
     def __init__(self):
         super().__init__("Research Discovery Agent")
 
-    def discover(self, signals: list[UnifiedSignal]) -> dict:
+    def discover(self, signals: list[UnifiedSignal], problem_statement: str = None) -> dict:
         """
         Extract patterns, anomalies, and customer quotes from the dataset without proposing solutions.
         """
@@ -28,7 +28,11 @@ CRITICAL RULES:
 1. Ground every pattern, quote, or hypothesis strictly in the provided data.
 2. DO NOT propose any product solutions, features, or roadmap items.
 3. Identify contradictions where they exist (e.g. users state one preference but show a different behavior).
+"""
+        if problem_statement:
+            system_prompt += f"\nFOCUS RULE: Your entire analysis and extraction MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize finding observed patterns, anomalies, representative quotes, contradictions, causal hypotheses, and Jobs-To-Be-Done that directly shed light on user behaviors, friction points, and barriers related to this specific problem statement.\n"
 
+        system_prompt += """
 Return strictly a JSON object with this schema:
 {
   "observed_patterns": ["Pattern 1", "Pattern 2"],
@@ -55,12 +59,13 @@ Return strictly a JSON object with this schema:
     }
   ]
 }
-
 """
         user_prompt = f"""
 Raw Dataset (Sample):
 {json.dumps(sample_signals, indent=2)}
-
-Perform the discovery.
 """
+        if problem_statement:
+            user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
+
+        user_prompt += "\nPerform the discovery.\n"
         return self.generate_json(system_prompt, user_prompt)

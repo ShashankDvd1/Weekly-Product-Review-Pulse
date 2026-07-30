@@ -306,31 +306,31 @@ class PipelineOrchestrator:
         # Stage 1: Planning
         log_agent_progress(1, "Research Planning Agent", "start")
         from agents.planning_agent import ResearchPlanningAgent
-        planning_res = ResearchPlanningAgent().plan(self.signals)
+        planning_res = ResearchPlanningAgent().plan(self.signals, self.active_problem_statement)
         log_agent_progress(1, "Research Planning Agent", "complete")
 
         # Stage 2: Processing
         log_agent_progress(2, "Data Processing Agent", "start")
         from agents.processing_agent import DataProcessingAgent
-        processing_res = DataProcessingAgent().process(self.signals)
+        processing_res = DataProcessingAgent().process(self.signals, self.active_problem_statement)
         log_agent_progress(2, "Data Processing Agent", "complete")
 
         # Stage 3: Discovery
         log_agent_progress(3, "Research Discovery Agent", "start")
         from agents.discovery_agent import ResearchDiscoveryAgent
-        discovery_res = ResearchDiscoveryAgent().discover(self.signals)
+        discovery_res = ResearchDiscoveryAgent().discover(self.signals, self.active_problem_statement)
         log_agent_progress(3, "Research Discovery Agent", "complete")
 
         # Stage 4: Segmentation
         log_agent_progress(4, "Pattern & Segmentation Agent", "start")
         from agents.segmentation_agent import PatternSegmentationAgent
-        segmentation_res = PatternSegmentationAgent().segment(discovery_res)
+        segmentation_res = PatternSegmentationAgent().segment(discovery_res, self.active_problem_statement)
         log_agent_progress(4, "Pattern & Segmentation Agent", "complete")
 
         # Stage 5: Root Cause & Strategy
         log_agent_progress(5, "Root Cause & Strategy Agent", "start")
         from agents.root_cause_agent import RootCauseStrategyAgent
-        root_cause_res = RootCauseStrategyAgent().analyze(segmentation_res, discovery_res)
+        root_cause_res = RootCauseStrategyAgent().analyze(segmentation_res, discovery_res, self.active_problem_statement)
         log_agent_progress(5, "Root Cause & Strategy Agent", "complete")
 
         self.strategy_deep_dive = {
@@ -391,19 +391,19 @@ class PipelineOrchestrator:
                 # Stage 6: Solution Generation
                 log_agent_progress(6, "Solution Generation Agent", "start")
                 from agents.solution_agent import SolutionGenerationAgent
-                solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res)
+                solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res, self.active_problem_statement)
                 log_agent_progress(6, "Solution Generation Agent", "complete")
 
                 # Stage 7: Executive Presentation
                 log_agent_progress(7, "Executive Presentation Agent", "start")
                 from agents.presentation_agent import ExecutivePresentationAgent
-                presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res)
+                presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res, self.active_problem_statement)
                 log_agent_progress(7, "Executive Presentation Agent", "complete")
 
                 # Stage 8: Evidence Traceability
                 log_agent_progress(8, "Evidence Traceability Agent", "start")
                 from agents.traceability_agent import EvidenceTraceabilityAgent
-                traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res)
+                traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res, self.active_problem_statement)
                 log_agent_progress(8, "Evidence Traceability Agent", "complete")
 
                 # Stage 9: Research Audit Agent (with Retry Loop)
@@ -416,7 +416,7 @@ class PipelineOrchestrator:
                     audit_res = audit_agent.audit(
                         planning_res, processing_res, discovery_res,
                         segmentation_res, root_cause_res, solution_res,
-                        presentation_res, traceability_res
+                        presentation_res, traceability_res, self.active_problem_statement
                     )
                     verdict = audit_res.get("verdict", "PASS")
                     if verdict in ["PASS", "PASS WITH WARNINGS"]:
@@ -428,9 +428,9 @@ class PipelineOrchestrator:
                         logger.warning(msg)
                         if attempt < 2:
                             self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Re-running solution generation and presentation synthesis with audit feedback...")
-                            solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res)
-                            presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res)
-                            traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res)
+                            solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res, self.active_problem_statement)
+                            presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res, self.active_problem_statement)
+                            traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res, self.active_problem_statement)
                         else:
                             raise Exception(f"Research Audit failed after maximum retries. Verdict: {verdict}")
                 
