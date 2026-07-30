@@ -1,46 +1,172 @@
 import { useState, useEffect } from 'react';
-import { Activity, MessageSquare, AlertTriangle, TrendingUp, RefreshCw, Users, Terminal, Send, Play, CheckCircle2, Calendar, Search, Layers } from 'lucide-react';
+import { 
+  Activity, 
+  MessageSquare, 
+  AlertTriangle, 
+  TrendingUp, 
+  RefreshCw, 
+  Users, 
+  Terminal, 
+  Send, 
+  Play, 
+  CheckCircle2, 
+  Calendar, 
+  Search, 
+  Layers,
+  Brain, 
+  ChevronDown, 
+  ChevronRight, 
+  Loader2, 
+  Target, 
+  Lightbulb, 
+  Presentation, 
+  FileText, 
+  ArrowLeft, 
+  ArrowRight, 
+  Award, 
+  Upload, 
+  Download,
+  Database,
+  Shield
+} from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { getBackendUrl } from '../config';
 
+const PHASE_META = {
+  1: { label: 'Planning & Processing', icon: <Target size={18} />, color: '#f97316', steps: ['step_1', 'step_2'] },
+  2: { label: 'Behavioral Discovery', icon: <Users size={18} />, color: '#8b5cf6', steps: ['step_4', 'step_8'] },
+  3: { label: 'Evidence Traceability', icon: <Lightbulb size={18} />, color: '#06b6d4', steps: ['step_13'] },
+  4: { label: 'Solution Generation', icon: <Presentation size={18} />, color: '#10b981', steps: ['step_14'] },
+};
+
+const renderValue = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'string') return <p style={{ margin: '0.25rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>{value}</p>;
+  if (typeof value === 'number' || typeof value === 'boolean') return <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{String(value)}</span>;
+  if (Array.isArray(value)) {
+    return (
+      <ul style={{ margin: '0.5rem 0', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+        {value.map((item, idx) => (
+          <li key={idx} style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+            {typeof item === 'object' ? renderObject(item) : String(item)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (typeof value === 'object') return renderObject(value);
+  return <span>{String(value)}</span>;
+};
+
+const formatKey = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+const renderObject = (obj) => {
+  if (!obj || typeof obj !== 'object') return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      {Object.entries(obj).map(([key, val]) => {
+        if (key === 'error') return <p key={key} style={{ color: 'var(--error)', fontStyle: 'italic' }}>{val}</p>;
+        return (
+          <div key={key}>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '0.25rem' }}>
+              {formatKey(key)}
+            </strong>
+            {renderValue(val)}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const StepCard = ({ stepId, stepData, isOpen, onToggle }) => {
+  const isFailed = stepData?.status === 'failed';
+
+  return (
+    <div style={{
+      background: 'var(--bg-secondary)',
+      borderRadius: '10px',
+      border: `1px solid ${isFailed ? 'rgba(239,68,68,0.3)' : 'var(--border-glass)'}`,
+      overflow: 'hidden',
+      transition: 'all 0.2s ease',
+    }}>
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '1rem 1.25rem',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+          color: '#fff',
+        }}
+      >
+        {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{stepId.replace('_', ' ').toUpperCase()}</span>
+        <span style={{ flex: 1, fontSize: '0.95rem', fontWeight: '600' }}>{stepData?.title}</span>
+        {isFailed ? (
+          <AlertTriangle size={16} color="var(--error)" />
+        ) : (
+          <CheckCircle2 size={16} color="var(--success)" />
+        )}
+      </button>
+      {isOpen && (
+        <div style={{ padding: '0 1.25rem 1.25rem 1.25rem', borderTop: '1px solid var(--border-glass)', textAlign: 'left' }}>
+          <div style={{ marginTop: '1rem' }}>
+            {stepData?.data ? renderObject(stepData.data) : <p style={{ color: 'var(--text-muted)' }}>No data</p>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Dashboard = () => {
-  const [data, setData] = useState(null);
+  const [activeSection, setActiveSection] = useState('overview'); // 'overview', 'steps', 'slides', 'case_study'
+
+  // Dashboard Overview Telemetry Data
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Pipeline & Ingestion execution states
   const [pipelineRunning, setPipelineRunning] = useState(false);
   const [pipelineLogs, setPipelineLogs] = useState([]);
   const [pipelineStatus, setPipelineStatus] = useState(null);
 
-  // Poll pipeline status if running
-  useEffect(() => {
-    let intervalId;
-    if (pipelineRunning) {
-      intervalId = setInterval(async () => {
-        try {
-          const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
-          if (!res.ok) {
-            // Ignore temporary gateway timeouts/502s during spikes
-            return;
-          }
-          const statusData = await res.json();
-          setPipelineStatus(statusData.status);
-          setPipelineLogs(statusData.progress || []);
-          
-          if (statusData.status === 'complete' || statusData.status === 'idle') {
-            setPipelineRunning(false);
-            clearInterval(intervalId);
-            await fetchDashboardData();
-            alert("Intelligence Pipeline Run Complete!");
-          }
-        } catch (err) {
-          console.error("Error fetching pipeline status", err);
-        }
-      }, 2000);
-    }
-    return () => clearInterval(intervalId);
-  }, [pipelineRunning]);
+  // Strategy Deep Dive states
+  const [strategyData, setStrategyData] = useState(null);
+  const [boardPresentation, setBoardPresentation] = useState(null);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [strategyLogs, setStrategyLogs] = useState([]);
+  const [completedSteps, setCompletedSteps] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(9);
+  const [strategyStatus, setStrategyStatus] = useState('idle');
 
-  // Default to 30 days ago to keep pipeline executions fast and clean
+  // Survey & Case Study states
+  const [generatingForm, setGeneratingForm] = useState(false);
+  const [generatedFormUrl, setGeneratedFormUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState(null);
+  const [surveyResult, setSurveyResult] = useState(null);
+  const [caseStudy, setCaseStudy] = useState(null);
+  const [caseLoading, setCaseLoading] = useState(true);
+
+  // Document exports states
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportDocUrl, setExportDocUrl] = useState(null);
+  const [exportSlidesLoading, setExportSlidesLoading] = useState(false);
+  const [exportSlidesUrl, setExportSlidesUrl] = useState(null);
+  const [exportSourceLoading, setExportSourceLoading] = useState(false);
+
+  // Collapsible step cards
+  const [openSteps, setOpenSteps] = useState({});
+
+  // Setup Date Range configurations
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const defaultFrom = thirtyDaysAgo.toISOString().split('T')[0];
@@ -50,25 +176,103 @@ const Dashboard = () => {
   const [fromDate, setFromDate] = useState(defaultFrom);
   const [toDate, setToDate] = useState(defaultTo);
 
-  // App Selection state for quick runs
   const [selectedApps, setSelectedApps] = useState({
     zepto: true,
     blinkit: true,
     swiggy_instamart: true
   });
 
-  // AI Prompt Mode Ingestion states
   const [promptMode, setPromptMode] = useState('quick'); // 'quick' or 'ai_prompt'
   const [prompt, setPrompt] = useState('');
   const [parsing, setParsing] = useState(false);
   const [parsedConfig, setParsedConfig] = useState(null);
 
+  const [problemStatement, setProblemStatement] = useState(
+    "You are a Product Manager on the Growth Team at your chosen company. Quick commerce platforms have successfully become a part of users' weekly routines. Many users place recurring orders for Groceries, snacks & beverages and household essentials. Over time, however, shopping behavior becomes highly repetitive. Users often purchase the same set of products repeatedly and rarely explore new categories available on the platform. One of the company's strategic goals is to: Increase the percentage of Monthly Active Customers who purchase products from at least one new category every month."
+  );
+
+  const toggleStep = (stepId) => {
+    setOpenSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
+  };
+
+  const strategyProgress = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+
+  // ── Long-running pipeline monitor (asynchronous polling) ──
+  useEffect(() => {
+    let intervalId;
+    if (pipelineRunning) {
+      intervalId = setInterval(async () => {
+        try {
+          // Poll main pipeline status
+          const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+          if (!res.ok) return;
+          const statusData = await res.json();
+          setPipelineStatus(statusData.status);
+          setPipelineLogs(statusData.progress || []);
+          
+          // Poll strategy deep dive status concurrently
+          const stratRes = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
+          if (stratRes.ok) {
+            const stratData = await stratRes.json();
+            setStrategyStatus(stratData.status);
+            setStrategyLogs(stratData.logs || []);
+            setCompletedSteps(stratData.completed_steps || 0);
+            if (stratData.result) setStrategyData(stratData.result);
+            if (stratData.board_presentation) setBoardPresentation(stratData.board_presentation);
+          }
+
+          if (statusData.status === 'complete' || statusData.status === 'idle') {
+            setPipelineRunning(false);
+            clearInterval(intervalId);
+            await fetchDashboardAndStrategy();
+            alert("Intelligence Ingestion & Strategy Discovery (Phase 1) Complete!");
+          }
+        } catch (err) {
+          console.error("Error polling pipeline status:", err);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(intervalId);
+  }, [pipelineRunning]);
+
+  // ── Phase 2 strategy deep dive monitor ──
+  useEffect(() => {
+    let intervalId;
+    if (strategyStatus === 'running' && completedSteps >= 5) {
+      intervalId = setInterval(async () => {
+        try {
+          const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
+          if (!res.ok) return;
+          const result = await res.json();
+          
+          if (result.logs) setStrategyLogs(result.logs);
+          if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
+          
+          if (result.status === 'completed') {
+            setStrategyStatus('completed');
+            clearInterval(intervalId);
+            setStrategyData(result.result);
+            if (result.board_presentation) setBoardPresentation(result.board_presentation);
+            alert("Phase 2 & Executive Presentation completed successfully!");
+            setActiveSection('slides'); // Auto-switch to board presentation tab
+          } else if (result.status === 'failed') {
+            setStrategyStatus('failed');
+            clearInterval(intervalId);
+            alert("Phase 2 compilation failed. Check console logs.");
+          }
+        } catch (err) {
+          console.error("Error polling Phase 2 strategy:", err);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(intervalId);
+  }, [strategyStatus, completedSteps]);
+
+  // ── Sync date range options ──
   useEffect(() => {
     if (dateRangeOption === 'custom') return;
-    
     const today = new Date();
     const toStr = today.toISOString().split('T')[0];
-    
     let days = 30;
     if (dateRangeOption === '7days') days = 7;
     else if (dateRangeOption === '14days') days = 14;
@@ -78,46 +282,65 @@ const Dashboard = () => {
     pastDate.setDate(today.getDate() - days);
     const fromStr = pastDate.toISOString().split('T')[0];
     
-    // eslint-disable-next-line
     setFromDate(fromStr);
     setToDate(toStr);
   }, [dateRangeOption]);
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardAndStrategy();
+    fetchCaseStudyData();
   }, []);
 
-  async function fetchDashboardData() {
+  async function fetchDashboardAndStrategy() {
     try {
-      // Check if pipeline is running in the background (wrapped in inner try-catch)
-      try {
-        const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
-        if (statusRes.ok) {
-          const statusData = await statusRes.json();
-          if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
-            setPipelineRunning(true);
-            setPipelineStatus(statusData.status);
-            setPipelineLogs(statusData.progress || []);
-          }
+      // 1. Check background ingestion
+      const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
+          setPipelineRunning(true);
+          setPipelineStatus(statusData.status);
+          setPipelineLogs(statusData.progress || []);
         }
-      } catch (statusErr) {
-        console.warn("Failed to check active background pipeline status:", statusErr);
       }
 
+      // 2. Fetch dashboard telemetry
       const response = await fetch(`${getBackendUrl()}/api/v2/dashboard/overview`);
-      if (!response.ok) throw new Error('Failed to fetch dashboard data');
-      const result = await response.json();
-      setData(result);
+      if (response.ok) {
+        const result = await response.json();
+        setDashboardData(result);
+      }
+
+      // 3. Fetch strategy deep dive data
+      const stratRes = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
+      if (stratRes.ok) {
+        const stratData = await stratRes.json();
+        setStrategyStatus(stratData.status);
+        setStrategyLogs(stratData.logs || []);
+        setCompletedSteps(stratData.completed_steps || 0);
+        if (stratData.result) setStrategyData(stratData.result);
+        if (stratData.board_presentation) setBoardPresentation(stratData.board_presentation);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const [problemStatement, setProblemStatement] = useState(
-    "You are a Product Manager on the Growth Team at your chosen company. Quick commerce platforms have successfully become a part of users' weekly routines. Many users place recurring orders for Groceries, snacks & beverages and household essentials. Over time, however, shopping behavior becomes highly repetitive. Users often purchase the same set of products repeatedly and rarely explore new categories available on the platform. One of the company's strategic goals is to: Increase the percentage of Monthly Active Customers who purchase products from at least one new category every month. Examples: A user who buys groceries starts buying pet supplies; a user who buys snacks starts buying personal care products; a user who buys household essentials starts buying baby products."
-  );
+  async function fetchCaseStudyData() {
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/mvp-case`);
+      if (res.ok) {
+        const result = await res.json();
+        setCaseStudy(result);
+      }
+    } catch (err) {
+      console.error("Failed to load case study:", err);
+    } finally {
+      setCaseLoading(false);
+    }
+  }
 
   const handleParsePrompt = async (e) => {
     e.preventDefault();
@@ -145,10 +368,8 @@ const Dashboard = () => {
 
   const handleLaunchAIPipeline = async () => {
     if (!parsedConfig) return;
-
     setPipelineRunning(true);
     setPipelineLogs(["[SYSTEM] Initiating AI custom intelligence run..."]);
-    
     try {
       const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/run`, {
         method: 'POST',
@@ -173,8 +394,7 @@ const Dashboard = () => {
       alert("Please select at least one app to analyze.");
       return;
     }
-
-    const confirm = window.confirm(`This will trigger a collection and analysis pipeline for [${appsToRun.join(', ')}] from ${fromDate} to ${toDate}. Continue?`);
+    const confirm = window.confirm(`This will trigger collection & multi-agent strategy analysis for [${appsToRun.join(', ')}]. Continue?`);
     if (!confirm) return;
     
     try {
@@ -198,377 +418,734 @@ const Dashboard = () => {
     }
   };
 
-  if (loading && !data) return (
-    <div className="flex-center" style={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
-      <div className="loader" style={{ width: '40px', height: '40px', borderColor: 'rgba(99, 102, 241, 0.3)', borderTopColor: 'var(--accent-primary)' }}></div>
-      <p style={{ color: 'var(--text-secondary)' }}>Loading Intelligence Overview...</p>
-    </div>
-  );
+  // ── Survey validation & exports ──
+  const handleSurveyUpload = async () => {
+    if (!file) return alert("Please select a Survey Responses CSV file first.");
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/surveys/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSurveyResult(data);
+        setStrategyStatus('running');
+        setCompletedSteps(5); // Transition back to running Phase 2
+        alert("Survey uploaded successfully! Resuming Phase 2 Strategy Compilation.");
+      } else {
+        alert(data.detail || 'Failed to upload survey');
+      }
+    } catch (err) {
+      alert('Error uploading survey file');
+    } finally {
+      setUploading(false);
+    }
+  };
 
-  if (error) return (
-    <div className="glass-card" style={{ borderColor: 'var(--danger)', margin: '2rem' }}>
-      <h3 style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <AlertTriangle /> Error
-      </h3>
-      <p>{error}</p>
-      <button className="btn-secondary" onClick={fetchDashboardData} style={{ marginTop: '1rem' }}>Retry</button>
-    </div>
-  );
+  const handleGenerateForm = async () => {
+    setGeneratingForm(true);
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/research/generate-form`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_name: "Quick Commerce Platform",
+          problem_statement: problemStatement,
+          product_description: "Consolidated multi-agent shopping behaviors analysis",
+          target_segment: "All platform users",
+          key_features: "Behavioral discovery feed",
+          assumptions: "Users stick to habit loops and avoid discovery of non-grocery categories"
+        })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        if (resData.form_url) setGeneratedFormUrl(resData.form_url);
+        else alert("Survey generated successfully and saved.");
+      } else {
+        alert(resData.detail || "Failed to generate Google Form.");
+      }
+    } catch (err) {
+      alert("Error generating form: " + err.message);
+    } finally {
+      setGeneratingForm(false);
+    }
+  };
 
-  // Formatting Sentiment Data for Chart
-  const sentData = data?.sentiment_summary ? [
-    { name: 'Positive', value: data.sentiment_summary.positive_pct, color: 'var(--success)' },
-    { name: 'Neutral', value: data.sentiment_summary.neutral_pct, color: 'var(--info)' },
-    { name: 'Negative', value: data.sentiment_summary.negative_pct, color: 'var(--danger)' }
-  ] : [];
+  const handleExportDoc = async () => {
+    try {
+      setExportLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-doc`, { method: 'POST' });
+      const resData = await res.json();
+      if (res.ok) setExportDocUrl(resData.doc_url);
+      else alert(resData.detail || "Export to Google Doc failed.");
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportSlides = async () => {
+    try {
+      setExportSlidesLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/executive-deck/export-slides`, { method: 'POST' });
+      const resData = await res.json();
+      if (res.ok) setExportSlidesUrl(resData.presentation_url);
+      else alert(resData.detail || "Export to Google Slides failed.");
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setExportSlidesLoading(false);
+    }
+  };
+
+  const handleExportSource = async () => {
+    try {
+      setExportSourceLoading(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-markdown`);
+      const resData = await res.json();
+      if (res.ok) {
+        const blob = new Blob([resData.markdown_content], { type: "text/markdown" });
+        const href = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = href;
+        link.download = "strategy_deep_dive_report.md";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+      } else {
+        alert(resData.detail || "Markdown export failed.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setExportSourceLoading(false);
+    }
+  };
+
+  const handleNextSlide = () => {
+    if (boardPresentation && currentSlideIndex < boardPresentation.slides.length - 1) {
+      setCurrentSlideIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePrevSlide = () => {
+    if (currentSlideIndex > 0) {
+      setCurrentSlideIndex(prev => prev - 1);
+    }
+  };
+
+  const COLORS = ['#8b5cf6', '#3b82f6', '#f59e0b', '#ef4444', '#10b981'];
+
+  // Calculate sentiment data for Recharts Pie
+  const sentimentChartData = dashboardData?.sentiment_summary ? [
+    { name: 'Positive', value: Math.round(dashboardData.sentiment_summary.positive * 100) },
+    { name: 'Neutral', value: Math.round(dashboardData.sentiment_summary.neutral * 100) },
+    { name: 'Negative', value: Math.round(dashboardData.sentiment_summary.negative * 100) },
+  ].filter(d => d.value > 0) : [];
 
   return (
-    <div>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      
+      {/* ── Consolidated Header & Tab Switcher ── */}
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="page-title text-gradient">Pulse Dashboard</h1>
-          <p className="page-subtitle">Configure pipelines, monitor ingestion runs, and track overall commerce indicators.</p>
-          {data?.date_range?.from_date && (
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Dataset coverage: <strong>{data.date_range.from_date}</strong> to <strong>{data.date_range.to_date}</strong>
-            </p>
-          )}
+          <h1 className="page-title text-gradient">Dashboard Hub</h1>
+          <p className="page-subtitle">Consolidated Ingestion, Multi-Agent UX Strategy Framework, and McKinsey Board Slides.</p>
+        </div>
+
+        {/* Tab switch bar */}
+        <div className="glass-panel" style={{ display: 'flex', padding: '0.25rem', borderRadius: '8px', gap: '0.25rem' }}>
+          <button 
+            onClick={() => setActiveSection('overview')}
+            style={{
+              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+              background: activeSection === 'overview' ? 'var(--accent-primary)' : 'transparent',
+              color: activeSection === 'overview' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease'
+            }}
+          >
+            Overview
+          </button>
+          <button 
+            onClick={() => setActiveSection('steps')}
+            style={{
+              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+              background: activeSection === 'steps' ? 'var(--accent-primary)' : 'transparent',
+              color: activeSection === 'steps' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
+              opacity: strategyData ? 1 : 0.5
+            }}
+            disabled={!strategyData}
+          >
+            Deep Dive Steps
+          </button>
+          <button 
+            onClick={() => setActiveSection('slides')}
+            style={{
+              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+              background: activeSection === 'slides' ? 'var(--accent-primary)' : 'transparent',
+              color: activeSection === 'slides' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
+              opacity: boardPresentation ? 1 : 0.5
+            }}
+            disabled={!boardPresentation}
+          >
+            Board Slides
+          </button>
+          <button 
+            onClick={() => setActiveSection('case_study')}
+            style={{
+              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+              background: activeSection === 'case_study' ? 'var(--accent-primary)' : 'transparent',
+              color: activeSection === 'case_study' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
+              opacity: caseStudy ? 1 : 0.5
+            }}
+            disabled={!caseStudy}
+          >
+            Case Study & PRD
+          </button>
         </div>
       </div>
 
-      {/* SETUP & INGESTION CONTROL PANEL */}
-      <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', textAlign: 'left' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.75rem', marginBottom: '1.25rem' }}>
-          <h3 style={{ margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Terminal size={18} color="var(--accent-primary)" /> Ingestion Settings & Control
-          </h3>
-          <div className="glass-panel" style={{ display: 'flex', padding: '0.2rem', borderRadius: '6px', gap: '0.2rem' }}>
-            <button
-              onClick={() => setPromptMode('quick')}
-              style={{
-                padding: '0.35rem 0.75rem', borderRadius: '4px', border: 'none', fontSize: '0.75rem', fontWeight: 'bold',
-                background: promptMode === 'quick' ? 'var(--accent-primary)' : 'transparent',
-                color: promptMode === 'quick' ? '#fff' : 'var(--text-secondary)',
-                cursor: 'pointer', transition: 'all 0.2s ease'
-              }}
-            >
-              Quick Setup
-            </button>
-            <button
-              onClick={() => setPromptMode('ai_prompt')}
-              style={{
-                padding: '0.35rem 0.75rem', borderRadius: '4px', border: 'none', fontSize: '0.75rem', fontWeight: 'bold',
-                background: promptMode === 'ai_prompt' ? 'var(--accent-primary)' : 'transparent',
-                color: promptMode === 'ai_prompt' ? '#fff' : 'var(--text-secondary)',
-                cursor: 'pointer', transition: 'all 0.2s ease'
-              }}
-            >
-              AI Ingestion Prompt
-            </button>
-          </div>
-        </div>
+      {/* ── TAB CONTENT ── */}
 
-        {/* QUICK SETTINGS SUBPANEL */}
-        {promptMode === 'quick' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Target Apps</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.zepto} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, zepto: e.target.checked }))} /> Zepto
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.blinkit} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, blinkit: e.target.checked }))} /> Blinkit
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#fff' }}>
-                    <input type="checkbox" checked={selectedApps.swiggy_instamart} style={{ accentColor: 'var(--accent-primary)', cursor: 'pointer' }} onChange={(e) => setSelectedApps(prev => ({ ...prev, swiggy_instamart: e.target.checked }))} /> Swiggy Instamart
-                  </label>
+      {/* 1. OVERVIEW TAB */}
+      {activeSection === 'overview' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Controls Panel */}
+          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem', textAlign: 'left' }}>
+            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontSize: '1.1rem' }}>
+              <Layers size={18} color="var(--accent-primary)" /> Pipeline Configuration Controls
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
+              
+              {/* App Targets */}
+              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>APP SOURCE TARGETS</span>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  {Object.keys(selectedApps).map(appKey => (
+                    <label key={appKey} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedApps[appKey]}
+                        onChange={(e) => setSelectedApps(prev => ({ ...prev, [appKey]: e.target.checked }))}
+                      />
+                      {appKey.replace('_', ' ').toUpperCase()}
+                    </label>
+                  ))}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Date Range</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
-                  <select
-                    value={dateRangeOption}
+              {/* Date Filters */}
+              <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>RANGE</span>
+                  <select 
+                    value={dateRangeOption} 
                     onChange={(e) => setDateRangeOption(e.target.value)}
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff', padding: '0.4rem 0.8rem', fontFamily: 'inherit', outline: 'none', cursor: 'pointer' }}
+                    style={{ width: '100%', background: 'var(--bg-secondary)', color: '#fff', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.3rem' }}
                   >
-                    <option value="7days">1 Week</option>
-                    <option value="14days">2 Weeks</option>
-                    <option value="30days">1 Month</option>
+                    <option value="7days">Past 7 Days</option>
+                    <option value="14days">Past 14 Days</option>
+                    <option value="30days">Past 30 Days (Recommended)</option>
                     <option value="custom">Custom Range</option>
                   </select>
-                  {dateRangeOption === 'custom' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingLeft: '0.5rem' }}>
-                      <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }} />
-                      <span style={{ color: 'var(--text-secondary)' }}>to</span>
-                      <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '4px', color: '#fff', padding: '0.3rem 0.5rem', fontFamily: 'inherit' }} />
-                    </div>
-                  )}
                 </div>
+                {dateRangeOption === 'custom' && (
+                  <>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>FROM</span>
+                      <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={{ background: 'var(--bg-secondary)', color: '#fff', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.2rem' }} />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>TO</span>
+                      <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={{ background: 'var(--bg-secondary)', color: '#fff', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.2rem' }} />
+                    </div>
+                  </>
+                )}
               </div>
+            </div>
 
-              <button className="btn-primary" onClick={handleRunPipeline} disabled={pipelineRunning} style={{ marginLeft: 'auto', padding: '0.6rem 1.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {pipelineRunning ? <div className="loader" style={{ width: '16px', height: '16px', borderTopColor: '#fff' }}></div> : <Play size={16} />}
-                Launch Ingestion
+            {/* Problem Statement Box */}
+            <div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem', fontWeight: 'bold' }}>ACTIVE RESEARCH HYPOTHESIS / PROBLEM STATEMENT</span>
+              <textarea 
+                value={problemStatement}
+                onChange={(e) => setProblemStatement(e.target.value)}
+                style={{ width: '100%', minHeight: '80px', background: 'var(--bg-secondary)', color: '#cbd5e1', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.6rem', fontSize: '0.85rem', lineHeight: '1.4' }}
+              />
+            </div>
+
+            {/* Launch Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleRunPipeline}
+                disabled={pipelineRunning}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.75rem', fontSize: '0.9rem' }}
+              >
+                {pipelineRunning ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Play size={16} />}
+                {pipelineRunning ? 'Ingesting & Discovering Phase 1...' : '🚀 Launch Ingestion Pipeline'}
               </button>
             </div>
           </div>
-        ) : (
-          /* AI PROMPT INGESTION SUBPANEL */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <form onSubmit={handleParsePrompt} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <textarea 
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g. 'Fetch Zepto reviews for the last 14 days and search reddit for grocery checkout errors'"
-                disabled={parsing || pipelineRunning}
-                style={{ 
-                  width: '100%', minHeight: '80px', background: 'var(--bg-secondary)', 
-                  border: '1px solid var(--border-glass)', borderRadius: '8px', color: '#fff', 
-                  padding: '0.75rem', fontFamily: 'inherit', resize: 'vertical', fontSize: '0.9rem'
-                }}
-              />
-              <button type="submit" className="btn-primary" disabled={parsing || pipelineRunning || !prompt.trim()} style={{ alignSelf: 'flex-end', padding: '0.4rem 1.2rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {parsing ? <RefreshCw className="loader" size={14} /> : <Send size={14} />}
-                Parse Ingestion Request
-              </button>
-            </form>
 
-            {parsedConfig && (
-              <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                  <strong>Ingestion Plan:</strong> Apps: {parsedConfig.apps.join(', ')} | Range: {parsedConfig.from_date} to {parsedConfig.to_date} | Reddit: {parsedConfig.include_reddit ? 'Yes' : 'No'}
-                </div>
-                <button className="btn-primary" onClick={handleLaunchAIPipeline} disabled={pipelineRunning} style={{ background: 'var(--success)', padding: '0.4rem 1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Play size={14} /> Run AI Plan
-                </button>
+          {/* ── Phase 1 / Active Logs Panel ── */}
+          {pipelineRunning && (
+            <div className="glass-panel" style={{ padding: '1.25rem', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '10px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h4 style={{ color: 'var(--accent-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Ingestion Pipeline Running...
+                </h4>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Status: {pipelineStatus}</span>
               </div>
-            )}
-          </div>
-        )}
-      </div>
+              
+              <div style={{
+                background: '#090e18', color: '#10b981', fontFamily: 'monospace', padding: '1rem', borderRadius: '6px',
+                maxHeight: '200px', overflowY: 'auto', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.25rem',
+                border: '1px solid rgba(255,255,255,0.03)'
+              }}>
+                {pipelineLogs.map((log, idx) => <div key={idx}>{log}</div>)}
+              </div>
+            </div>
+          )}
 
-      {/* Problem Statement Control Bar */}
-      <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1rem 1.25rem', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent-primary)', marginBottom: '0.4rem' }}>
-          🎯 Target Problem Statement / Strategic Focus:
-        </label>
-        <input 
-          type="text" 
-          value={problemStatement} 
-          onChange={(e) => setProblemStatement(e.target.value)} 
-          placeholder="e.g. Why do users stick to grocery categories and avoid exploring electronics or beauty?"
-          style={{
-            width: '100%',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-glass)',
-            borderRadius: '6px',
-            color: '#fff',
-            padding: '0.6rem 0.85rem',
-            fontSize: '0.9rem',
-            fontFamily: 'inherit',
-            outline: 'none'
-          }}
-        />
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.35rem' }}>
-          This problem statement anchors all AI reasoning engines (Theme Detection, Category Barriers, Personas, JTBD, Opportunities & Survey Generation).
-        </span>
-      </div>
+          {/* ── Active Awaiting Survey Validation Banner ── */}
+          {strategyStatus === 'awaiting_survey' && !pipelineRunning && (
+            <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '12px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#a78bfa', marginBottom: '0.5rem' }}>
+                <Shield size={20} />
+                <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Hypothesis Validation & Survey Upload Required</h3>
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 1.25rem 0', lineHeight: '1.5' }}>
+                Phase 1 (Discovery) completed successfully. To proceed to Phase 2 (Solution Synthesis, Presentation Deck Generation, Evidence Traceability, and McKinsey Strategy Audit), generate the survey form and upload the respondents' CSV data.
+              </p>
 
-      {/* Real-time Pipeline Console */}
-      {(pipelineRunning || pipelineLogs.length > 0) && (
-        <div className="glass-card" style={{ 
-          marginBottom: '2rem', 
-          background: '#07070a', 
-          border: '1px solid #1f1f2e', 
-          fontFamily: 'monospace',
-          padding: '1.25rem',
-          borderRadius: '8px',
-          animation: 'fadeIn 0.3s ease-out'
-        }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            borderBottom: '1px solid #1f1f2e', 
-            paddingBottom: '0.75rem', 
-            marginBottom: '1rem' 
-          }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: pipelineRunning ? 'var(--accent-primary)' : 'var(--success)' }}></span>
-              Pipeline Console Logs
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              {pipelineRunning && <span style={{ color: '#cbd5e1', fontSize: '0.85rem', animation: 'pulse 1.5s infinite' }}>Analyzing signals in real-time...</span>}
-              {pipelineLogs.length > 0 && (
-                <div style={{ display: 'flex', gap: '1rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={handleGenerateForm} 
+                  disabled={generatingForm}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}
+                >
+                  {generatingForm ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Layers size={16} />}
+                  {generatingForm ? 'Generating Form...' : '⚡ Generate Google Form Survey'}
+                </button>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-light)', padding: '0.25rem 0.5rem', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                  <input 
+                    type="file" 
+                    accept=".csv"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    style={{ color: '#fff', fontSize: '0.85rem' }}
+                  />
                   <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(pipelineLogs.join('\n'));
-                      alert("Console logs copied to clipboard!");
-                    }} 
-                    style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}
+                    className="btn-secondary" 
+                    onClick={handleSurveyUpload}
+                    disabled={uploading || !file}
+                    style={{ padding: '0.4rem 1rem' }}
                   >
-                    📋 Copy Logs
+                    {uploading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Upload size={14} />}
+                    Upload CSV
                   </button>
-                  <button 
-                    onClick={() => setPipelineLogs([])} 
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
-                  >
-                    Clear Console
-                  </button>
+                </div>
+              </div>
+
+              {generatedFormUrl && (
+                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#10b981' }}>👉 Form created! Send this link to respondents, then download the responses sheet as CSV: </span>
+                  <a href={generatedFormUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', fontWeight: 'bold', fontSize: '0.85rem', textDecoration: 'underline' }}>{generatedFormUrl}</a>
                 </div>
               )}
             </div>
+          )}
+
+          {/* ── Phase 2 running / compile progress ── */}
+          {strategyStatus === 'running' && completedSteps >= 5 && (
+            <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center' }}>
+                <h4 style={{ color: '#10b981', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Running Strategy Phase 2 Compilation...
+                </h4>
+                <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{strategyProgress}% Complete</span>
+              </div>
+              <div style={{ height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden', marginBottom: '1rem' }}>
+                <div style={{ height: '100%', width: `${strategyProgress}%`, background: 'linear-gradient(90deg, #10b981, #059669)', borderRadius: '3px', transition: 'width 0.5s ease' }} />
+              </div>
+
+              <div style={{
+                background: '#090e18', color: '#10b981', fontFamily: 'monospace', padding: '1rem', borderRadius: '6px',
+                maxHeight: '180px', overflowY: 'auto', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.25rem',
+                border: '1px solid rgba(255,255,255,0.03)'
+              }}>
+                {strategyLogs.slice().reverse().map((log, idx) => <div key={idx}>{log}</div>)}
+              </div>
+            </div>
+          )}
+
+          {/* Telemetry charts and metrics */}
+          {dashboardData ? (
+            <>
+              {/* Metric Cards */}
+              <div className="grid-4">
+                <div className="glass-panel metric-card">
+                  <div className="metric-icon" style={{ color: 'var(--accent-primary)' }}><MessageSquare size={22} /></div>
+                  <div className="metric-value">{dashboardData.total_signals}</div>
+                  <div className="metric-label">Unified Signals Ingested</div>
+                </div>
+                <div className="glass-panel metric-card">
+                  <div className="metric-icon" style={{ color: 'var(--success)' }}><TrendingUp size={22} /></div>
+                  <div className="metric-value">
+                    {Math.round((dashboardData.sentiment_summary?.positive || 0) * 100)}%
+                  </div>
+                  <div className="metric-label">Positive Sentiment Rate</div>
+                </div>
+                <div className="glass-panel metric-card">
+                  <div className="metric-icon" style={{ color: 'var(--accent-secondary)' }}><Users size={22} /></div>
+                  <div className="metric-value">{dashboardData.personas_count || 2}</div>
+                  <div className="metric-label">User Segments Clustered</div>
+                </div>
+                <div className="glass-panel metric-card">
+                  <div className="metric-icon" style={{ color: 'var(--warning)' }}><AlertTriangle size={22} /></div>
+                  <div className="metric-value">{dashboardData.opportunities_count || 4}</div>
+                  <div className="metric-label">Growth Opportunities Mapped</div>
+                </div>
+              </div>
+
+              {/* Charts & Lists Row */}
+              <div className="grid-2" style={{ gridTemplateColumns: '4fr 6fr', gap: '1.5rem' }}>
+                
+                {/* Sentiment Distribution Pie */}
+                <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', color: '#fff', fontSize: '1rem', textAlign: 'left' }}>Sentiment Distribution</h3>
+                  <div style={{ width: '100%', height: '220px', position: 'relative' }}>
+                    {sentimentChartData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={sentimentChartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            <Cell fill="#10b981" />
+                            <Cell fill="#64748b" />
+                            <Cell fill="#ef4444" />
+                          </Pie>
+                          <Tooltip formatter={(value) => `${value}%`} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p style={{ color: 'var(--text-muted)', paddingTop: '90px' }}>No sentiment data</p>
+                    )}
+                    <div style={{ position: 'absolute', top: '48%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>OVERALL</span>
+                      <h4 style={{ margin: 0, color: '#fff', fontSize: '1.25rem' }}>Sentiment</h4>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div> Positive
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#64748b' }}></div> Neutral
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></div> Negative
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Themes & Barriers list */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  
+                  {/* Top Themes */}
+                  <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'left' }}>
+                    <h3 style={{ margin: '0 0 1rem 0', color: '#fff', fontSize: '1.1rem' }}>Top Clustered Feedback Themes</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {dashboardData.top_themes?.slice(0, 3).map((theme, i) => (
+                        <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <h4 style={{ margin: '0 0 0.25rem 0', color: '#fff', fontSize: '0.9rem' }}>{theme.title}</h4>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Confidence Score: {Math.round(theme.confidence * 100)}%</span>
+                          </div>
+                          <span style={{ background: 'var(--accent-primary-alpha)', color: 'var(--accent-primary)', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                            {theme.mentions} Mentions
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Barriers */}
+                  <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'left' }}>
+                    <h3 style={{ margin: '0 0 1rem 0', color: '#fff', fontSize: '1.1rem' }}>Primary Category Exploration Barriers</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {dashboardData.top_barriers?.slice(0, 3).map((barrier, i) => (
+                        <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <h4 style={{ margin: '0 0 0.25rem 0', color: '#fff', fontSize: '0.9rem' }}>{barrier.category} Avoidance</h4>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Barrier Type: <strong style={{ color: 'var(--accent-secondary)' }}>{barrier.type}</strong></span>
+                          </div>
+                          <span style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                            Conf: {Math.round(barrier.confidence * 100)}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </>
+          ) : (
+            <div className="glass-card" style={{ padding: '4rem', textAlign: 'center' }}>
+              <Database size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+              <h3 style={{ color: '#fff', margin: '0 0 0.5rem 0' }}>No Ingestion Data Available</h3>
+              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Select your app sources and click "Launch Ingestion Pipeline" to query and scrub customer signals.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 2. STRATEGY DEEP DIVE STEPS TAB */}
+      {activeSection === 'steps' && strategyData && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Action Bar */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
+            <button className="btn-secondary" onClick={handleExportDoc} disabled={exportLoading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {exportLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <FileText size={16} />}
+              Export Google Doc
+            </button>
+            <button className="btn-secondary" onClick={handleExportSlides} disabled={exportSlidesLoading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {exportSlidesLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Presentation size={16} />}
+              Export Google Slides
+            </button>
+            <button className="btn-secondary" onClick={handleExportSource} disabled={exportSourceLoading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {exportSourceLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={16} />}
+              Download Markdown
+            </button>
           </div>
 
-          <div style={{ 
-            maxHeight: '200px', 
-            overflowY: 'auto', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '0.4rem', 
-            fontSize: '0.85rem', 
-            color: '#38bdf8',
-            textAlign: 'left'
-          }}>
-            {pipelineLogs.map((log, index) => (
-              <div key={index} style={{ 
-                color: log.includes('❌') ? 'var(--danger)' : log.includes('✅') ? 'var(--success)' : '#cbd5e1' 
-              }}>
-                {log}
-              </div>
-            ))}
+          {exportDocUrl && (
+            <div className="glass-panel" style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', textAlign: 'left' }}>
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✅ Google Doc created successfully! </span>
+              <a href={exportDocUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>View Google Doc</a>
+            </div>
+          )}
+
+          {exportSlidesUrl && (
+            <div className="glass-panel" style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', textAlign: 'left' }}>
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✅ Google Slides presentation generated! </span>
+              <a href={exportSlidesUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>View Presentation</a>
+            </div>
+          )}
+
+          {/* Live Strategy Progress Bar */}
+          <div style={{ padding: '0 0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Deep Strategy Framework Steps</span>
+              <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                {completedSteps}/{totalSteps} stages complete
+              </span>
+            </div>
+            <div style={{ height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${strategyProgress}%`, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', borderRadius: '3px', transition: 'width 0.5s ease' }} />
+            </div>
+          </div>
+
+          {/* collapsible steps list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {[1, 2, 3, 4].map(phaseNum => {
+              const phase = PHASE_META[phaseNum];
+              const completedCount = phase.steps.filter(sid => strategyData.steps?.[sid]?.status === 'complete').length;
+              return (
+                <div key={phaseNum} style={{ marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: `2px solid ${phase.color}30` }}>
+                    <div style={{ background: `${phase.color}20`, padding: '0.4rem', borderRadius: '6px', color: phase.color }}>{phase.icon}</div>
+                    <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 'bold' }}>Phase {phaseNum}: {phase.label}</h2>
+                    <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completedCount}/{phase.steps.length} completed</span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {phase.steps.map(stepId => (
+                      strategyData.steps?.[stepId] ? (
+                        <StepCard 
+                          key={stepId}
+                          stepId={stepId}
+                          stepData={strategyData.steps[stepId]}
+                          isOpen={!!openSteps[stepId]}
+                          onToggle={() => toggleStep(stepId)}
+                        />
+                      ) : null
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* KPI Stats */}
-      <div className="grid-4" style={{ marginBottom: '2rem' }}>
-        <div className="glass-card stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Total Signals</span>
-            <MessageSquare size={20} color="var(--accent-primary)" />
-          </div>
-          <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{data?.total_signals || 0}</h2>
-          <p style={{ color: 'var(--success)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '0.5rem' }}>
-            <TrendingUp size={14} /> Active Dataset
-          </p>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Themes Detected</span>
-            <Activity size={20} color="var(--accent-secondary)" />
-          </div>
-          <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{data?.top_themes?.length || 0}</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Across all sources
-          </p>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Barriers Found</span>
-            <AlertTriangle size={20} color="var(--warning)" />
-          </div>
-          <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{data?.top_barriers?.length || 0}</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Preventing exploration
-          </p>
-        </div>
-
-        <div className="glass-card stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Personas Gen.</span>
-            <Users size={20} color="var(--accent-tertiary)" />
-          </div>
-          <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{data?.personas_count || 0}</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Behavioral archetypes
-          </p>
-        </div>
-      </div>
-
-      <div className="grid-2">
-        {/* Sentiment Chart */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.5rem' }}>Overall Sentiment</h3>
-          <div style={{ flex: 1, minHeight: '250px' }}>
-            {sentData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={sentData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {sentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-glass)', borderRadius: '8px' }}
-                    itemStyle={{ color: '#fff' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                No sentiment data available
-              </div>
-            )}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1rem' }}>
-            {sentData.map(d => (
-              <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: d.color }}></div>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{d.name} ({d.value}%)</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Source Distribution */}
-        <div className="glass-card">
-          <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.5rem' }}>Data Sources</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
-            {data?.signals_by_source && Object.entries(data.signals_by_source).map(([source, count]) => (
-              <div key={source}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ textTransform: 'capitalize' }}>{source.replace('_', ' ')}</span>
-                  <span style={{ color: 'var(--text-secondary)' }}>{count} signals</span>
-                </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ 
-                    width: `${(count / data.total_signals) * 100}%`, 
-                    height: '100%', 
-                    background: 'var(--gradient-brand)',
-                    borderRadius: '4px'
-                  }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* 3. BOARD SLIDES TAB */}
+      {activeSection === 'slides' && boardPresentation && (
+        <div className="grid-2" style={{ gridTemplateColumns: '7.5fr 2.5fr', gap: '1.5rem' }}>
           
-          <h3 style={{ margin: '2rem 0 1rem 0', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.5rem' }}>App Coverage</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {data?.signals_by_app && Object.entries(data.signals_by_app).map(([app, count]) => (
-              <div key={app} style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem' }}>
-                <span style={{ textTransform: 'capitalize', color: 'var(--text-primary)' }}>{app.replace('_', ' ')}</span>
-                <span style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }}>{count}</span>
+          {/* Slides Deck Visualizer */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="glass-panel" style={{ 
+              minHeight: '420px', background: 'linear-gradient(135deg, #090e1a, #0b1931)', border: '2px solid rgba(255,255,255,0.06)',
+              borderRadius: '16px', padding: '2rem', display: 'flex', flexDirection: 'column', position: 'relative',
+              boxShadow: '0 15px 35px rgba(0,0,0,0.5)', textAlign: 'left', overflow: 'hidden'
+            }}>
+              {/* Branded accent tag */}
+              <div style={{ position: 'absolute', top: '12px', right: '20px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: boardPresentation.primary_color || 'var(--accent-primary)' }}></span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
+                  {boardPresentation.presentation_theme || 'STRATEGY DECISION'}
+                </span>
               </div>
-            ))}
+
+              {/* active slide rendering */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: '1rem' }}>
+                {(() => {
+                  const activeSlide = boardPresentation.slides[currentSlideIndex];
+                  if (!activeSlide) return null;
+                  const skipKeys = ["title", "headline", "slide_number", "type", "speaker_notes"];
+                  const entries = Object.entries(activeSlide).filter(([k]) => !skipKeys.includes(k));
+                  const brandColor = boardPresentation.primary_color || 'var(--accent-primary)';
+                  
+                  return (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%', overflowY: 'auto' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+                          Slide {activeSlide.slide_number}: {activeSlide.title}
+                        </span>
+                        <h2 style={{ fontSize: '1.65rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+                          {activeSlide.headline}
+                        </h2>
+                      </div>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', maxHeight: '310px', paddingRight: '0.5rem' }}>
+                        {entries.slice(0, 4).map(([key, val]) => (
+                          <div key={key} style={{ 
+                            background: 'rgba(255,255,255,0.01)', padding: '0.6rem 0.8rem', borderRadius: '8px',
+                            border: '1px solid rgba(255,255,255,0.04)', borderLeft: `3px solid ${brandColor}`
+                          }}>
+                            <strong style={{ color: '#fff', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.15rem' }}>{key.replace(/_/g, ' ')}</strong>
+                            {renderValue(val)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* slide footer */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.75rem', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span>McKinsey Storytelling Contract</span>
+                <span>Page {currentSlideIndex + 1} of {boardPresentation.slides.length}</span>
+              </div>
+            </div>
+
+            {/* slide navigation buttons */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button className="btn-secondary" onClick={handlePrevSlide} disabled={currentSlideIndex === 0}>
+                <ArrowLeft size={16} /> Previous
+              </button>
+              <button className="btn-secondary" onClick={handleNextSlide} disabled={currentSlideIndex === boardPresentation.slides.length - 1}>
+                Next <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Speaker Notes */}
+          <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+            <h3 style={{ borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.5rem', color: '#fff', fontSize: '1rem', margin: 0 }}>
+              🎙️ Board Presenter Notes
+            </h3>
+            <p style={{ color: '#cbd5e1', fontSize: '0.85rem', fontStyle: 'italic', margin: 0, lineHeight: '1.5' }}>
+              "{boardPresentation.slides[currentSlideIndex]?.speaker_notes || 'No notes compiled for this slide.'}"
+            </p>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* 4. CASE STUDY & MVP TAB */}
+      {activeSection === 'case_study' && caseStudy && (
+        <div className="glass-panel" style={{ padding: '2rem', textAlign: 'left' }}>
+          <h2 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Case Study: {caseStudy.product_name || 'Blinkit'} MVP</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Detailed strategic framing and MVP requirements validated by Multi-Agent research.</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Strategic Focus</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.strategic_focus}</p>
+            </div>
+
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Target Persona</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.target_persona}</p>
+            </div>
+
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Proposed MVP Solution</h3>
+              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+                <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0' }}>{caseStudy.mvp_solution?.solution_name}</h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{caseStudy.mvp_solution?.description}</p>
+                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', fontSize: '0.85rem' }}>
+                  <span>Impact: <strong style={{ color: 'var(--success)' }}>{caseStudy.mvp_solution?.impact}</strong></span>
+                  <span>Effort: <strong style={{ color: 'var(--warning)' }}>{caseStudy.mvp_solution?.effort}</strong></span>
+                  <span>Confidence: <strong>{caseStudy.mvp_solution?.confidence * 100}%</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Hypotheses & Experiments</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {caseStudy.experiments?.map((exp, idx) => (
+                  <div key={idx} style={{ background: 'rgba(255,255,255,0.01)', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid var(--accent-secondary)' }}>
+                    <h4 style={{ color: '#fff', margin: '0 0 0.35rem 0' }}>Hypothesis: {exp.hypothesis}</h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}><strong>Experiment:</strong> {exp.experiment}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Execution Metrics</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <p style={{ color: 'var(--text-secondary)' }}><strong>North Star Metric:</strong> {caseStudy.metrics?.north_star_metric}</p>
+                <p style={{ color: 'var(--text-secondary)' }}><strong>Guardrail Metric:</strong> {caseStudy.metrics?.guardrail_metric}</p>
+                <p style={{ color: 'var(--text-secondary)' }}><strong>Counter Metric:</strong> {caseStudy.metrics?.counter_metric}</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Identified Risks</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.risks}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global CSS animations */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };

@@ -13,7 +13,6 @@ const Sidebar = () => {
   const navItems = [
     { path: '/', label: 'Overview', icon: <LayoutDashboard size={20} /> },
     { path: '/insights', label: 'Consumer Insights', icon: <Users size={20} /> },
-    { path: '/strategy', label: 'Strategy & Case Study', icon: <Brain size={20} /> },
     { path: '/signals', label: 'Signals Database', icon: <Table size={20} /> },
     { path: '/review', label: 'Review Board', icon: <Award size={20} /> },
   ];
