@@ -31,6 +31,17 @@ Return strictly a JSON object with this schema:
       "evidence_strength": "High/Medium/Low",
       "supporting_facts": ["Fact 1"]
     }
+  ],
+  "growth_opportunities": [
+    {
+      "title": "Opportunity title",
+      "description": "Opportunity description",
+      "category": "Feature/UX/Content/Ops/Marketing",
+      "impact": "high/medium/low",
+      "effort": "high/medium/low",
+      "confidence": 0.8,
+      "recommended_experiment": "Experiment description"
+    }
   ]
 }
 """

@@ -43,8 +43,19 @@ Return strictly a JSON object with this schema:
       "evidence": "Supporting text or signal reference",
       "confidence": "High/Medium/Low"
     }
+  ],
+  "jobs_to_be_done": [
+    {
+      "job_statement": "When [situation], I want to [motivation], so I can [outcome]",
+      "category": "functional/emotional/social",
+      "current_solution": "How users do it today",
+      "gaps": ["Gap 1", "Gap 2"],
+      "opportunity_score": 8.0,
+      "supporting_quotes": ["Quote 1"]
+    }
   ]
 }
+
 """
         user_prompt = f"""
 Raw Dataset (Sample):

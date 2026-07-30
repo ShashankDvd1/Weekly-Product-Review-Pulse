@@ -150,6 +150,208 @@ class PipelineOrchestrator:
         except Exception as pce:
             logger.error(f"Failed to load pipeline cache: {pce}")
 
+    def _map_phase_1_outputs_to_dashboard(self):
+        """Maps Phase 1 agent outputs to dashboard variables."""
+        if not self.strategy_deep_dive:
+            return
+
+        discovery_res = self.strategy_deep_dive.get("discovery", {})
+        segmentation_res = self.strategy_deep_dive.get("segmentation", {})
+        root_cause_res = self.strategy_deep_dive.get("root_cause", {})
+
+        from core.schemas import Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity, Hypothesis, SentimentLabel, BarrierType, ConfidenceLevel, JTBDCategory
+
+        # 1. Map Hypotheses
+        self.hypotheses = []
+        for i, h_raw in enumerate(discovery_res.get("hypotheses", [])):
+            try:
+                conf = h_raw.get("confidence", "Medium").upper().replace(" ", "_")
+                if conf not in ConfidenceLevel.__members__:
+                    conf = "MEDIUM"
+                self.hypotheses.append(Hypothesis(
+                    hypothesis_id=f"H{i+1}",
+                    statement=h_raw.get("hypothesis", ""),
+                    rationale=h_raw.get("evidence", ""),
+                    evidence_count=1,
+                    confidence=1.0 if conf == "HIGH" else (0.5 if conf == "MEDIUM" else 0.2),
+                    validation_method="User Survey & Triangulation",
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map hypothesis: {e}")
+
+        # 2. Map JTBD (from discovery)
+        self.jobs = []
+        for i, j_raw in enumerate(discovery_res.get("jobs_to_be_done", [])):
+            try:
+                cat_str = j_raw.get("category", "functional").lower()
+                cat = JTBDCategory.FUNCTIONAL
+                if "emotional" in cat_str:
+                    cat = JTBDCategory.EMOTIONAL
+                elif "social" in cat_str:
+                    cat = JTBDCategory.SOCIAL
+                self.jobs.append(JTBD(
+                    jtbd_id=f"J{i+1}",
+                    job_statement=j_raw.get("job_statement", ""),
+                    category=cat,
+                    current_solution=j_raw.get("current_solution", ""),
+                    gaps=j_raw.get("gaps", []),
+                    opportunity_score=float(j_raw.get("opportunity_score", 5.0)),
+                    signal_count=len(j_raw.get("supporting_quotes", [])),
+                    supporting_quotes=j_raw.get("supporting_quotes", [])
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map JTBD: {e}")
+
+        # 3. Map Themes (from segmentation)
+        self.themes = []
+        for i, t_raw in enumerate(segmentation_res.get("prioritized_themes", [])):
+            try:
+                self.themes.append(Theme(
+                    theme_id=f"T{i+1}",
+                    title=t_raw.get("theme_name", ""),
+                    summary=t_raw.get("theme_name", ""),
+                    category="UX",
+                    sentiment=SentimentLabel.NEGATIVE,
+                    mention_count=len(t_raw.get("supporting_facts", [])),
+                    confidence=0.8,
+                    confidence_level=ConfidenceLevel.HIGH,
+                    supporting_quotes=t_raw.get("supporting_facts", []),
+                    apps_affected=["zepto", "blinkit", "swiggy_instamart"]
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map Theme: {e}")
+
+        # 4. Map Personas (from segmentation)
+        self.personas = []
+        for i, p_raw in enumerate(segmentation_res.get("user_segments", [])):
+            try:
+                self.personas.append(Persona(
+                    persona_id=f"P{i+1}",
+                    name=p_raw.get("segment_name", ""),
+                    description=", ".join(p_raw.get("defining_behaviors", [])),
+                    shopping_habits=", ".join(p_raw.get("defining_behaviors", [])),
+                    motivations=p_raw.get("observed_needs", []),
+                    barriers=[],
+                    preferred_categories=[],
+                    avoided_categories=[],
+                    apps_used=["zepto", "blinkit", "swiggy_instamart"],
+                    signal_count=int(float(p_raw.get("estimated_size_pct", 30))),
+                    representative_quotes=[]
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map Persona: {e}")
+
+        # 5. Map Opportunities (from segmentation)
+        self.opportunities = []
+        for i, o_raw in enumerate(segmentation_res.get("growth_opportunities", [])):
+            try:
+                self.opportunities.append(GrowthOpportunity(
+                    opportunity_id=f"O{i+1}",
+                    title=o_raw.get("title", ""),
+                    description=o_raw.get("description", ""),
+                    category=o_raw.get("category", "UX"),
+                    impact=o_raw.get("impact", "medium").lower(),
+                    effort=o_raw.get("effort", "medium").lower(),
+                    confidence=float(o_raw.get("confidence", 0.8)),
+                    supporting_themes=[],
+                    supporting_jtbd=[],
+                    recommended_experiment=o_raw.get("recommended_experiment", "")
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map Opportunity: {e}")
+
+        # 6. Map Barriers (from root causes)
+        self.barriers = []
+        for i, b_raw in enumerate(root_cause_res.get("validated_root_causes", [])):
+            try:
+                self.barriers.append(CategoryBarrier(
+                    barrier_id=f"B{i+1}",
+                    category="Quick Commerce",
+                    barrier_type=BarrierType.TRUST,
+                    description=b_raw.get("explanation", ""),
+                    signal_count=len(b_raw.get("supporting_evidence", [])),
+                    confidence=float(b_raw.get("impact_score", 8.0)) / 10.0,
+                    confidence_level=ConfidenceLevel.HIGH,
+                    recommended_intervention=b_raw.get("cause_title", ""),
+                    apps_affected=["zepto", "blinkit", "swiggy_instamart"]
+                ))
+            except Exception as e:
+                logger.error(f"Failed to map CategoryBarrier: {e}")
+
+    def run_strategy_phase_1(self, log_func=None):
+        """Executes Phase 1 strategy agents (Stages 1-5) and maps results to dashboard."""
+        def default_log(msg):
+            logger.info(msg)
+        
+        log = log_func if log_func else default_log
+        
+        self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] v2 Multi-Agent Research Strategy Pipeline initialized."]
+        self.strategy_completed_steps = 0
+        self.strategy_status = "running"
+        self.strategy_total_steps = 9
+
+        # Helper to log steps
+        def log_agent_progress(step_num, agent_name, status, detail=""):
+            timestamp = datetime.now().strftime('%H:%M:%S')
+            if status == "start":
+                msg = f"Running Stage {step_num}/9: {agent_name}..."
+            elif status == "complete":
+                self.strategy_completed_steps = step_num
+                msg = f"Stage {step_num}/9: {agent_name} completed successfully."
+            elif status == "failed":
+                msg = f"ERROR: Stage {step_num}/9: {agent_name} failed. {detail}"
+            self.strategy_logs.append(f"[{timestamp}] {msg}")
+            log(msg)
+
+        # Stage 1: Planning
+        log_agent_progress(1, "Research Planning Agent", "start")
+        from agents.planning_agent import ResearchPlanningAgent
+        planning_res = ResearchPlanningAgent().plan(self.signals)
+        log_agent_progress(1, "Research Planning Agent", "complete")
+
+        # Stage 2: Processing
+        log_agent_progress(2, "Data Processing Agent", "start")
+        from agents.processing_agent import DataProcessingAgent
+        processing_res = DataProcessingAgent().process(self.signals)
+        log_agent_progress(2, "Data Processing Agent", "complete")
+
+        # Stage 3: Discovery
+        log_agent_progress(3, "Research Discovery Agent", "start")
+        from agents.discovery_agent import ResearchDiscoveryAgent
+        discovery_res = ResearchDiscoveryAgent().discover(self.signals)
+        log_agent_progress(3, "Research Discovery Agent", "complete")
+
+        # Stage 4: Segmentation
+        log_agent_progress(4, "Pattern & Segmentation Agent", "start")
+        from agents.segmentation_agent import PatternSegmentationAgent
+        segmentation_res = PatternSegmentationAgent().segment(discovery_res)
+        log_agent_progress(4, "Pattern & Segmentation Agent", "complete")
+
+        # Stage 5: Root Cause & Strategy
+        log_agent_progress(5, "Root Cause & Strategy Agent", "start")
+        from agents.root_cause_agent import RootCauseStrategyAgent
+        root_cause_res = RootCauseStrategyAgent().analyze(segmentation_res, discovery_res)
+        log_agent_progress(5, "Root Cause & Strategy Agent", "complete")
+
+        self.strategy_deep_dive = {
+            "planning": planning_res,
+            "processing": processing_res,
+            "discovery": discovery_res,
+            "segmentation": segmentation_res,
+            "root_cause": root_cause_res,
+            "steps": {
+                "step_1": {"title": "Problem Discovery Plan", "status": "complete", "data": planning_res},
+                "step_2": {"title": "Data Processing & Stats", "status": "complete", "data": processing_res},
+                "step_4": {"title": "Research Discoveries", "status": "complete", "data": discovery_res},
+                "step_8": {"title": "Root Causes", "status": "complete", "data": root_cause_res}
+            }
+        }
+        self.strategy_status = "awaiting_survey"
+        self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 1 (Discovery) completed successfully. Awaiting Survey Data.")
+        
+        # Map outputs to dashboard variables
+        self._map_phase_1_outputs_to_dashboard()
+
     def run_strategy_deep_dive_async(self, target_phase=1):
         """Runs the 9-Agent sequential strategy pipeline in a background thread."""
         self.strategy_status = "running"
@@ -173,54 +375,7 @@ class PipelineOrchestrator:
 
         try:
             if target_phase == 1 or not self.strategy_deep_dive:
-                self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] v2 Multi-Agent Research Strategy Pipeline initialized."]
-                self.strategy_completed_steps = 0
-                
-                # Stage 1: Planning
-                log_agent_progress(1, "Research Planning Agent", "start")
-                from agents.planning_agent import ResearchPlanningAgent
-                planning_res = ResearchPlanningAgent().plan(self.signals)
-                log_agent_progress(1, "Research Planning Agent", "complete")
-
-                # Stage 2: Processing
-                log_agent_progress(2, "Data Processing Agent", "start")
-                from agents.processing_agent import DataProcessingAgent
-                processing_res = DataProcessingAgent().process(self.signals)
-                log_agent_progress(2, "Data Processing Agent", "complete")
-
-                # Stage 3: Discovery
-                log_agent_progress(3, "Research Discovery Agent", "start")
-                from agents.discovery_agent import ResearchDiscoveryAgent
-                discovery_res = ResearchDiscoveryAgent().discover(self.signals)
-                log_agent_progress(3, "Research Discovery Agent", "complete")
-
-                # Stage 4: Segmentation
-                log_agent_progress(4, "Pattern & Segmentation Agent", "start")
-                from agents.segmentation_agent import PatternSegmentationAgent
-                segmentation_res = PatternSegmentationAgent().segment(discovery_res)
-                log_agent_progress(4, "Pattern & Segmentation Agent", "complete")
-
-                # Stage 5: Root Cause & Strategy
-                log_agent_progress(5, "Root Cause & Strategy Agent", "start")
-                from agents.root_cause_agent import RootCauseStrategyAgent
-                root_cause_res = RootCauseStrategyAgent().analyze(segmentation_res, discovery_res)
-                log_agent_progress(5, "Root Cause & Strategy Agent", "complete")
-
-                self.strategy_deep_dive = {
-                    "planning": planning_res,
-                    "processing": processing_res,
-                    "discovery": discovery_res,
-                    "segmentation": segmentation_res,
-                    "root_cause": root_cause_res,
-                    "steps": {
-                        "step_1": {"title": "Problem Discovery Plan", "status": "complete", "data": planning_res},
-                        "step_2": {"title": "Data Processing & Stats", "status": "complete", "data": processing_res},
-                        "step_4": {"title": "Research Discoveries", "status": "complete", "data": discovery_res},
-                        "step_8": {"title": "Root Causes", "status": "complete", "data": root_cause_res}
-                    }
-                }
-                self.strategy_status = "awaiting_survey"
-                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 1 (Discovery) completed successfully. Awaiting Survey Data.")
+                self.run_strategy_phase_1()
             
             else:
                 # Target phase 2: Resuming
@@ -508,144 +663,30 @@ class PipelineOrchestrator:
     # ── Analysis Phase ─────────────────────────
     def analyze_all(self, problem_statement: Optional[str] = None) -> dict:
         """
-        Run the complete AI analysis pipeline on collected signals.
+        Run the complete AI analysis pipeline (using Phase 1 Strategy Agents) on collected signals.
         """
-        from reasoning.behavior_analyzer import detect_themes, detect_category_barriers, analyze_sentiment_batch
-        from reasoning.persona_generator import generate_personas
-        from reasoning.jtbd_analyzer import analyze_jtbd
-        from reasoning.opportunity_miner import identify_opportunities
-        from reasoning.research_copilot import generate_hypotheses, generate_interview_questions
-        from output.report_generator import generate_executive_summary, generate_category_discovery_report
-
         if not self.signals:
             return {"error": "No signals to analyze. Run collect_all() first."}
 
         self.active_problem_statement = problem_statement
         self._status = "analyzing"
 
-        from concurrent.futures import ThreadPoolExecutor
-        import threading
-
-        lock = threading.Lock()
-
-        def safe_log(msg):
-            with lock:
-                self._log_progress(msg)
-
-        # Phase 1: Concurrently run independent analyses
-        safe_log("🎭 Running parallel ingestion analysis stages...")
-
-        def run_sentiment():
-            safe_log("🎭 Running sentiment analysis...")
-            try:
-                self.signals = analyze_sentiment_batch(self.signals)
-                safe_log("  ✅ Sentiment analysis complete")
-            except Exception as e:
-                logger.error(f"Sentiment analysis failed: {e}")
-                safe_log(f"  ❌ Sentiment analysis failed: {e}")
-
-        def run_themes():
-            safe_log("🔍 Detecting themes...")
-            try:
-                self.themes = detect_themes(self.signals, context=problem_statement if problem_statement else "quick commerce category exploration behavior")
-                safe_log(f"  ✅ {len(self.themes)} themes detected")
-            except Exception as e:
-                logger.error(f"Theme detection failed: {e}")
-                safe_log(f"  ❌ Theme detection failed: {e}")
-
-        def run_barriers():
-            safe_log("🚧 Detecting category exploration barriers...")
-            try:
-                self.barriers = detect_category_barriers(self.signals, problem_statement=problem_statement)
-                safe_log(f"  ✅ {len(self.barriers)} category barriers detected")
-            except Exception as e:
-                logger.error(f"Category barrier detection failed: {e}")
-                safe_log(f"  ❌ Category barrier detection failed: {e}")
-
-        def run_personas():
-            safe_log("👤 Generating user personas...")
-            try:
-                self.personas = generate_personas(self.signals, problem_statement=problem_statement)
-                safe_log(f"  ✅ {len(self.personas)} personas generated")
-            except Exception as e:
-                logger.error(f"Persona generation failed: {e}")
-                safe_log(f"  ❌ Persona generation failed: {e}")
-
-        def run_jtbd():
-            safe_log("🎯 Extracting Jobs-To-Be-Done...")
-            try:
-                self.jobs = analyze_jtbd(self.signals, problem_statement=problem_statement)
-                safe_log(f"  ✅ {len(self.jobs)} jobs extracted")
-            except Exception as e:
-                logger.error(f"JTBD analysis failed: {e}")
-                safe_log(f"  ❌ JTBD analysis failed: {e}")
-
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            futures = [
-                executor.submit(run_sentiment),
-                executor.submit(run_themes),
-                executor.submit(run_barriers),
-                executor.submit(run_personas),
-                executor.submit(run_jtbd)
-            ]
-            for f in futures:
-                f.result()
-
-        # Phase 2: Opportunity Mining (depends on themes, barriers, personas, jobs)
-        safe_log("💡 Identifying growth opportunities...")
+        # Run sentiment analysis first
+        from reasoning.behavior_analyzer import analyze_sentiment_batch
         try:
-            self.opportunities = identify_opportunities(
-                self.themes, self.barriers, self.personas, self.jobs, self.signals, problem_statement=problem_statement
-            )
-            safe_log(f"  ✅ {len(self.opportunities)} opportunities identified")
+            self._log_progress("🎭 Running sentiment analysis...")
+            self.signals = analyze_sentiment_batch(self.signals)
+            self._log_progress("  ✅ Sentiment analysis complete")
         except Exception as e:
-            logger.error(f"Opportunity mining failed: {e}")
-            safe_log(f"  ❌ Opportunity mining failed: {e}")
-            self.opportunities = []
+            logger.error(f"Sentiment analysis failed: {e}")
+            self._log_progress(f"  ❌ Sentiment analysis failed: {e}")
 
-        # Phase 3: Parallel reporting and hypotheses creation
-        def run_hypotheses_and_interview():
-            safe_log("🔬 Generating research hypotheses...")
-            try:
-                self.hypotheses = generate_hypotheses(self.barriers, self.opportunities, self.themes)
-                safe_log(f"  ✅ {len(self.hypotheses)} hypotheses generated")
-            except Exception as e:
-                logger.error(f"Hypotheses generation failed: {e}")
-                safe_log(f"  ❌ Hypotheses generation failed: {e}")
-                self.hypotheses = []
-
-            safe_log("📋 Generating interview questions...")
-            try:
-                self.interview_script = generate_interview_questions(
-                    self.personas, self.barriers, self.hypotheses
-                )
-                safe_log(f"  ✅ {len(self.interview_script.optimized_script) if self.interview_script else 0} optimized questions generated")
-            except Exception as e:
-                logger.error(f"Interview script generation failed: {e}")
-                safe_log(f"  ❌ Interview script generation failed: {e}")
-
-        def run_summary():
-            safe_log("📊 Generating executive summary...")
-            try:
-                self.executive_summary = generate_executive_summary(
-                    self.signals, self.themes, self.barriers,
-                    self.personas, self.jobs, self.opportunities,
-                )
-                safe_log("  ✅ Executive summary generated")
-            except Exception as e:
-                logger.error(f"Executive summary generation failed: {e}")
-                safe_log(f"  ❌ Executive summary generation failed: {e}")
-
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            futures = [
-                executor.submit(run_hypotheses_and_interview),
-                executor.submit(run_summary)
-            ]
-            for f in futures:
-                f.result()
+        # Run Phase 1 Strategy Agents
+        self._log_progress("🧠 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...")
+        self.run_strategy_phase_1(log_func=self._log_progress)
 
         self._status = "complete"
-        safe_log("🎉 Analysis pipeline complete!")
+        self._log_progress("🎉 Analysis pipeline complete!")
         
         # Save pipeline results to local file cache
         try:
@@ -666,7 +707,7 @@ class PipelineOrchestrator:
             os.makedirs("data", exist_ok=True)
             with open(os.path.join("data", "pipeline_cache.json"), "w", encoding="utf-8") as f:
                 json.dump(cache_data, f, indent=2)
-            safe_log("💾 Ingestion pipeline cache successfully saved to local file.")
+            self._log_progress("💾 Ingestion pipeline cache successfully saved to local file.")
         except Exception as e:
             logger.error(f"Failed to save pipeline cache: {e}")
 
