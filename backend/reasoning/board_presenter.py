@@ -315,18 +315,10 @@ def format_step_data_as_text(data, indent=""):
     return f"{indent}{data}"
 
 
-def synthesize_board_presentation(strategy_data: dict) -> dict:
-    """
-    Takes strategy deep dive output and synthesizes it into a
-    structured 10-slide board presentation matching the McKinsey arc.
-    """
-    logger.info("Synthesizing board presentation from Strategy Deep Dive...")
-    client = LLMClient()
-
-    # Formulate step text to feed as context (trimmed to prevent payload limit errors)
+def _build_step_context(strategy_data: dict) -> str:
+    """Build trimmed step context string from strategy deep dive data."""
     steps = strategy_data.get("steps", {})
     steps_context_list = []
-    # Filter for high-impact steps to fit context constraints while preserving factual detail
     high_impact_steps = ["step_1", "step_2", "step_4", "step_8", "step_13", "step_14"]
     for step_id, info in steps.items():
         if step_id not in high_impact_steps:
@@ -337,30 +329,276 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
         formatted_text = format_step_data_as_text(step_data)
         steps_context_list.append(f"### {step_id.upper()}: {step_title}\n{formatted_text}")
 
-    strategy_steps_text = "\n\n".join(steps_context_list)
-
-    # Also include active problem statement if available
+    ctx = "\n\n".join(steps_context_list)
     problem_statement = strategy_data.get("active_problem_statement", "")
     if problem_statement:
-        strategy_steps_text = f"## ACTIVE PROBLEM STATEMENT\n{problem_statement}\n\n" + strategy_steps_text
+        ctx = f"## ACTIVE PROBLEM STATEMENT\n{problem_statement}\n\n" + ctx
+    return ctx
 
-    prompt = PROMPT_TEMPLATE.format(
-        strategy_steps=strategy_steps_text,
-        ANTI_HALLUCINATION_RULES=ANTI_HALLUCINATION_RULES
-    )
 
-    # Run LLM query using deep reasoning model
+# ── Per-batch prompt templates ──────────────────────────────────────────────
+
+BATCH_A_SYSTEM = """You are a McKinsey Engagement Manager preparing slides 1-5 of a 10-slide board deck.
+Output a JSON object with ONLY these 5 slides in a "slides" array plus brand metadata.
+Use EXACT type values. No markdown. No text outside JSON.
+ANTI-HALLUCINATION: preserve all statistics and quotes exactly as given."""
+
+BATCH_B_SYSTEM = """You are a McKinsey Engagement Manager preparing slides 6-10 of a 10-slide board deck.
+Output a JSON object with ONLY these 5 slides in a "slides" array.
+Use EXACT type values. No markdown. No text outside JSON.
+ANTI-HALLUCINATION: preserve all statistics and quotes exactly as given."""
+
+BATCH_A_SCHEMA = """\
+Return exactly this JSON (slides 1-5 only):
+{
+  "presentation_title": "...",
+  "subtitle": "...",
+  "presentation_theme": "Blinkit Yellow | Zepto Purple | Swiggy Orange",
+  "app_name": "Blinkit | Zepto | Swiggy Instamart",
+  "primary_color": "#hex",
+  "secondary_color": "#hex",
+  "slides": [
+    {
+      "slide_number": 1, "type": "market_gap",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2", "detailed bullet 3"],
+      "speaker_notes": "presenter notes",
+      "market_gap_table": [
+        {"platform": "Blinkit", "offer": "...", "missing": "..."},
+        {"platform": "Zepto", "offer": "...", "missing": "..."},
+        {"platform": "Swiggy Instamart", "offer": "...", "missing": "..."},
+        {"platform": "BigBasket", "offer": "...", "missing": "..."},
+        {"platform": "Amazon Fresh", "offer": "...", "missing": "..."}
+      ],
+      "why_solve_first": ["Reason 1", "Reason 2", "Reason 3"],
+      "stats": [{"label": "...", "value": "..."}, {"label": "...", "value": "..."}, {"label": "...", "value": "..."}]
+    },
+    {
+      "slide_number": 2, "type": "user_research",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2", "detailed bullet 3"],
+      "speaker_notes": "presenter notes",
+      "findings": {"total_analyzed": 150, "llm_labeled": 150, "discovery_pain_pct": 20, "top_theme": "...",
+        "wants_variety_pct": 40, "less_repetition_pct": 30, "real_shuffle_pct": 20, "better_music_pct": 10},
+      "sentiment": {"negative": 60, "neutral": 30, "positive": 60},
+      "cited_quotes": [{"quote": "...", "source": "..."}, {"quote": "...", "source": "..."}, {"quote": "...", "source": "..."}]
+    },
+    {
+      "slide_number": 3, "type": "personas_journey",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "personas": [
+        {"name": "...", "title": "archetype", "meta": "age/city/frequency", "trust_pattern": "...", "unmet_need": "...", "behavioral_trap": "...", "quote": "..."},
+        {"name": "...", "title": "archetype", "meta": "...", "trust_pattern": "...", "unmet_need": "...", "behavioral_trap": "...", "quote": "..."}
+      ],
+      "user_journey": [
+        {"stage": "1. Open", "behavior": "...", "friction": "..."},
+        {"stage": "2. Served", "behavior": "...", "friction": "..."},
+        {"stage": "3. Browse", "behavior": "...", "friction": "..."},
+        {"stage": "4. Checkout", "behavior": "...", "friction": "..."},
+        {"stage": "5. Exit", "behavior": "...", "friction": "..."}
+      ]
+    },
+    {
+      "slide_number": 4, "type": "problem_framing",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "true_problem": "...", "target_cohort": "...",
+      "evidences": ["...", "...", "..."],
+      "value_generated": {"for_user": "...", "for_platform": "..."},
+      "why_now": {"saturation": "...", "ai_unlock": "...", "first_mover": "..."}
+    },
+    {
+      "slide_number": 5, "type": "hypotheses_rice",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "hypotheses": [
+        {"id": "H1", "name": "...", "statement": "...", "validation": "..."},
+        {"id": "H2", "name": "...", "statement": "...", "validation": "..."},
+        {"id": "H3", "name": "...", "statement": "...", "validation": "..."}
+      ],
+      "rice_scores": [
+        {"hypothesis_id": "H1", "reach": 9, "impact": 9, "confidence": 8, "effort": 4, "score": 162},
+        {"hypothesis_id": "H2", "reach": 5, "impact": 6, "confidence": 6, "effort": 5, "score": 36},
+        {"hypothesis_id": "H3", "reach": 4, "impact": 4, "confidence": 4, "effort": 7, "score": 9}
+      ],
+      "winning_rationale": "..."
+    }
+  ]
+}"""
+
+BATCH_B_SCHEMA = """\
+Return exactly this JSON (slides 6-10 only):
+{
+  "slides": [
+    {
+      "slide_number": 6, "type": "solution_comparison",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "solutions": [
+        {"id": "S1", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S2", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S3", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S4", "name": "...", "status": "CHOSEN", "description": "...", "feedback": "..."}
+      ],
+      "vs_comparison": [
+        {"against": "S1", "justification": "..."},
+        {"against": "S2", "justification": "..."},
+        {"against": "S3", "justification": "..."}
+      ]
+    },
+    {
+      "slide_number": 7, "type": "mvp_spec",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "screens": [{"name": "...", "spec": "..."}, {"name": "...", "spec": "..."}, {"name": "...", "spec": "..."}],
+      "trust_cues": ["cue 1", "cue 2", "cue 3"],
+      "live_links": ["https://example-prototype.streamlit.app/"]
+    },
+    {
+      "slide_number": 8, "type": "data_flow_edges",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "data_flow": {"review_engine": "...", "product_engine": "..."},
+      "nudges": ["nudge 1", "nudge 2", "nudge 3"],
+      "edge_cases": [
+        {"id": "E1", "title": "...", "mitigation": "..."},
+        {"id": "E2", "title": "...", "mitigation": "..."},
+        {"id": "E3", "title": "...", "mitigation": "..."},
+        {"id": "E4", "title": "...", "mitigation": "..."}
+      ]
+    },
+    {
+      "slide_number": 9, "type": "metrics_indicators",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "north_star": {"name": "...", "definition": "...", "target": "X% to Y%", "why": "...", "stalls_action": "..."},
+      "leading_indicators": [
+        {"name": "...", "target": ">18%", "proves": "...", "below_target_action": "..."},
+        {"name": "...", "target": ">8%", "proves": "...", "below_target_action": "..."},
+        {"name": "...", "target": ">15%", "proves": "...", "below_target_action": "..."},
+        {"name": "...", "target": "+30%", "proves": "...", "below_target_action": "..."}
+      ]
+    },
+    {
+      "slide_number": 10, "type": "failure_mitigations",
+      "title": "takeaway title", "headline": "key insight headline",
+      "bullets": ["detailed bullet 1", "detailed bullet 2"],
+      "speaker_notes": "presenter notes",
+      "failures": [
+        {"risk": "...", "handling": "...", "severity": "CRIT"},
+        {"risk": "...", "handling": "...", "severity": "HIGH"},
+        {"risk": "...", "handling": "...", "severity": "MED"}
+      ],
+      "guardrails": [
+        {"name": "...", "threshold": "< 4%", "purpose": "..."},
+        {"name": "...", "threshold": "< 200ms", "purpose": "..."},
+        {"name": "...", "threshold": "< 1%", "purpose": "..."}
+      ],
+      "closing_message": "..."
+    }
+  ]
+}"""
+
+
+def _call_batch(client: LLMClient, system: str, user: str) -> list:
+    """Call LLM for one batch of slides, return the slides list or [] on failure."""
+    import time
     try:
-        result_json = client.generate(
-            system_prompt="Output strictly a valid JSON object matching the requested schema. No markdown wrappers. No text outside JSON.",
-            user_prompt=prompt,
-            creative=False
+        result = client.generate(
+            system_prompt=system,
+            user_prompt=user,
+            creative=False,
+            max_tokens=5500,
         )
-        logger.info("Successfully synthesized board presentation.")
-        return result_json
+        slides = result.get("slides", [])
+        logger.info(f"Batch returned {len(slides)} slides.")
+        return slides, result
     except Exception as e:
-        logger.exception("Failed to synthesize board presentation. Generating fallback structure.")
-        return create_fallback_presentation(strategy_data)
+        logger.error(f"Batch LLM call failed: {e}")
+        return [], {}
+
+
+def synthesize_board_presentation(strategy_data: dict) -> dict:
+    """
+    Takes strategy deep dive output and synthesizes it into a
+    structured 10-slide board presentation using TWO separate LLM calls
+    (slides 1-5, then slides 6-10) to stay within Groq token limits.
+    Falls back to rich static data for any slides the LLM fails to return.
+    """
+    import time
+    logger.info("Synthesizing board presentation via 2-batch LLM approach...")
+    client = LLMClient()
+
+    step_context = _build_step_context(strategy_data)
+    fallback = create_fallback_presentation(strategy_data)
+
+    # ── Batch A: slides 1–5 ─────────────────────────────────────────────
+    batch_a_user = (
+        f"## Strategy Deep Dive Data:\n{step_context}\n\n"
+        f"## Your Task:\nGenerate slides 1-5 of the McKinsey board deck based on the data above.\n\n"
+        f"{BATCH_A_SCHEMA}"
+    )
+    logger.info("Running Batch A: slides 1-5...")
+    slides_a, meta_a = _call_batch(client, BATCH_A_SYSTEM, batch_a_user)
+
+    # Respect Groq RPM between the two calls
+    logger.info("Waiting 3s between batches to respect Groq rate limits...")
+    time.sleep(3)
+
+    # ── Batch B: slides 6–10 ────────────────────────────────────────────
+    batch_b_user = (
+        f"## Strategy Deep Dive Data:\n{step_context}\n\n"
+        f"## Your Task:\nGenerate slides 6-10 of the McKinsey board deck based on the data above.\n\n"
+        f"{BATCH_B_SCHEMA}"
+    )
+    logger.info("Running Batch B: slides 6-10...")
+    slides_b, _ = _call_batch(client, BATCH_B_SYSTEM, batch_b_user)
+
+    # ── Merge & validate ────────────────────────────────────────────────
+    # Index all returned slides by slide_number
+    llm_slides_by_num = {}
+    for s in slides_a + slides_b:
+        num = s.get("slide_number")
+        if num:
+            llm_slides_by_num[int(num)] = s
+
+    # Build final 10-slide array; fall back slide-by-slide if LLM missed any
+    fallback_by_num = {s["slide_number"]: s for s in fallback["slides"]}
+    final_slides = []
+    for n in range(1, 11):
+        if n in llm_slides_by_num:
+            final_slides.append(llm_slides_by_num[n])
+        else:
+            logger.warning(f"Slide {n} missing from LLM output — using fallback.")
+            final_slides.append(fallback_by_num[n])
+
+    # Brand metadata from batch A if available, else from fallback
+    app_name = meta_a.get("app_name") or fallback["app_name"]
+    primary_color = meta_a.get("primary_color") or fallback["primary_color"]
+    secondary_color = meta_a.get("secondary_color") or fallback["secondary_color"]
+    presentation_title = meta_a.get("presentation_title") or fallback["presentation_title"]
+    subtitle = meta_a.get("subtitle") or fallback["subtitle"]
+    theme = meta_a.get("presentation_theme") or fallback["presentation_theme"]
+
+    result = {
+        "presentation_title": presentation_title,
+        "subtitle": subtitle,
+        "presentation_theme": theme,
+        "app_name": app_name,
+        "primary_color": primary_color,
+        "secondary_color": secondary_color,
+        "slides": final_slides,
+    }
+    logger.info(f"Board presentation complete: {len(final_slides)} slides.")
+    return result
 
 
 def _detect_brand(strategy_data: dict) -> tuple[str, str, str]:

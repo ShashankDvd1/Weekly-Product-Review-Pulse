@@ -81,22 +81,25 @@ class LLMClient:
             time.sleep(sleep_time)
         self._last_call_time = time.time()
 
-    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5) -> str:
+    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5, max_tokens: int = None) -> str:
         """Make a single LLM call with retries."""
-        # Estimate input tokens + 1000 for output
+        # Estimate input tokens + expected output
         estimated_input = sum(count_tokens(m.get("content", "")) for m in messages)
-        estimated_total = estimated_input + 1000
+        estimated_total = estimated_input + (max_tokens or 2000)
 
         for attempt in range(retries):
             self._enforce_rate_limit()
             self._enforce_token_limit(estimated_tokens=estimated_total)
             try:
-                response = self._client.chat.completions.create(
+                call_kwargs = dict(
                     messages=messages,
                     model=model,
                     temperature=temperature,
                     response_format={"type": "json_object"},
                 )
+                if max_tokens:
+                    call_kwargs["max_tokens"] = max_tokens
+                response = self._client.chat.completions.create(**call_kwargs)
                 
                 # Accurately track tokens used
                 if hasattr(response, 'usage') and response.usage:
@@ -147,7 +150,7 @@ class LLMClient:
         raise RuntimeError("LLM call failed after all retries")
 
     # ── public API ──────────────────────────────
-    def analyze(self, system_prompt: str, user_prompt: str, use_reasoning: bool = False) -> dict:
+    def analyze(self, system_prompt: str, user_prompt: str, use_reasoning: bool = False, max_tokens: int = None) -> dict:
         """
         Run an analytical LLM call and return parsed JSON.
 
@@ -172,12 +175,12 @@ class LLMClient:
         ]
 
         try:
-            raw = self._call(messages, model, temperature)
+            raw = self._call(messages, model, temperature, max_tokens=max_tokens)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
                 logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
-                raw = self._call(messages, model, temperature)
+                raw = self._call(messages, model, temperature, max_tokens=max_tokens)
             else:
                 raise
 
@@ -187,7 +190,7 @@ class LLMClient:
             logger.error(f"Failed to parse LLM JSON output: {raw[:200]}...")
             return {"error": "Failed to parse LLM response", "raw": raw}
 
-    def generate(self, system_prompt: str, user_prompt: str, creative: bool = False) -> dict:
+    def generate(self, system_prompt: str, user_prompt: str, creative: bool = False, max_tokens: int = None) -> dict:
         """
         Run a generative LLM call (personas, JTBD, reports).
 
@@ -212,12 +215,12 @@ class LLMClient:
         ]
 
         try:
-            raw = self._call(messages, model, temperature)
+            raw = self._call(messages, model, temperature, max_tokens=max_tokens)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
                 logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
-                raw = self._call(messages, model, temperature)
+                raw = self._call(messages, model, temperature, max_tokens=max_tokens)
             else:
                 raise
 
