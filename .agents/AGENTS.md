@@ -22,6 +22,7 @@ Follow this sequence before proposing any product solution:
 * Highlight supporting and contradicting evidence for key arguments.
 * Distinguish between correlation and causation.
 * If evidence is weak or limited (e.g. small sample sizes), explicitly declare the uncertainty.
+* **Framework Selection Rule**: Before analyzing data or writing a report, determine which analytical frameworks are appropriate for the available evidence. Only use a framework if it uncovers new, evidence-backed insights. If multiple frameworks produce overlapping conclusions, keep only the one that provides the greatest analytical value. Avoid framework-driven analysis; prefer evidence-driven analysis.
 
 ## Presentation & Writing Style
 * Build arguments that are logically impossible to dismiss. Each slide/report section must address one core question.

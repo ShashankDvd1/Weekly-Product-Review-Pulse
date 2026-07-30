@@ -24,10 +24,10 @@ import {
 import { getBackendUrl } from '../config';
 
 const PHASE_META = {
-  1: { label: 'Problem Discovery', icon: <Target size={18} />, color: '#f97316', steps: ['step_1', 'step_2', 'step_3', 'step_4'] },
-  2: { label: 'Behavioral & Market Analysis', icon: <Users size={18} />, color: '#8b5cf6', steps: ['step_5', 'step_6', 'step_7', 'step_8', 'step_9'] },
-  3: { label: 'Strategic Opportunity', icon: <Lightbulb size={18} />, color: '#06b6d4', steps: ['step_10', 'step_11', 'step_12', 'step_13'] },
-  4: { label: 'Solutions & Presentation', icon: <Presentation size={18} />, color: '#10b981', steps: ['step_14', 'step_15', 'step_16'] },
+  1: { label: 'Planning & Processing', icon: <Target size={18} />, color: '#f97316', steps: ['step_1', 'step_2'] },
+  2: { label: 'Behavioral Discovery', icon: <Users size={18} />, color: '#8b5cf6', steps: ['step_4', 'step_8'] },
+  3: { label: 'Evidence Traceability', icon: <Lightbulb size={18} />, color: '#06b6d4', steps: ['step_13'] },
+  4: { label: 'Solution Generation', icon: <Presentation size={18} />, color: '#10b981', steps: ['step_14'] },
 };
 
 const renderValue = (value) => {
@@ -137,7 +137,7 @@ const StrategyHub = () => {
 
   const [logs, setLogs] = useState([]);
   const [completedSteps, setCompletedSteps] = useState(0);
-  const [totalSteps, setTotalSteps] = useState(17);
+  const [totalSteps, setTotalSteps] = useState(9);
 
   // Case study states
   const [caseStudy, setCaseStudy] = useState(null);

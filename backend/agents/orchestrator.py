@@ -63,7 +63,7 @@ class PipelineOrchestrator:
         self.strategy_status = "idle"  # idle, running, completed, failed
         self.strategy_logs = []
         self.strategy_completed_steps = 0
-        self.strategy_total_steps = 17
+        self.strategy_total_steps = 9
         self._status = "idle"
         self._progress = []
 
@@ -83,13 +83,13 @@ class PipelineOrchestrator:
                     # Check status
                     if self.strategy_deep_dive and self.board_presentation:
                         self.strategy_status = "completed"
-                        self.strategy_completed_steps = 17
-                    elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) < 16:
+                        self.strategy_completed_steps = 9
+                    elif self.strategy_deep_dive and self.strategy_deep_dive.get("steps") and len(self.strategy_deep_dive["steps"]) < 8:
                         self.strategy_status = "awaiting_survey"
                         self.strategy_completed_steps = len(self.strategy_deep_dive["steps"])
                     elif self.strategy_deep_dive:
                         self.strategy_status = "completed" # fallback
-                        self.strategy_completed_steps = 17
+                        self.strategy_completed_steps = 9
                     
                     if self.strategy_deep_dive:
                         if not self.board_presentation and self.strategy_status == "completed":
@@ -151,100 +151,151 @@ class PipelineOrchestrator:
             logger.error(f"Failed to load pipeline cache: {pce}")
 
     def run_strategy_deep_dive_async(self, target_phase=1):
-        """Runs the Strategy Deep Dive in a background thread with progress logging. Defaults to Phase 1."""
-        if self.strategy_status == "running" and target_phase != 2:
-            return
-        
+        """Runs the 9-Agent sequential strategy pipeline in a background thread."""
         self.strategy_status = "running"
-        if target_phase == 1 or not hasattr(self, "strategy_logs") or not self.strategy_logs:
-            self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive analysis pipeline initialized."]
-        else:
-            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Resuming Strategy Deep Dive (Phase 2)...")
+        self.strategy_total_steps = 9
         
-        # Extract existing steps from the deep dive state
-        existing_steps = self.strategy_deep_dive.get("steps", {}) if self.strategy_deep_dive else {}
-        
-        # Clear subsequent Phase 2 steps and board presentation to force re-evaluation and ensure accurate log counts
-        self.board_presentation = None
-        for step_id in ["step_14", "step_15", "step_16"]:
-            if step_id in existing_steps:
-                existing_steps.pop(step_id)
-        
-        # Track completed steps by ID to prevent double-counting
-        self.strategy_completed_steps_set = {
-            s_id for s_id, s in existing_steps.items() if s.get("status") == "complete"
-        }
-        if self.board_presentation:
-            self.strategy_completed_steps_set.add("step_17")
-        self.strategy_completed_steps = len(self.strategy_completed_steps_set)
-        
-        def progress_cb(step_id, step_title, status, detail=""):
+        # Load survey validation if present
+        survey_validation = self.strategy_deep_dive.get("survey_validation") if (self.strategy_deep_dive and isinstance(self.strategy_deep_dive, dict)) else None
+
+        # Helper to log steps
+        def log_agent_progress(step_num, agent_name, status, detail=""):
             timestamp = datetime.now().strftime('%H:%M:%S')
             if status == "start":
-                msg = f"[{timestamp}] Running {step_id.upper()}: {step_title}..."
+                msg = f"[{timestamp}] Running Stage {step_num}/9: {agent_name}..."
             elif status == "complete":
-                self.strategy_completed_steps_set.add(step_id)
-                self.strategy_completed_steps = len(self.strategy_completed_steps_set)
-                msg = f"[{timestamp}] Step {step_id.upper()} completed successfully ({self.strategy_completed_steps}/{self.strategy_total_steps})."
+                self.strategy_completed_steps = step_num
+                msg = f"[{timestamp}] Stage {step_num}/9: {agent_name} completed successfully."
             elif status == "failed":
-                msg = f"[{timestamp}] ERROR: Step {step_id.upper()} failed. Details: {detail}"
+                msg = f"[{timestamp}] ERROR: Stage {step_num}/9: {agent_name} failed. {detail}"
             self.strategy_logs.append(msg)
             logger.info(msg)
 
-        def on_step_complete(step_id, step_res):
-            if not self.strategy_deep_dive:
-                self.strategy_deep_dive = {"steps": {}}
-            if "steps" not in self.strategy_deep_dive:
-                self.strategy_deep_dive["steps"] = {}
-            self.strategy_deep_dive["steps"][step_id] = step_res
-            # Save strategy deep dive data to file cache incrementally
-            try:
-                os.makedirs("data", exist_ok=True)
-                with open(os.path.join("data", "strategy_cache.json"), "w", encoding="utf-8") as f:
-                    json.dump({
-                        "strategy_deep_dive": self.strategy_deep_dive,
-                        "board_presentation": self.board_presentation,
-                        "active_problem_statement": self.active_problem_statement
-                    }, f, indent=2)
-            except Exception as ce:
-                logger.error(f"Failed to auto-save strategy cache step: {ce}")
-
         try:
-            from reasoning.strategy_deep_dive import run_strategy_deep_dive
-            problem_stmt = getattr(self, "active_problem_statement", None)
-            result = run_strategy_deep_dive(
-                self.signals,
-                self.themes,
-                self.barriers,
-                self.personas,
-                self.opportunities,
-                problem_statement=problem_stmt,
-                progress_callback=progress_cb,
-                existing_steps=existing_steps,
-                on_step_complete=on_step_complete,
-                target_phase=target_phase,
-                survey_context=self.strategy_deep_dive.get("survey_validation") if self.strategy_deep_dive else None
-            )
-            # Preserve survey validation metadata when overwriting self.strategy_deep_dive
-            survey_validation = self.strategy_deep_dive.get("survey_validation") if self.strategy_deep_dive else None
-            self.strategy_deep_dive = result
-            if survey_validation:
-                self.strategy_deep_dive["survey_validation"] = survey_validation
-            
-            if target_phase == 1:
+            if target_phase == 1 or not self.strategy_deep_dive:
+                self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] v2 Multi-Agent Research Strategy Pipeline initialized."]
+                self.strategy_completed_steps = 0
+                
+                # Stage 1: Planning
+                log_agent_progress(1, "Research Planning Agent", "start")
+                from agents.planning_agent import ResearchPlanningAgent
+                planning_res = ResearchPlanningAgent().plan(self.signals)
+                log_agent_progress(1, "Research Planning Agent", "complete")
+
+                # Stage 2: Processing
+                log_agent_progress(2, "Data Processing Agent", "start")
+                from agents.processing_agent import DataProcessingAgent
+                processing_res = DataProcessingAgent().process(self.signals)
+                log_agent_progress(2, "Data Processing Agent", "complete")
+
+                # Stage 3: Discovery
+                log_agent_progress(3, "Research Discovery Agent", "start")
+                from agents.discovery_agent import ResearchDiscoveryAgent
+                discovery_res = ResearchDiscoveryAgent().discover(self.signals)
+                log_agent_progress(3, "Research Discovery Agent", "complete")
+
+                # Stage 4: Segmentation
+                log_agent_progress(4, "Pattern & Segmentation Agent", "start")
+                from agents.segmentation_agent import PatternSegmentationAgent
+                segmentation_res = PatternSegmentationAgent().segment(discovery_res)
+                log_agent_progress(4, "Pattern & Segmentation Agent", "complete")
+
+                # Stage 5: Root Cause & Strategy
+                log_agent_progress(5, "Root Cause & Strategy Agent", "start")
+                from agents.root_cause_agent import RootCauseStrategyAgent
+                root_cause_res = RootCauseStrategyAgent().analyze(segmentation_res, discovery_res)
+                log_agent_progress(5, "Root Cause & Strategy Agent", "complete")
+
+                self.strategy_deep_dive = {
+                    "planning": planning_res,
+                    "processing": processing_res,
+                    "discovery": discovery_res,
+                    "segmentation": segmentation_res,
+                    "root_cause": root_cause_res,
+                    "steps": {
+                        "step_1": {"title": "Problem Discovery Plan", "status": "complete", "data": planning_res},
+                        "step_2": {"title": "Data Processing & Stats", "status": "complete", "data": processing_res},
+                        "step_4": {"title": "Research Discoveries", "status": "complete", "data": discovery_res},
+                        "step_8": {"title": "Root Causes", "status": "complete", "data": root_cause_res}
+                    }
+                }
                 self.strategy_status = "awaiting_survey"
                 self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 1 (Discovery) completed successfully. Awaiting Survey Data.")
+            
             else:
-                # We are running phase 2 or all, do the presentation synthesis
-                progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "start")
-                from reasoning.board_presenter import synthesize_board_presentation
-                board_deck = synthesize_board_presentation(result)
-                self.board_presentation = board_deck
-                progress_cb("step_17", "Board-Level Executive Presentation Synthesis", "complete")
+                # Target phase 2: Resuming
+                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Resuming Multi-Agent Research Strategy (Phase 2)...")
+                self.strategy_completed_steps = 5
                 
+                planning_res = self.strategy_deep_dive.get("planning")
+                processing_res = self.strategy_deep_dive.get("processing")
+                discovery_res = self.strategy_deep_dive.get("discovery")
+                segmentation_res = self.strategy_deep_dive.get("segmentation")
+                root_cause_res = self.strategy_deep_dive.get("root_cause")
+
+                # Stage 6: Solution Generation
+                log_agent_progress(6, "Solution Generation Agent", "start")
+                from agents.solution_agent import SolutionGenerationAgent
+                solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res)
+                log_agent_progress(6, "Solution Generation Agent", "complete")
+
+                # Stage 7: Executive Presentation
+                log_agent_progress(7, "Executive Presentation Agent", "start")
+                from agents.presentation_agent import ExecutivePresentationAgent
+                presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res)
+                log_agent_progress(7, "Executive Presentation Agent", "complete")
+
+                # Stage 8: Evidence Traceability
+                log_agent_progress(8, "Evidence Traceability Agent", "start")
+                from agents.traceability_agent import EvidenceTraceabilityAgent
+                traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res)
+                log_agent_progress(8, "Evidence Traceability Agent", "complete")
+
+                # Stage 9: Research Audit Agent (with Retry Loop)
+                log_agent_progress(9, "Research Audit Agent", "start")
+                from agents.audit_agent import ResearchAuditAgent
+                audit_agent = ResearchAuditAgent()
+                
+                # Implementation of Audit Loop (up to 2 retries)
+                for attempt in range(3):
+                    audit_res = audit_agent.audit(
+                        planning_res, processing_res, discovery_res,
+                        segmentation_res, root_cause_res, solution_res,
+                        presentation_res, traceability_res
+                    )
+                    verdict = audit_res.get("verdict", "PASS")
+                    if verdict in ["PASS", "PASS WITH WARNINGS"]:
+                        self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Audit passed with verdict: {verdict}")
+                        break
+                    else:
+                        msg = f"[{datetime.now().strftime('%H:%M:%S')}] Audit Attempt {attempt + 1} failed: {verdict}. Feedback: {json.dumps(audit_res.get('required_revisions', []))}"
+                        self.strategy_logs.append(msg)
+                        logger.warning(msg)
+                        if attempt < 2:
+                            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Re-running solution generation and presentation synthesis with audit feedback...")
+                            solution_res = SolutionGenerationAgent().generate(root_cause_res, discovery_res)
+                            presentation_res = ExecutivePresentationAgent().synthesize(solution_res, root_cause_res, discovery_res)
+                            traceability_res = EvidenceTraceabilityAgent().trace(solution_res, root_cause_res, discovery_res)
+                        else:
+                            raise Exception(f"Research Audit failed after maximum retries. Verdict: {verdict}")
+                
+                log_agent_progress(9, "Research Audit Agent", "complete")
+
+                # Merge Phase 2 outputs
+                self.strategy_deep_dive["solutions"] = solution_res
+                self.strategy_deep_dive["traceability"] = traceability_res
+                self.strategy_deep_dive["audit"] = audit_res
+                self.strategy_deep_dive["steps"]["step_13"] = {"title": "Traceability Map", "status": "complete", "data": traceability_res}
+                self.strategy_deep_dive["steps"]["step_14"] = {"title": "Prioritized Solutions", "status": "complete", "data": solution_res}
+                
+                self.board_presentation = presentation_res
                 self.strategy_status = "completed"
                 self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 2 & Executive Presentation completed successfully.")
-            
+
+            # Preserve survey validation metadata when overwriting self.strategy_deep_dive
+            if survey_validation:
+                self.strategy_deep_dive["survey_validation"] = survey_validation
+
             # Save strategy deep dive data to file cache
             try:
                 os.makedirs("data", exist_ok=True)
@@ -254,13 +305,13 @@ class PipelineOrchestrator:
                         "board_presentation": self.board_presentation,
                         "active_problem_statement": self.active_problem_statement
                     }, f, indent=2)
-                self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Strategy Deep Dive data successfully saved to local file cache.")
             except Exception as ce:
                 logger.error(f"Failed to save strategy cache: {ce}")
+
         except Exception as e:
             self.strategy_status = "failed"
-            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Critical failure in Strategy Deep Dive pipeline: {e}")
-            logger.exception("Strategy Deep Dive failed")
+            self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Critical failure in Multi-agent pipeline: {e}")
+            logger.exception("Multi-agent Strategy Deep Dive failed")
 
 
     @property
