@@ -125,6 +125,540 @@ const StepCard = ({ stepId, stepData, isOpen, onToggle }) => {
   );
 };
 
+const renderActiveSlideContent = (activeSlide, brandColor) => {
+  const type = activeSlide.type;
+  switch (type) {
+    case 'market_gap':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem', textAlign: 'left' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: Market Gap & Problem
+            </span>
+            <h2 style={{ fontSize: '1.5rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.5rem' }}>
+              {activeSlide.bullets?.map((b, i) => (
+                <p key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', margin: 0, lineHeight: '1.4' }}>• {b}</p>
+              ))}
+            </div>
+            {/* Stat Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {activeSlide.stats?.map((st, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: brandColor }}>{st.value}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{st.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', overflowY: 'auto', textAlign: 'left', paddingRight: '0.25rem' }}>
+            {/* Market Gap Table */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>Platform</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>What they offer</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>What's missing</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeSlide.market_gap_table?.map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '0.4rem', fontWeight: 'bold', color: brandColor }}>{row.platform}</td>
+                      <td style={{ padding: '0.4rem', color: 'var(--text-secondary)' }}>{row.offer}</td>
+                      <td style={{ padding: '0.4rem', color: '#f87171' }}>{row.missing}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Why Solve First */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <strong style={{ display: 'block', fontSize: '0.7rem', color: brandColor, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Why Solve This First</strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                {activeSlide.why_solve_first?.map((pt, i) => (
+                  <div key={i} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>✓ {pt}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    case 'user_research':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.75rem', textAlign: 'left' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: User Research & Sentiment
+            </span>
+            <h2 style={{ fontSize: '1.5rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+            {/* Findings Card */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Analyzed / Labeled</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fff' }}>{activeSlide.findings?.total_analyzed} / {activeSlide.findings?.llm_labeled}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Discovery Pain Rate</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--error)' }}>{activeSlide.findings?.discovery_pain_pct}%</div>
+              </div>
+            </div>
+            {/* Demands */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.35rem' }}>
+              {[
+                { label: 'Variety', pct: activeSlide.findings?.wants_variety_pct },
+                { label: 'Less Repetition', pct: activeSlide.findings?.less_repetition_pct },
+                { label: 'Real navigation', pct: activeSlide.findings?.real_shuffle_pct },
+                { label: 'Better suggestions', pct: activeSlide.findings?.better_music_pct }
+              ].map((d, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.35rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.65rem', border: '1px solid rgba(255,255,255,0.03)' }}>
+                  <div style={{ fontWeight: 'bold', color: brandColor }}>{d.pct}%</div>
+                  <div style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', overflowY: 'auto', textAlign: 'left', paddingRight: '0.25rem' }}>
+            {/* Sentiment Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem' }}>
+              <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', padding: '0.5rem', borderRadius: '6px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--error)' }}>{activeSlide.sentiment?.negative}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Negative</div>
+              </div>
+              <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', padding: '0.5rem', borderRadius: '6px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--warning)' }}>{activeSlide.sentiment?.neutral}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Neutral</div>
+              </div>
+              <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', padding: '0.5rem', borderRadius: '6px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--success)' }}>{activeSlide.sentiment?.positive}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Positive</div>
+              </div>
+            </div>
+            {/* Cited Quotes */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <strong style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cited User Verbatims</strong>
+              {activeSlide.cited_quotes?.map((q, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.75rem', borderLeft: `3px solid ${brandColor}` }}>
+                  <p style={{ margin: '0 0 0.25rem 0', color: '#e2e8f0', fontStyle: 'italic' }}>"{q.quote}"</p>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{q.source}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    case 'personas_journey':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+                Slide {activeSlide.slide_number}: Segment Personas & User Journey
+              </span>
+              <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '800' }}>
+                {activeSlide.headline}
+              </h2>
+            </div>
+          </div>
+          {/* Personas Side-by-side */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            {activeSlide.personas?.map((p, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.75rem', borderLeft: `3px solid ${i === 0 ? 'var(--accent-primary)' : 'var(--accent-secondary)'}` }}>
+                <strong style={{ fontSize: '0.85rem', color: '#fff', display: 'block' }}>{p.name}</strong>
+                <span style={{ fontSize: '0.7rem', color: brandColor, fontStyle: 'italic', display: 'block', marginBottom: '0.35rem' }}>"{p.title}" — {p.meta}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', color: 'var(--text-secondary)' }}>
+                  <div><strong>Trust pattern:</strong> {p.trust_pattern}</div>
+                  <div><strong>Unmet need:</strong> {p.unmet_need}</div>
+                  <div><strong>Behavioral trap:</strong> {p.behavioral_trap}</div>
+                </div>
+                <p style={{ margin: '0.4rem 0 0 0', color: 'var(--text-muted)', fontStyle: 'italic' }}>"{p.quote}"</p>
+              </div>
+            ))}
+          </div>
+          {/* User Journey horizontal flow */}
+          <div style={{ marginTop: '0.25rem' }}>
+            <strong style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>User Journey Habit Loop</strong>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
+              {activeSlide.user_journey?.map((st, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.7rem', position: 'relative' }}>
+                  <div style={{ fontWeight: 'bold', color: brandColor, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.2rem', marginBottom: '0.25rem' }}>{st.stage}</div>
+                  <div style={{ color: '#fff', fontWeight: '500', marginBottom: '0.2rem' }}>{st.behavior}</div>
+                  <div style={{ color: '#f87171', fontSize: '0.65rem' }}><strong>Friction:</strong> {st.friction}</div>
+                  {i < 4 && (
+                    <div style={{ position: 'absolute', top: '50%', right: '-8px', transform: 'translateY(-50%)', zIndex: 10, color: 'rgba(255,255,255,0.2)' }}>→</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    case 'problem_framing':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: Problem Framing Canvas
+            </span>
+            <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '800' }}>
+              {activeSlide.headline}
+            </h2>
+          </div>
+          {/* 4-Panel Canvas Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.1)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+              <strong style={{ color: 'var(--error)', textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', marginBottom: '0.25rem' }}>1. What is the True Problem?</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>{activeSlide.true_problem}</p>
+            </div>
+            <div style={{ background: 'rgba(139,92,246,0.03)', border: '1px solid rgba(139,92,246,0.1)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+              <strong style={{ color: '#8b5cf6', textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', marginBottom: '0.25rem' }}>2. Who faces this problem?</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>{activeSlide.target_cohort}</p>
+            </div>
+            <div style={{ background: 'rgba(6,182,212,0.03)', border: '1px solid rgba(6,182,212,0.1)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+              <strong style={{ color: '#06b6d4', textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', marginBottom: '0.25rem' }}>3. How do we know it's a problem?</strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', color: 'var(--text-secondary)' }}>
+                {activeSlide.evidences?.map((ev, idx) => (
+                  <div key={idx}>• {ev}</div>
+                ))}
+              </div>
+            </div>
+            <div style={{ background: 'rgba(16,185,129,0.03)', border: '1px solid rgba(16,185,129,0.1)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+              <strong style={{ color: 'var(--success)', textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', marginBottom: '0.25rem' }}>4. Value Generated by Solving This</strong>
+              <div style={{ color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                <div><strong>For Users:</strong> {activeSlide.value_generated?.for_user}</div>
+                <div style={{ marginTop: '0.25rem' }}><strong>For Platform:</strong> {activeSlide.value_generated?.for_platform}</div>
+              </div>
+            </div>
+          </div>
+          {/* Why solve now */}
+          <div style={{ background: 'rgba(245,158,11,0.03)', border: '1px solid rgba(245,158,11,0.1)', padding: '0.6rem', borderRadius: '8px', fontSize: '0.75rem' }}>
+            <strong style={{ color: 'var(--warning)', textTransform: 'uppercase', fontSize: '0.7rem', display: 'block', marginBottom: '0.25rem' }}>5. Why Should We Solve This Now?</strong>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              <div><strong>Saturation:</strong> <span style={{ color: 'var(--text-secondary)' }}>{activeSlide.why_now?.saturation}</span></div>
+              <div><strong>AI Unlock:</strong> <span style={{ color: 'var(--text-secondary)' }}>{activeSlide.why_now?.ai_unlock}</span></div>
+              <div><strong>First-mover window:</strong> <span style={{ color: 'var(--text-secondary)' }}>{activeSlide.why_now?.first_mover}</span></div>
+            </div>
+          </div>
+        </div>
+      );
+    case 'hypotheses_rice':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: Hypotheses & RICE Framework
+            </span>
+            <h2 style={{ fontSize: '1.4rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+            {/* Hypotheses List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {activeSlide.hypotheses?.map((h, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.75rem', borderLeft: `3px solid ${h.id === 'H1' ? 'var(--success)' : 'rgba(255,255,255,0.2)'}` }}>
+                  <strong style={{ color: '#fff' }}>{h.id}: {h.name}</strong>
+                  {h.id === 'H1' && <span style={{ marginLeft: '0.5rem', background: 'var(--success)30', color: 'var(--success)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 'bold' }}>CHOSEN</span>}
+                  <p style={{ margin: '0.2rem 0 0 0', color: 'var(--text-secondary)' }}>{h.statement}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', paddingRight: '0.25rem' }}>
+            {/* RICE Comparison Table */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.72rem' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>ID</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center' }}>Reach</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center' }}>Impact</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center' }}>Conf</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center' }}>Effort</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center', fontWeight: 'bold', color: brandColor }}>Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeSlide.rice_scores?.map((r, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: r.hypothesis_id === 'H1' ? 'rgba(16,185,129,0.04)' : 'transparent' }}>
+                      <td style={{ padding: '0.4rem', fontWeight: 'bold', color: r.hypothesis_id === 'H1' ? 'var(--success)' : '#fff' }}>{r.hypothesis_id}</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>{r.reach}/10</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>{r.impact}/10</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>{r.confidence * 10 || r.confidence}/10</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>{r.effort}/10</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center', fontWeight: 'bold', color: r.hypothesis_id === 'H1' ? 'var(--success)' : brandColor }}>{r.score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Winning Rationale */}
+            <div style={{ background: 'rgba(16,185,129,0.03)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.1)', fontSize: '0.72rem', textAlign: 'left' }}>
+              <strong style={{ color: 'var(--success)', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Winning Rationale</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>{activeSlide.winning_rationale}</p>
+            </div>
+          </div>
+        </div>
+      );
+    case 'solution_comparison':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: Solution Comparison
+            </span>
+            <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '800' }}>
+              {activeSlide.headline}
+            </h2>
+          </div>
+          {/* Solutions list S1-S4 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+            {activeSlide.solutions?.map((sol, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.7rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', borderTop: `4px solid ${sol.status === 'CHOSEN' ? 'var(--success)' : 'var(--error)'}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <strong style={{ color: '#fff' }}>{sol.id}: {sol.name}</strong>
+                </div>
+                <span style={{ fontSize: '0.6rem', padding: '1px 4px', borderRadius: '3px', fontWeight: 'bold', alignSelf: 'flex-start', background: sol.status === 'CHOSEN' ? 'var(--success)20' : 'var(--error)20', color: sol.status === 'CHOSEN' ? 'var(--success)' : 'var(--error)' }}>
+                  {sol.status}
+                </span>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.65rem', lineHeight: '1.3' }}>{sol.description}</p>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.62rem', fontStyle: 'italic' }}>"{sol.feedback}"</p>
+              </div>
+            ))}
+          </div>
+          {/* Solution vs comparison chosen justification */}
+          <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)', fontSize: '0.72rem' }}>
+            <strong style={{ color: brandColor, textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>Why the Selected Solution Wins Against Each Alternative</strong>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              {activeSlide.vs_comparison?.map((comp, idx) => (
+                <div key={idx}>
+                  <strong style={{ color: 'var(--error)' }}>vs {comp.against}:</strong>{' '}
+                  <span style={{ color: 'var(--text-secondary)' }}>{comp.justification}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    case 'mvp_spec':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: MVP Prototype Specifications
+            </span>
+            <h2 style={{ fontSize: '1.4rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginTop: '0.25rem' }}>
+              {activeSlide.bullets?.map((b, i) => (
+                <p key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', margin: 0, lineHeight: '1.4' }}>• {b}</p>
+              ))}
+            </div>
+            <div style={{ background: 'rgba(59,130,246,0.05)', border: '1px solid rgba(59,130,246,0.1)', padding: '0.5rem 0.75rem', borderRadius: '8px', fontSize: '0.72rem', marginTop: '0.25rem' }}>
+              <strong style={{ color: '#60a5fa', display: 'block', marginBottom: '0.2rem' }}>Dynamic Trust Cues Configured</strong>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {activeSlide.trust_cues?.map((tc, idx) => (
+                  <span key={idx} style={{ background: 'rgba(255,255,255,0.03)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-secondary)' }}>{tc}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', paddingRight: '0.25rem' }}>
+            <strong style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>MVP Screen Mapping Spec</strong>
+            {activeSlide.screens?.map((scr, idx) => (
+              <div key={idx} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.72rem', borderLeft: `3px solid ${brandColor}` }}>
+                <strong style={{ color: '#fff', display: 'block', marginBottom: '0.15rem' }}>{idx + 1}. {scr.name}</strong>
+                <span style={{ color: 'var(--text-secondary)' }}>{scr.spec}</span>
+              </div>
+            ))}
+            {activeSlide.live_links && activeSlide.live_links.length > 0 && (
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.7rem', textAlign: 'center', marginTop: '0.25rem' }}>
+                <span style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }}>🔗 Mock Live Prototype URL:</span>
+                <a href={activeSlide.live_links[0]} target="_blank" rel="noopener noreferrer" style={{ color: brandColor, textDecoration: 'underline', fontWeight: 'bold' }}>Interactive App Prototype</a>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    case 'data_flow_edges':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: System Data Flow & Edge Cases
+            </span>
+            <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '800' }}>
+              {activeSlide.headline}
+            </h2>
+          </div>
+          {/* Data Flow pipelines */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div style={{ background: 'rgba(6,182,212,0.02)', border: '1px solid rgba(6,182,212,0.08)', padding: '0.6rem', borderRadius: '8px', fontSize: '0.72rem' }}>
+              <strong style={{ color: '#06b6d4', display: 'block', marginBottom: '0.2rem', textTransform: 'uppercase', fontSize: '0.65rem' }}>① Review Insights Pipeline</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{activeSlide.data_flow?.review_engine}</p>
+            </div>
+            <div style={{ background: 'rgba(16,185,129,0.02)', border: '1px solid rgba(16,185,129,0.08)', padding: '0.6rem', borderRadius: '8px', fontSize: '0.72rem' }}>
+              <strong style={{ color: 'var(--success)', display: 'block', marginBottom: '0.2px', textTransform: 'uppercase', fontSize: '0.65rem' }}>② Contextual Cross-Sell Engine</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{activeSlide.data_flow?.product_engine}</p>
+            </div>
+          </div>
+          {/* Grounding & Edge Cases */}
+          <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '0.75rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)', fontSize: '0.7rem' }}>
+              <strong style={{ color: brandColor, display: 'block', marginBottom: '0.2rem', textTransform: 'uppercase', fontSize: '0.65rem' }}>Behavioral Nudges Built In</strong>
+              {activeSlide.nudges?.map((n, i) => (
+                <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>• {n}</div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <strong style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Edge Cases & Mitigations Handled</strong>
+              {activeSlide.edge_cases?.map((ec, idx) => (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.4rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.68rem' }}>
+                  <strong style={{ color: '#fff' }}>{ec.id}: {ec.title}</strong>{' '}
+                  <span style={{ color: 'var(--text-muted)' }}>→ {ec.mitigation}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    case 'metrics_indicators':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: success metrics & leading indicators
+            </span>
+            <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: '800' }}>
+              {activeSlide.headline}
+            </h2>
+          </div>
+          {/* North Star banner */}
+          <div style={{ background: 'linear-gradient(90deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08))', border: '1px solid rgba(16,185,129,0.2)', padding: '0.6rem 1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ textAlign: 'left' }}>
+              <strong style={{ color: 'var(--success)', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', letterSpacing: '0.5px' }}>★ NORTH STAR METRIC</strong>
+              <span style={{ fontSize: '1rem', fontWeight: 'bold', color: '#fff' }}>{activeSlide.north_star?.name}</span>
+              <p style={{ margin: '0.15rem 0 0 0', color: 'var(--text-secondary)', fontSize: '0.7rem', lineHeight: '1.3' }}>{activeSlide.north_star?.definition}</p>
+            </div>
+            <div style={{ textAlign: 'right', minWidth: '120px' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--success)' }}>{activeSlide.north_star?.target}</div>
+              <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>Target Shift</div>
+            </div>
+          </div>
+          {/* Leading Indicators */}
+          <div>
+            <strong style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>Leading Indicators & Action Plans</strong>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              {activeSlide.leading_indicators?.map((li, idx) => (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.7rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.15rem' }}>
+                    <strong style={{ color: '#fff' }}>{li.name}</strong>
+                    <strong style={{ color: brandColor }}>{li.target}</strong>
+                  </div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem' }}>{li.proves}</div>
+                  <div style={{ color: '#f87171', fontSize: '0.62rem', marginTop: '0.2rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.2rem' }}>
+                    <strong>Below Target:</strong> {li.below_target_action}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    case 'failure_mitigations':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%', overflowY: 'auto', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: Failure Modes & Mitigations
+            </span>
+            <h2 style={{ fontSize: '1.4rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.25rem' }}>
+              {activeSlide.bullets?.map((b, i) => (
+                <p key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', margin: 0, lineHeight: '1.4' }}>• {b}</p>
+              ))}
+            </div>
+            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.5rem' }}>
+              "{activeSlide.closing_message}"
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', paddingRight: '0.25rem' }}>
+            {/* Failure table */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.72rem' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>What could go wrong</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'left' }}>Mitigation</th>
+                    <th style={{ padding: '0.4rem', textAlign: 'center' }}>Sev</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeSlide.failures?.map((f, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '0.4rem', color: 'var(--text-secondary)' }}>{f.risk}</td>
+                      <td style={{ padding: '0.4rem', color: 'var(--text-secondary)' }}>{f.handling}</td>
+                      <td style={{ padding: '0.4rem', textAlign: 'center' }}>
+                        <span style={{ 
+                          fontSize: '0.55rem', fontWeight: 'bold', padding: '1px 4px', borderRadius: '3px',
+                          background: f.severity === 'CRIT' ? 'rgba(239,68,68,0.2)' : f.severity === 'HIGH' ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)',
+                          color: f.severity === 'CRIT' ? 'var(--error)' : f.severity === 'HIGH' ? 'var(--warning)' : 'var(--accent-secondary)'
+                        }}>{f.severity}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Guardrails List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <strong style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Guardrails to enforce</strong>
+              {activeSlide.guardrails?.map((g, idx) => (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.01)', padding: '0.4rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.03)', fontSize: '0.68rem', display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>{g.name}: <strong style={{ color: 'var(--error)' }}>{g.threshold}</strong></span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>{g.purpose}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    default:
+      // Fallback to standard key-value rendering
+      const skipKeys = ["title", "headline", "slide_number", "type", "speaker_notes"];
+      const entries = Object.entries(activeSlide).filter(([k]) => !skipKeys.includes(k));
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1rem', textAlign: 'left' }}>
+            <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
+              Slide {activeSlide.slide_number}: {activeSlide.title}
+            </span>
+            <h2 style={{ fontSize: '1.65rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
+              {activeSlide.headline}
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', maxHeight: '310px', paddingRight: '0.5rem', textAlign: 'left' }}>
+            {entries.slice(0, 4).map(([key, val]) => (
+              <div key={key} style={{ 
+                background: 'rgba(255,255,255,0.01)', padding: '0.6rem 0.8rem', borderRadius: '8px',
+                border: '1px solid rgba(255,255,255,0.04)', borderLeft: `3px solid ${brandColor}`
+              }}>
+                <strong style={{ color: '#fff', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.15rem' }}>{key.replace(/_/g, ' ')}</strong>
+                {renderValue(val)}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+  }
+};
+
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('overview'); // 'overview', 'steps', 'slides', 'case_study'
 
@@ -597,19 +1131,6 @@ const Dashboard = () => {
           >
             Board Slides
           </button>
-          <button 
-            onClick={() => setActiveSection('case_study')}
-            style={{
-              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
-              background: activeSection === 'case_study' ? 'var(--accent-primary)' : 'transparent',
-              color: activeSection === 'case_study' ? '#fff' : 'var(--text-secondary)',
-              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
-              opacity: caseStudy ? 1 : 0.5
-            }}
-            disabled={!caseStudy}
-          >
-            Case Study & PRD
-          </button>
         </div>
       </div>
 
@@ -1024,34 +1545,8 @@ const Dashboard = () => {
                 {(() => {
                   const activeSlide = boardPresentation.slides[currentSlideIndex];
                   if (!activeSlide) return null;
-                  const skipKeys = ["title", "headline", "slide_number", "type", "speaker_notes"];
-                  const entries = Object.entries(activeSlide).filter(([k]) => !skipKeys.includes(k));
                   const brandColor = boardPresentation.primary_color || 'var(--accent-primary)';
-                  
-                  return (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '1.5rem', height: '100%', overflowY: 'auto' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: brandColor, textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>
-                          Slide {activeSlide.slide_number}: {activeSlide.title}
-                        </span>
-                        <h2 style={{ fontSize: '1.65rem', color: '#fff', margin: 0, fontWeight: '800', lineHeight: '1.3' }}>
-                          {activeSlide.headline}
-                        </h2>
-                      </div>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', maxHeight: '310px', paddingRight: '0.5rem' }}>
-                        {entries.slice(0, 4).map(([key, val]) => (
-                          <div key={key} style={{ 
-                            background: 'rgba(255,255,255,0.01)', padding: '0.6rem 0.8rem', borderRadius: '8px',
-                            border: '1px solid rgba(255,255,255,0.04)', borderLeft: `3px solid ${brandColor}`
-                          }}>
-                            <strong style={{ color: '#fff', fontSize: '0.7rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.15rem' }}>{key.replace(/_/g, ' ')}</strong>
-                            {renderValue(val)}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
+                  return renderActiveSlideContent(activeSlide, brandColor);
                 })()}
               </div>
 
@@ -1085,64 +1580,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* 4. CASE STUDY & MVP TAB */}
-      {activeSection === 'case_study' && caseStudy && (
-        <div className="glass-panel" style={{ padding: '2rem', textAlign: 'left' }}>
-          <h2 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Case Study: {caseStudy.product_name || 'Blinkit'} MVP</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Detailed strategic framing and MVP requirements validated by Multi-Agent research.</p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Strategic Focus</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.strategic_focus}</p>
-            </div>
-
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Target Persona</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.target_persona}</p>
-            </div>
-
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Proposed MVP Solution</h3>
-              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
-                <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0' }}>{caseStudy.mvp_solution?.solution_name}</h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{caseStudy.mvp_solution?.description}</p>
-                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', fontSize: '0.85rem' }}>
-                  <span>Impact: <strong style={{ color: 'var(--success)' }}>{caseStudy.mvp_solution?.impact}</strong></span>
-                  <span>Effort: <strong style={{ color: 'var(--warning)' }}>{caseStudy.mvp_solution?.effort}</strong></span>
-                  <span>Confidence: <strong>{caseStudy.mvp_solution?.confidence * 100}%</strong></span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Hypotheses & Experiments</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {caseStudy.experiments?.map((exp, idx) => (
-                  <div key={idx} style={{ background: 'rgba(255,255,255,0.01)', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid var(--accent-secondary)' }}>
-                    <h4 style={{ color: '#fff', margin: '0 0 0.35rem 0' }}>Hypothesis: {exp.hypothesis}</h4>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}><strong>Experiment:</strong> {exp.experiment}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Execution Metrics</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <p style={{ color: 'var(--text-secondary)' }}><strong>North Star Metric:</strong> {caseStudy.metrics?.north_star_metric}</p>
-                <p style={{ color: 'var(--text-secondary)' }}><strong>Guardrail Metric:</strong> {caseStudy.metrics?.guardrail_metric}</p>
-                <p style={{ color: 'var(--text-secondary)' }}><strong>Counter Metric:</strong> {caseStudy.metrics?.counter_metric}</p>
-              </div>
-            </div>
-
-            <div>
-              <h3 style={{ color: 'var(--accent-primary)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.35rem' }}>Identified Risks</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{caseStudy.risks}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Global CSS animations */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
