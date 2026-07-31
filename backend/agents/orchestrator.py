@@ -491,6 +491,16 @@ class PipelineOrchestrator:
                 self.strategy_deep_dive["steps"]["step_14"] = {"title": "Prioritized Solutions", "status": "complete", "data": solution_res}
                 
                 self.board_presentation = presentation_res
+                
+                # Generate Prototype PRD Markdown
+                try:
+                    self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Generating MVP Prototype PRD Markdown for Figma/Lovable...")
+                    from reasoning.prototype_generator import generate_prototype_markdown
+                    self.mvp_workspace_prd = generate_prototype_markdown(self.strategy_deep_dive)
+                except Exception as prd_err:
+                    logger.error(f"Failed to generate Prototype Markdown: {prd_err}")
+                    self.mvp_workspace_prd = "# Prototype Specification\n\nError generating prototype markdown."
+
                 self.strategy_status = "completed"
                 self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Phase 2 & Executive Presentation completed successfully.")
 
@@ -505,6 +515,7 @@ class PipelineOrchestrator:
                     json.dump({
                         "strategy_deep_dive": self.strategy_deep_dive,
                         "board_presentation": self.board_presentation,
+                        "mvp_workspace_prd": self.mvp_workspace_prd,
                         "active_problem_statement": self.active_problem_statement
                     }, f, indent=2)
             except Exception as ce:

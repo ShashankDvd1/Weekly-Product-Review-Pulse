@@ -346,6 +346,7 @@ ANTI-HALLUCINATION: preserve all statistics and quotes exactly as given."""
 BATCH_B_SYSTEM = """You are a McKinsey Engagement Manager preparing slides 6-10 of a 10-slide board deck.
 Output a JSON object with ONLY these 5 slides in a "slides" array.
 Use EXACT type values. No markdown. No text outside JSON.
+CRITICAL: Ensure no data is duplicated across slides. In Slide 6 (solution_comparison), S1, S2, S3, and S4 MUST be completely distinct solution concepts with different names, descriptions, and feedback. S4 MUST NOT be the same as S1.
 ANTI-HALLUCINATION: preserve all statistics and quotes exactly as given."""
 
 BATCH_A_SCHEMA = """\
@@ -440,10 +441,10 @@ Return exactly this JSON (slides 6-10 only):
       "bullets": ["detailed bullet 1", "detailed bullet 2"],
       "speaker_notes": "presenter notes",
       "solutions": [
-        {"id": "S1", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S2", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S3", "name": "...", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S4", "name": "...", "status": "CHOSEN", "description": "...", "feedback": "..."}
+        {"id": "S1", "name": "Full Homepage Redesign", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S2", "name": "Push Notification Campaign", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S3", "name": "Category Badges without Authenticity Seals", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S4", "name": "Contextual In-Cart Cross-Sell Hub with Brand Badging", "status": "CHOSEN", "description": "...", "feedback": "..."}
       ],
       "vs_comparison": [
         {"against": "S1", "justification": "..."},
@@ -457,8 +458,7 @@ Return exactly this JSON (slides 6-10 only):
       "bullets": ["detailed bullet 1", "detailed bullet 2"],
       "speaker_notes": "presenter notes",
       "screens": [{"name": "...", "spec": "..."}, {"name": "...", "spec": "..."}, {"name": "...", "spec": "..."}],
-      "trust_cues": ["cue 1", "cue 2", "cue 3"],
-      "live_links": ["https://example-prototype.streamlit.app/"]
+      "trust_cues": ["cue 1", "cue 2", "cue 3"]
     },
     {
       "slide_number": 8, "type": "data_flow_edges",
@@ -810,8 +810,7 @@ def create_fallback_presentation(strategy_data: dict) -> dict:
                 {"name": "Product Trust Card", "spec": "Inline trust panel showing Brand Origin badge, Seller Verification Score (1-5), and 'Doorstep Return' guarantee link — visible without leaving the cart surface."},
                 {"name": "Post-Checkout Category Nudge", "spec": "Single personalised category suggestion shown on the order confirmation screen; one-tap 'Explore [Category]' CTA; tracks impressions vs. clicks separately from cart drawer CTR."}
             ],
-            "trust_cues": ["Brand Origin Verification Badge", "Seller Authenticity Score (1-5)", "Doorstep Return Guarantee", "100% Original Seal"],
-            "live_links": ["https://example-discovery-prototype.streamlit.app/"]
+            "trust_cues": ["Brand Origin Verification Badge", "Seller Authenticity Score (1-5)", "Doorstep Return Guarantee", "100% Original Seal"]
         },
         {
             "slide_number": 8,

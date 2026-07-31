@@ -447,18 +447,18 @@ def get_strategy_deep_dive(background_tasks: BackgroundTasks):
 
 @app.get("/api/v2/reports/mvp-workspace")
 def get_mvp_workspace():
-    """Generates or returns the MVP Workspace PRD document based on Deep Dive results."""
+    """Generates or returns the MVP Prototype Markdown PRD document based on Deep Dive results."""
     orchestrator = get_orchestrator()
-    if orchestrator.strategy_status != "completed" or not orchestrator.strategy_deep_dive:
+    if not orchestrator.strategy_deep_dive:
         return {"error": "Strategy Deep Dive must be completed first."}
         
     # Check if we already generated it
     if hasattr(orchestrator, "mvp_workspace_prd") and orchestrator.mvp_workspace_prd:
-        return orchestrator.mvp_workspace_prd
+        return {"markdown": orchestrator.mvp_workspace_prd}
         
-    from reasoning.mvp_workspace_generator import generate_mvp_workspace
-    prd = generate_mvp_workspace(orchestrator.strategy_deep_dive)
-    orchestrator.mvp_workspace_prd = prd
+    from reasoning.prototype_generator import generate_prototype_markdown
+    prd_md = generate_prototype_markdown(orchestrator.strategy_deep_dive)
+    orchestrator.mvp_workspace_prd = prd_md
     
     # Save cache
     import json, os
@@ -467,13 +467,13 @@ def get_mvp_workspace():
         if os.path.exists(cache_path):
             with open(cache_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            data["mvp_workspace_prd"] = prd
+            data["mvp_workspace_prd"] = prd_md
             with open(cache_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
     except Exception as e:
         logger.error(f"Failed to save MVP Workspace to cache: {e}")
         
-    return prd
+    return {"markdown": prd_md}
 
 
 @app.post("/api/v2/reports/strategy-deep-dive/run")

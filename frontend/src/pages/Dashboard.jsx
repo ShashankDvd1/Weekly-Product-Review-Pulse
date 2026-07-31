@@ -682,6 +682,10 @@ const Dashboard = () => {
   const [totalSteps, setTotalSteps] = useState(9);
   const [strategyStatus, setStrategyStatus] = useState('idle');
 
+  // Prototype Markdown state
+  const [prototypeMarkdown, setPrototypeMarkdown] = useState('');
+  const [prototypeLoading, setPrototypeLoading] = useState(false);
+
   // Survey & Case Study states
   const [generatingForm, setGeneratingForm] = useState(false);
   const [generatedFormUrl, setGeneratedFormUrl] = useState(null);
@@ -1062,6 +1066,34 @@ const Dashboard = () => {
     }
   };
 
+  const fetchPrototypeMarkdown = async () => {
+    if (prototypeMarkdown) return;
+    setPrototypeLoading(true);
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/mvp-workspace`);
+      if (res.ok) {
+        const data = await res.json();
+        setPrototypeMarkdown(data.markdown || "# Prototype PRD\n\nNo prototype data generated.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch prototype markdown:", err);
+    } finally {
+      setPrototypeLoading(false);
+    }
+  };
+
+  const handleDownloadPrototypeMarkdown = () => {
+    if (!prototypeMarkdown) return;
+    const blob = new Blob([prototypeMarkdown], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'mvp_prototype_spec.md');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleNextSlide = () => {
     if (boardPresentation && currentSlideIndex < boardPresentation.slides.length - 1) {
       setCurrentSlideIndex(prev => prev + 1);
@@ -1131,6 +1163,22 @@ const Dashboard = () => {
             disabled={!boardPresentation}
           >
             Board Slides
+          </button>
+          <button 
+            onClick={() => {
+              setActiveSection('prototype');
+              fetchPrototypeMarkdown();
+            }}
+            style={{
+              padding: '0.5rem 1rem', borderRadius: '6px', border: 'none',
+              background: activeSection === 'prototype' ? 'var(--accent-primary)' : 'transparent',
+              color: activeSection === 'prototype' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease',
+              opacity: strategyData ? 1 : 0.5
+            }}
+            disabled={!strategyData}
+          >
+            Prototype Markdown
           </button>
         </div>
       </div>
@@ -1577,6 +1625,63 @@ const Dashboard = () => {
             <p style={{ color: '#cbd5e1', fontSize: '0.85rem', fontStyle: 'italic', margin: 0, lineHeight: '1.5' }}>
               "{boardPresentation.slides[currentSlideIndex]?.speaker_notes || 'No notes compiled for this slide.'}"
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* 4. PROTOTYPE MARKDOWN TAB */}
+      {activeSection === 'prototype' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', fontWeight: 'bold' }}>🚀 Detailed MVP Prototype PRD</h2>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                Import directly into Lovable, Figma, or Google Stitch to build interactive prototypes.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleDownloadPrototypeMarkdown}
+                disabled={!prototypeMarkdown || prototypeLoading}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <Download size={16} /> Download .MD File
+              </button>
+              <button 
+                className="btn-secondary" 
+                onClick={() => {
+                  navigator.clipboard.writeText(prototypeMarkdown);
+                  alert("Prototype Markdown copied to clipboard!");
+                }}
+                disabled={!prototypeMarkdown || prototypeLoading}
+              >
+                Copy Markdown
+              </button>
+            </div>
+          </div>
+
+          <div className="glass-panel" style={{ padding: '1.5rem', background: '#0d111d', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {prototypeLoading ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', marginBottom: '0.5rem' }} />
+                <p>Generating detailed PRD Prototype Markdown via AI engine...</p>
+              </div>
+            ) : (
+              <pre style={{ 
+                whiteSpace: 'pre-wrap', 
+                wordWrap: 'break-word', 
+                fontFamily: 'monospace', 
+                fontSize: '0.85rem', 
+                color: '#e2e8f0',
+                lineHeight: '1.6',
+                margin: 0,
+                maxHeight: '600px',
+                overflowY: 'auto'
+              }}>
+                {prototypeMarkdown || "No prototype markdown available. Please complete Strategy Deep Dive first."}
+              </pre>
+            )}
           </div>
         </div>
       )}
