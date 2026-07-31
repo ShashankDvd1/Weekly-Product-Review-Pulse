@@ -1,9 +1,12 @@
 import json
 import os
+import logging
 from typing import List, Optional, Union, Any
 from pydantic import BaseModel, field_validator
 from core.llm_client import LLMClient
 from core.config import LLM_MODEL_REASONING, LLM_TEMPERATURE_CREATIVE, GOOGLE_SERVICE_ACCOUNT_FILE, GOOGLE_API_SCOPES
+
+logger = logging.getLogger(__name__)
 
 try:
     from google.oauth2.service_account import Credentials
