@@ -81,7 +81,7 @@ class LLMClient:
             time.sleep(sleep_time)
         self._last_call_time = time.time()
 
-    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5, max_tokens: int = None) -> str:
+    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5, max_tokens: int = None, is_json: bool = True) -> str:
         """Make a single LLM call with retries."""
         # Estimate input tokens + expected output
         estimated_input = sum(count_tokens(m.get("content", "")) for m in messages)
@@ -95,8 +95,9 @@ class LLMClient:
                     messages=messages,
                     model=model,
                     temperature=temperature,
-                    response_format={"type": "json_object"},
                 )
+                if is_json:
+                    call_kwargs["response_format"] = {"type": "json_object"}
                 if max_tokens:
                     call_kwargs["max_tokens"] = max_tokens
                 response = self._client.chat.completions.create(**call_kwargs)

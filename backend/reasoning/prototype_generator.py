@@ -86,7 +86,8 @@ STRUCTURE YOUR MARKDOWN AS FOLLOWS:
             ],
             model="llama-3.3-70b-versatile",
             temperature=0.3,
-            max_tokens=6000
+            max_tokens=6000,
+            is_json=False
         )
         # Strip potential wrapping backticks if present
         cleaned = raw_markdown.strip()
