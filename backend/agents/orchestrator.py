@@ -161,7 +161,7 @@ class PipelineOrchestrator:
         segmentation_res = self.strategy_deep_dive.get("segmentation", {})
         root_cause_res = self.strategy_deep_dive.get("root_cause", {})
 
-        from core.schemas import UnifiedSignal, SignalSource, SentimentLabel, Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity, Hypothesis, BarrierType, ConfidenceLevel, JTBDCategory
+        from core.schemas import UnifiedSignal, DataSource, SentimentLabel, Theme, CategoryBarrier, Persona, JTBD, GrowthOpportunity, Hypothesis, BarrierType, ConfidenceLevel, JTBDCategory
 
         # 0. Reconstruct Signals if empty (e.g. on page refresh from strategy_cache.json)
         if not self.signals:
@@ -174,21 +174,24 @@ class PipelineOrchestrator:
             for idx in range(int(total_sigs)):
                 if idx < int(total_sigs * neg_pct):
                     st = SentimentLabel.NEGATIVE
+                    score = -0.8
                 elif idx < int(total_sigs * (neg_pct + pos_pct)):
                     st = SentimentLabel.POSITIVE
+                    score = 0.8
                 else:
                     st = SentimentLabel.NEUTRAL
+                    score = 0.0
 
                 reconstructed.append(UnifiedSignal(
-                    id=f"cached-sig-{idx}",
-                    source=SignalSource.PLAY_STORE if idx % 2 == 0 else SignalSource.REDDIT,
-                    text="Cached verified user review signal.",
-                    rating=1 if st == SentimentLabel.NEGATIVE else (5 if st == SentimentLabel.POSITIVE else 3),
-                    date="2026-04-30",
+                    unified_id=f"cached-sig-{idx}",
+                    source=DataSource.PLAY_STORE if idx % 2 == 0 else DataSource.REDDIT,
+                    source_id=f"src-{idx}",
                     app_name="Blinkit",
-                    sentiment=st,
-                    category="Grocery",
-                    language="en"
+                    content="Cached verified user review signal.",
+                    rating=1 if st == SentimentLabel.NEGATIVE else (5 if st == SentimentLabel.POSITIVE else 3),
+                    sentiment_score=score,
+                    date=datetime(2026, 4, 30),
+                    word_count=10
                 ))
             self.signals = reconstructed
 
