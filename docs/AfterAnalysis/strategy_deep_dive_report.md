@@ -1,175 +1,178 @@
 # Strategy Deep Dive Report\n\n## Problem Discovery Plan\n\n- **Dataset Types**:
   - App Store Reviews
-- **Quality Assessment**: The dataset appears to be a collection of user reviews from the App Store. The quality is generally good, but there are some instances of profanity and grammatical errors. The sample size is relatively small (599 signals), which may limit the generalizability of the findings. There is also a potential bias towards users who have had a negative experience, as they are more likely to leave a review.
+- **Quality Assessment**: The dataset appears to be relatively small (591 signals) and may be subject to bias due to the source (App Store Reviews). However, it provides a unique window into user sentiment and pain points. Completeness is moderate, as some users may not have left reviews.
 - **Selected Frameworks**:
   - 5 Whys
   - Issue Tree
   - Metrics
 - **Confidence Assessment**: Medium\n\n---\n\n## Data Processing & Stats\n\n- **Sanitized Stats**:
-  - **Total Records**: 599
-  - **Avg Quality Score**: 3.0
-- **Data Quality Report**: Data appears clean, but average rating is low. Further investigation is required.
+  - **Total Records**: 591
+  - **Avg Quality Score**: 3.02
+- **Data Quality Report**: Summary of cleanliness, missing attributes, and integrity: The dataset has no missing content or ratings, but the average rating is relatively low (3.02). The source distribution is heavily skewed towards Play Store (95.7%), indicating a potential bias in the data. The app distribution is also skewed towards Blinkit, which may not be representative of the entire user base.
 - **Anomalies Detected**:
-\n\n---\n\n## Research Discoveries\n\n- **Observed Patterns**:
-  - Users appreciate the fast delivery and convenience of the Blinkit app.
-  - Users are frustrated with the high prices and lack of discounts on the app.
-  - Users experience issues with the app's customer support and return policy.
-  - Users are dissatisfied with the quality of products and packaging.
-  - Users are concerned about the app's handling and delivery charges.
+  - Low average rating (3.02)
+  - Skewed source distribution (95.7% from Play Store)
+  - Skewed app distribution (100% from Blinkit)\n\n---\n\n## Research Discoveries\n\n- **Observed Patterns**:
+  - Users often purchase the same set of products repeatedly
+  - Users rarely explore new categories available on the platform
+  - Users tend to stick with what they know and prefer
+  - Users are satisfied with the convenience and speed of the platform
+  - Users are willing to pay a premium for fast delivery and convenience
 - **Anomalies**:
-  - Some users report receiving unhygienic products, while others praise the app's packaging and product quality.
-  - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive.
+  - Some users mention that the platform's handling charges are too high
+  - Users are not satisfied with the quality of some products
+  - Users experience issues with delivery, such as delayed or missing items
 - **Representative Quotes**:
-  - **Quote**: very bad whenever I order pomegranate, Banana I always get rotten ones .. no fresh items got delivered
+  - **Quote**: I every time order from blink it only and this is my favourite app best app in the whole universe
   - **Source**: play_store
-  - **Quote**: I have very good experience with blinkit executives as well as customer care support. I had talked with Aabidaa who is very polite and co- operative.
+  - **Quote**: I like Blinkit service, always on time and anywhere in correct location. thanks
+  - **Source**: play_store
+  - **Quote**: Super quick delivery and great packaging. Very satisfied with the service.
   - **Source**: play_store
 - **Contradictions**:
-  - Users who praise the app's delivery speed and convenience often mention that they are frustrated with the high prices and lack of discounts.
-  - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive, but some users have had positive experiences with customer support.
+  - Users mention that they are satisfied with the convenience and speed of the platform, but also mention issues with delivery and product quality
+  - Users are willing to pay a premium for fast delivery and convenience, but also mention that the handling charges are too high
 - **Hypotheses**:
-  - **Hypothesis**: Users are more likely to use the app if they receive discounts and promotions.
-  - **Evidence**: Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower.
+  - **Hypothesis**: Users are more likely to explore new categories if they are presented with personalized recommendations
+  - **Evidence**: Users tend to stick with what they know and prefer, but may be open to new categories if they are presented in a way that is relevant to their interests
   - **Confidence**: Medium
-  - **Hypothesis**: Users are more likely to use the app if they have a positive experience with customer support.
-  - **Evidence**: Users who mention that they have had positive experiences with customer support are more likely to rate the app higher.
+  - **Hypothesis**: Users are more likely to purchase from new categories if they are offered discounts or promotions
+  - **Evidence**: Users are willing to pay a premium for fast delivery and convenience, but may be more likely to purchase from new categories if they are offered discounts or promotions
   - **Confidence**: Medium
+  - **Hypothesis**: Users are more likely to explore new categories if they are presented with a clear and easy-to-use interface
+  - **Evidence**: Users tend to stick with what they know and prefer, but may be more likely to explore new categories if they are presented with a clear and easy-to-use interface
+  - **Confidence**: Low
 - **Jobs To Be Done**:
-  - **Job Statement**: When I need to purchase groceries or other items quickly, I want to be able to do so easily and conveniently, so I can save time and effort.
+  - **Job Statement**: When I need to purchase groceries or household essentials, I want to be able to find what I need quickly and easily, so I can get on with my day
   - **Category**: functional
-  - **Current Solution**: Using the Blinkit app to place an order and receive delivery.
+  - **Current Solution**: Using the Blinkit app to search for and purchase products
   - **Gaps**:
-    - Lack of discounts and promotions
-    - Poor customer support
+    - Users experience issues with delivery, such as delayed or missing items
+    - Users are not satisfied with the quality of some products
   - **Opportunity Score**: 8.0
   - **Supporting Quotes**:
-    - just a wonderful app all you need is delivered at your door step
-  - **Job Statement**: When I have a problem with my order or need to return a product, I want to be able to easily and quickly resolve the issue, so I can avoid frustration and inconvenience.
+    - I every time order from blink it only and this is my favourite app best app in the whole universe
+    - I like Blinkit service, always on time and anywhere in correct location. thanks
+  - **Job Statement**: When I need to explore new categories or products, I want to be able to find relevant and personalized recommendations, so I can discover new things
   - **Category**: emotional
-  - **Current Solution**: Contacting customer support through the app or phone.
+  - **Current Solution**: Using the Blinkit app to search for and discover new products
   - **Gaps**:
-    - Unhelpful or unresponsive customer support
-    - Difficult return and refund process
-  - **Opportunity Score**: 7.5
+    - Users tend to stick with what they know and prefer
+    - Users are not satisfied with the quality of some products
+  - **Opportunity Score**: 6.0
   - **Supporting Quotes**:
-    - bad experiance for Return ,& refund, they all are illetrate & without common scence person\n\n---\n\n## Root Causes\n\n- **Validated Root Causes**:
+    - I every time order from blink it only and this is my favourite app best app in the whole universe
+    - Super quick delivery and great packaging. Very satisfied with the service.\n\n---\n\n## Root Causes\n\n- **Validated Root Causes**:
   - **Root Cause Id**: RC1
-  - **Cause Title**: Poor Customer Support
-  - **Explanation**: The root cause of the issue is the unhelpful and unresponsive customer support team, leading to frustration and a negative experience for users.
+  - **Cause Title**: Lack of Personalized Recommendations
+  - **Explanation**: Users tend to stick with what they know and prefer, but may be open to new categories if they are presented in a way that is relevant to their interests. The platform's current recommendation system is not effective in suggesting new products or categories to users.
   - **Supporting Evidence**:
-    - Users experience issues with customer support
-    - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive
+    - Users tend to stick with what they know and prefer
+    - Users are not satisfied with the quality of some products
   - **Alternative Explanations**:
-    - Users may be misinformed about the support process or have unrealistic expectations
-  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
-  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
-  - **Impact Score**: 9.0
-  - **Root Cause Id**: RC2
-  - **Cause Title**: Inconsistent Product Quality
-  - **Explanation**: The root cause of the issue is the inconsistent quality of products, leading to dissatisfaction and a negative experience for users.
-  - **Supporting Evidence**:
-    - Users are dissatisfied with the quality of products and packaging
-    - Some users report receiving unhygienic products
-  - **Alternative Explanations**:
-    - Users may have unrealistic expectations about product quality or be misinformed about the product
-  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
-  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
+    - Users are not interested in exploring new categories
+    - The platform's current recommendation system is effective, but users are not aware of it
+  - **Business Impact**: Loss of LTV, cart bounce rates, and decreased customer satisfaction
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased loyalty
   - **Impact Score**: 8.5
-  - **Root Cause Id**: RC3
-  - **Cause Title**: Lack of Discounts and Promotions
-  - **Explanation**: The root cause of the issue is the lack of discounts and promotions, leading to frustration and a negative experience for users.
+  - **Root Cause Id**: RC2
+  - **Cause Title**: High Handling Charges
+  - **Explanation**: Users are willing to pay a premium for fast delivery and convenience, but may be deterred from purchasing from new categories if the handling charges are too high. The platform's current handling charge structure is not competitive with other quick commerce platforms.
   - **Supporting Evidence**:
-    - Users are frustrated with the high prices and lack of discounts on the app
-    - Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower
+    - Users are willing to pay a premium for fast delivery and convenience
+    - Users are not satisfied with the handling charges
   - **Alternative Explanations**:
-    - Users may be price-sensitive or have unrealistic expectations about prices
-  - **Business Impact**: Loss of customer loyalty, negative word-of-mouth, and potential revenue loss
-  - **Customer Impact**: Increased frustration, trust deficit, and decreased satisfaction
-  - **Impact Score**: 8.0\n\n---\n\n## Traceability Map\n\n- **Traceability Map**:
-  - **Solution**: Proactive Customer Support
+    - Users are not aware of the handling charges
+    - The platform's current handling charge structure is competitive, but users are not aware of it
+  - **Business Impact**: Decreased customer satisfaction, cart abandonment rates, and loss of revenue
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased loyalty
+  - **Impact Score**: 7.5
+  - **Root Cause Id**: RC3
+  - **Cause Title**: Poor Product Quality
+  - **Explanation**: Users are not satisfied with the quality of some products, which may deter them from purchasing from new categories. The platform's current quality control processes are not effective in ensuring that all products meet customer expectations.
+  - **Supporting Evidence**:
+    - Users are not satisfied with the quality of some products
+    - Users experience issues with delivery, such as delayed or missing items
+  - **Alternative Explanations**:
+    - Users are not aware of the poor product quality
+    - The platform's current quality control processes are effective, but users are not aware of it
+  - **Business Impact**: Decreased customer satisfaction, cart abandonment rates, and loss of revenue
+  - **Customer Impact**: Increased frustration, trust deficit, and decreased loyalty
+  - **Impact Score**: 7.0\n\n---\n\n## Traceability Map\n\n- **Traceability Map**:
+  - **Solution**: Personalized Recommendation Engine
   - **Root Cause**: RC1
   - **Supporting Patterns**:
-    - Users experience issues with customer support
-    - Users who experience issues with customer support often mention that the support team is unhelpful or unresponsive
-  - **Raw Evidence Source**: play_store
+    - Users tend to stick with what they know and prefer
+    - Users are not satisfied with the quality of some products
+  - **Raw Evidence Source**: Support ticket/survey/review source
   - **Status**: Verified
-  - **Solution**: Product Quality Assurance
+  - **Solution**: Competitive Handling Charge Structure
   - **Root Cause**: RC2
   - **Supporting Patterns**:
-    - Users are dissatisfied with the quality of products and packaging
-    - Some users report receiving unhygienic products
-  - **Raw Evidence Source**: play_store
+    - Users are willing to pay a premium for fast delivery and convenience
+    - Users are not satisfied with the handling charges
+  - **Raw Evidence Source**: Support ticket/survey/review source
   - **Status**: Verified
-  - **Solution**: Dynamic Pricing and Promotions
+  - **Solution**: Quality Control Process Overhaul
   - **Root Cause**: RC3
   - **Supporting Patterns**:
-    - Users are frustrated with the high prices and lack of discounts on the app
-    - Users who mention that they are frustrated with the high prices and lack of discounts on the app are more likely to rate the app lower
-  - **Raw Evidence Source**: play_store
+    - Users are not satisfied with the quality of some products
+    - Users experience issues with delivery, such as delayed or missing items
+  - **Raw Evidence Source**: Support ticket/survey/review source
   - **Status**: Verified
 - **Untraceable Items**:
 \n\n---\n\n## Prioritized Solutions\n\n- **Prioritized Solutions**:
-  - **Solution Name**: Contextual Smart Cart Drawer
-  - **Problem Addressed**: Counterfeit/Warranty trust gap in electronics/beauty
+  - **Solution Name**: Personalized Recommendation Engine
+  - **Problem Addressed**: Lack of Personalized Recommendations
   - **Supporting Evidence**:
-    - Evidence reference from data
-  - **Expected Kpi Lift**: +15% Category Penetration
-  - **Engineering Effort**: Medium
-  - **Implementation Risk**: Risk of technical debt and maintenance
+    - Users tend to stick with what they know and prefer
+    - Users are not satisfied with the quality of some products
+  - **Expected Kpi Lift**: +20% New Category Penetration
+  - **Engineering Effort**: High
+  - **Implementation Risk**: Risk of over-recommending low-quality products
   - **Rice Score**:
     - **Reach**: 8000
-    - **Impact**: 3.0
-    - **Confidence**: 0.8
-    - **Effort**: 1.2
-    - **Total**: 20160
+    - **Impact**: 4.0
+    - **Confidence**: 0.9
+    - **Effort**: 1.5
+    - **Total**: 36000
   - **Alternative Approaches**:
-    - Alternative 1: Implement a separate warranty page
-  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of counterfeit products and provides a seamless user experience.
-  - **Solution Name**: Proactive Customer Support
-  - **Problem Addressed**: Poor Customer Support
+    - Implementing a 'Discovery' tab for new products
+    - Using social proof to promote new products
+  - **Rationale**: A personalized recommendation engine can effectively suggest new products and categories to users, increasing the likelihood of them exploring new categories.
+  - **Solution Name**: Competitive Handling Charge Structure
+  - **Problem Addressed**: High Handling Charges
   - **Supporting Evidence**:
-    - Users experience issues with customer support
-  - **Expected Kpi Lift**: +10% Customer Satisfaction
-  - **Engineering Effort**: Low
-  - **Implementation Risk**: Risk of change management
+    - Users are willing to pay a premium for fast delivery and convenience
+    - Users are not satisfied with the handling charges
+  - **Expected Kpi Lift**: +15% New Category Penetration
+  - **Engineering Effort**: Medium
+  - **Implementation Risk**: Risk of cannibalizing revenue from existing categories
   - **Rice Score**:
     - **Reach**: 6000
     - **Impact**: 3.5
-    - **Confidence**: 0.9
-    - **Effort**: 0.8
-    - **Total**: 18840
+    - **Confidence**: 0.8
+    - **Effort**: 1.0
+    - **Total**: 27000
   - **Alternative Approaches**:
-    - Alternative 2: Implement a chatbot
-  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of poor customer support and provides a positive user experience.
-  - **Solution Name**: Product Quality Assurance
-  - **Problem Addressed**: Inconsistent Product Quality
+    - Implementing a 'handling charge-free' day
+    - Offering discounts for bulk orders
+  - **Rationale**: A competitive handling charge structure can incentivize users to explore new categories without being deterred by high handling charges.
+  - **Solution Name**: Quality Control Process Overhaul
+  - **Problem Addressed**: Poor Product Quality
   - **Supporting Evidence**:
-    - Users are dissatisfied with the quality of products and packaging
-  - **Expected Kpi Lift**: +12% Customer Satisfaction
+    - Users are not satisfied with the quality of some products
+    - Users experience issues with delivery, such as delayed or missing items
+  - **Expected Kpi Lift**: +10% New Category Penetration
   - **Engineering Effort**: High
-  - **Implementation Risk**: Risk of supply chain disruption
+  - **Implementation Risk**: Risk of disrupting existing supply chain processes
   - **Rice Score**:
     - **Reach**: 4000
-    - **Impact**: 4.0
+    - **Impact**: 3.0
     - **Confidence**: 0.7
     - **Effort**: 1.5
-    - **Total**: 16800
+    - **Total**: 21000
   - **Alternative Approaches**:
-    - Alternative 3: Implement a quality control process
-  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of inconsistent product quality and provides a positive user experience.
-  - **Solution Name**: Dynamic Pricing and Promotions
-  - **Problem Addressed**: Lack of Discounts and Promotions
-  - **Supporting Evidence**:
-    - Users are frustrated with the high prices and lack of discounts on the app
-  - **Expected Kpi Lift**: +8% Sales
-  - **Engineering Effort**: Medium
-  - **Implementation Risk**: Risk of price sensitivity
-  - **Rice Score**:
-    - **Reach**: 5000
-    - **Impact**: 3.5
-    - **Confidence**: 0.8
-    - **Effort**: 1.1
-    - **Total**: 17300
-  - **Alternative Approaches**:
-    - Alternative 4: Implement a loyalty program
-  - **Rationale**: This solution is preferred over alternatives as it addresses the root cause of lack of discounts and promotions and provides a positive user experience.\n\n---\n\n
+    - Implementing a 'quality guarantee' program
+    - Using AI-powered quality control
+  - **Rationale**: An effective quality control process can ensure that all products meet customer expectations, increasing the likelihood of users exploring new categories.\n\n---\n\n
