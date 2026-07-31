@@ -151,7 +151,9 @@ CONFIDENCE_LEVELS = {
 GOOGLE_API_SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/forms.body",
-    "https://www.googleapis.com/auth/drive"
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/presentations"
 ]
 GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv(
     "GOOGLE_SERVICE_ACCOUNT_FILE",
