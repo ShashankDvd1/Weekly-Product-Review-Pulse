@@ -108,17 +108,32 @@ def generate_survey_structure(project_data: dict) -> SurveyForm:
 def get_google_credentials():
     """
     Returns valid Google Credentials. Priority:
-    1. Saved user OAuth token (token.json)
-    2. OAuth client_secret.json (runs local server or headless authentication flow)
-    3. Service Account credentials
+    1. Saved user OAuth token (token.json file or GOOGLE_TOKEN_JSON env var)
+    2. OAuth client_secret (client_secret.json file or GOOGLE_CLIENT_SECRET_JSON env var)
+    3. Service Account credentials (service_account.json file or GOOGLE_SERVICE_ACCOUNT_JSON env var)
     """
     from core.config import GOOGLE_CLIENT_SECRET_FILE, GOOGLE_TOKEN_FILE, GOOGLE_SERVICE_ACCOUNT_FILE, GOOGLE_API_SCOPES
+    from google.oauth2.credentials import Credentials as UserCredentials
+    from google.oauth2.service_account import Credentials as ServiceAccountCredentials
+    import json
     
-    # 1. Check existing user OAuth token
+    # 1. Check existing user OAuth token (env var or file)
+    token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
+    if token_json_str:
+        try:
+            info = json.loads(token_json_str)
+            creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
+            if creds and creds.valid:
+                return creds
+            if creds and creds.expired and creds.refresh_token:
+                from google.auth.transport.requests import Request
+                creds.refresh(Request())
+                return creds
+        except Exception as e:
+            print(f"Warning: Could not load user token from env var: {e}")
+
     if os.path.exists(GOOGLE_TOKEN_FILE):
         try:
-            from google.oauth2.credentials import Credentials as UserCredentials
-            import json
             with open(GOOGLE_TOKEN_FILE) as f:
                 info = json.load(f)
             creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
@@ -131,9 +146,20 @@ def get_google_credentials():
                     token.write(creds.to_json())
                 return creds
         except Exception as e:
-            print(f"Warning: Could not load user token: {e}")
+            print(f"Warning: Could not load user token from file: {e}")
 
-    # 2. Check client_secret.json (fallback if token.json doesn't exist or failed)
+    # 2. Check client_secret (env var or file)
+    client_secret_env = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
+    if client_secret_env:
+        try:
+            secret_info = json.loads(client_secret_env)
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            flow = InstalledAppFlow.from_client_config(secret_info, GOOGLE_API_SCOPES)
+            creds = flow.run_local_server(port=0)
+            return creds
+        except Exception as e:
+            print(f"Warning: InstalledAppFlow from env secret failed: {e}")
+
     if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
         try:
             import webbrowser
@@ -141,7 +167,6 @@ def get_google_credentials():
             
             def powershell_open(url, new=0, autoraise=True):
                 try:
-                    # Explicitly run Start-Process in PowerShell to open browser on host OS
                     subprocess.run(["powershell", "-Command", f"Start-Process '{url}'"], shell=True)
                     return True
                 except Exception:
@@ -158,11 +183,20 @@ def get_google_credentials():
         except Exception as e:
             print(f"Warning: InstalledAppFlow failed: {e}")
 
-    # 3. Fallback to Service Account
-    if os.path.exists(GOOGLE_SERVICE_ACCOUNT_FILE):
-        return Credentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
+    # 3. Fallback to Service Account (env var or file)
+    sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if sa_env:
+        try:
+            sa_info = json.loads(sa_env)
+            return ServiceAccountCredentials.from_service_account_info(sa_info, scopes=GOOGLE_API_SCOPES)
+        except Exception as e:
+            print(f"Warning: Service Account from env failed: {e}")
 
-    raise FileNotFoundError("Neither client_secret.json nor service_account.json found in backend/credentials/")
+    if os.path.exists(GOOGLE_SERVICE_ACCOUNT_FILE):
+        return ServiceAccountCredentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
+
+    raise FileNotFoundError("Neither client_secret.json nor service_account.json found in backend/credentials/, and no GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON environment variable is set.")
+
 
 
 def survey_to_google_form_requests(survey: SurveyForm) -> list:
