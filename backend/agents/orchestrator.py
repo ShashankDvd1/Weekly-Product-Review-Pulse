@@ -92,27 +92,10 @@ class PipelineOrchestrator:
                         self.strategy_completed_steps = 9
                     
                     if self.strategy_deep_dive:
-                        if not self.board_presentation and self.strategy_status == "completed":
-                            logger.info("Cache has deep dive but lacks board presentation. Synthesizing in background...")
-                            def run_bg_synthesis():
-                                try:
-                                    from reasoning.board_presenter import synthesize_board_presentation
-                                    self.board_presentation = synthesize_board_presentation(self.strategy_deep_dive)
-                                    # Save back to cache
-                                    try:
-                                        with open(cache_path, "w", encoding="utf-8") as f_out:
-                                            json.dump({
-                                                "strategy_deep_dive": self.strategy_deep_dive,
-                                                "board_presentation": self.board_presentation,
-                                                "active_problem_statement": self.active_problem_statement
-                                            }, f_out, indent=2)
-                                    except Exception as write_err:
-                                        logger.error(f"Failed to write updated cache: {write_err}")
-                                except Exception as synth_err:
-                                    logger.error(f"Failed to synthesize board presentation in background: {synth_err}")
-                            
+                        if (not self.board_presentation or not self.mvp_workspace_prd) and self.strategy_status == "completed":
+                            logger.info("Cache has deep dive but lacks board presentation or prototype PRD. Synthesizing in background...")
                             import threading
-                            threading.Thread(target=run_bg_synthesis, daemon=True).start()
+                            threading.Thread(target=self.resynthesize_presentation_and_prototype, daemon=True).start()
                         
                         self._map_phase_1_outputs_to_dashboard()
                         self.strategy_logs = [f"[{datetime.now().strftime('%H:%M:%S')}] Loaded strategy deep dive and presentation from local cache file."]
@@ -525,6 +508,49 @@ class PipelineOrchestrator:
             self.strategy_status = "failed"
             self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] Critical failure in Multi-agent pipeline: {e}")
             logger.exception("Multi-agent Strategy Deep Dive failed")
+
+    def resynthesize_presentation_and_prototype(self) -> dict:
+        """
+        Re-synthesizes board presentation slides (10 McKinsey slides)
+        and detailed Prototype PRD Markdown using existing cached deep dive data.
+        """
+        if not self.strategy_deep_dive:
+            raise ValueError("No strategy deep dive data cached to re-synthesize from.")
+
+        logger.info("Re-synthesizing presentation and prototype from cache...")
+        self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] 🔄 Re-synthesizing board presentation & prototype markdown from cached deep dive...")
+
+        # 1. Re-synthesize board presentation
+        from reasoning.board_presenter import synthesize_board_presentation
+        self.board_presentation = synthesize_board_presentation(self.strategy_deep_dive)
+
+        # 2. Re-synthesize prototype PRD markdown
+        try:
+            from reasoning.prototype_generator import generate_prototype_markdown
+            self.mvp_workspace_prd = generate_prototype_markdown(self.strategy_deep_dive)
+        except Exception as prd_err:
+            logger.error(f"Failed to generate Prototype Markdown during re-synthesis: {prd_err}")
+            self.mvp_workspace_prd = f"# Prototype Specification\n\nError generating prototype markdown: {prd_err}"
+
+        # 3. Overwrite strategy_cache.json
+        try:
+            os.makedirs("data", exist_ok=True)
+            with open(os.path.join("data", "strategy_cache.json"), "w", encoding="utf-8") as f:
+                json.dump({
+                    "strategy_deep_dive": self.strategy_deep_dive,
+                    "board_presentation": self.board_presentation,
+                    "mvp_workspace_prd": self.mvp_workspace_prd,
+                    "active_problem_statement": self.active_problem_statement
+                }, f, indent=2)
+            logger.info("Successfully updated strategy_cache.json with re-synthesized outputs.")
+        except Exception as ce:
+            logger.error(f"Failed to write re-synthesized cache: {ce}")
+
+        self.strategy_logs.append(f"[{datetime.now().strftime('%H:%M:%S')}] ✅ Board presentation and prototype markdown re-synthesized & cached successfully.")
+        return {
+            "board_presentation": self.board_presentation,
+            "mvp_workspace_prd": self.mvp_workspace_prd
+        }
 
 
     @property

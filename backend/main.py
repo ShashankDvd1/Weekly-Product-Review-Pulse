@@ -476,6 +476,26 @@ def get_mvp_workspace():
     return {"markdown": prd_md}
 
 
+@app.post("/api/v2/reports/resynthesize-cache")
+def resynthesize_cache_endpoint():
+    """Re-synthesizes presentation slides and prototype PRD markdown from existing cached deep dive data."""
+    orchestrator = get_orchestrator()
+    if not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="No Strategy Deep Dive data cached. Run Deep Strategy Analysis first.")
+
+    try:
+        res = orchestrator.resynthesize_presentation_and_prototype()
+        return {
+            "status": "success",
+            "message": "Re-synthesized presentation slides and prototype markdown from cached deep dive.",
+            "board_presentation": res.get("board_presentation"),
+            "mvp_workspace_prd": res.get("mvp_workspace_prd")
+        }
+    except Exception as e:
+        logger.exception("Failed to re-synthesize presentation and prototype from cache")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/v2/reports/strategy-deep-dive/run")
 def run_strategy_deep_dive_endpoint(background_tasks: BackgroundTasks):
     """Forces a fresh run of the Strategy Deep Dive by bypassing/deleting cache."""

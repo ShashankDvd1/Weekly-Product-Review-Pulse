@@ -708,6 +708,7 @@ const Dashboard = () => {
   // Prototype Markdown state
   const [prototypeMarkdown, setPrototypeMarkdown] = useState('');
   const [prototypeLoading, setPrototypeLoading] = useState(false);
+  const [resynthesizing, setResynthesizing] = useState(false);
 
   // Survey & Case Study states
   const [generatingForm, setGeneratingForm] = useState(false);
@@ -1115,6 +1116,25 @@ const Dashboard = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleResynthesizeCache = async () => {
+    try {
+      setResynthesizing(true);
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/resynthesize-cache`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.board_presentation) setBoardPresentation(data.board_presentation);
+        if (data.mvp_workspace_prd) setPrototypeMarkdown(data.mvp_workspace_prd);
+        alert("✅ Presentation slides and prototype markdown successfully re-synthesized from cache!");
+      } else {
+        alert(data.detail || "Re-synthesis failed.");
+      }
+    } catch (err) {
+      alert("Error re-synthesizing cache: " + err.message);
+    } finally {
+      setResynthesizing(false);
+    }
   };
 
   const handleNextSlide = () => {
@@ -1530,6 +1550,10 @@ const Dashboard = () => {
             <button className="btn-secondary" onClick={handleExportSource} disabled={exportSourceLoading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {exportSourceLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={16} />}
               Download Deep Dive MD
+            </button>
+            <button className="btn-secondary" onClick={handleResynthesizeCache} disabled={resynthesizing} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}>
+              {resynthesizing ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <RefreshCw size={16} />}
+              Re-synthesize Outputs from Cache
             </button>
             <button className="btn-primary" onClick={handleDownloadPrototypeMarkdown} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Download size={16} />
