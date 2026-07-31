@@ -383,6 +383,19 @@ class PipelineOrchestrator:
         # Map outputs to dashboard variables
         self._map_phase_1_outputs_to_dashboard()
 
+        # Save strategy deep dive data to file cache
+        try:
+            os.makedirs("data", exist_ok=True)
+            with open(os.path.join("data", "strategy_cache.json"), "w", encoding="utf-8") as f:
+                json.dump({
+                    "strategy_deep_dive": self.strategy_deep_dive,
+                    "board_presentation": self.board_presentation,
+                    "active_problem_statement": self.active_problem_statement
+                }, f, indent=2)
+            logger.info("Saved Phase 1 strategy deep dive data to strategy_cache.json")
+        except Exception as ce:
+            logger.error(f"Failed to save Phase 1 strategy cache: {ce}")
+
     def run_strategy_deep_dive_async(self, target_phase=1):
         """Runs the 9-Agent sequential strategy pipeline in a background thread."""
         self.strategy_status = "running"
