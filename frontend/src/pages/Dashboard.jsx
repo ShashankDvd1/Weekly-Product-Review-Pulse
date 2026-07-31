@@ -475,12 +475,35 @@ const renderActiveSlideContent = (activeSlide, brandColor) => {
                 <span style={{ color: 'var(--text-secondary)' }}>{scr.spec}</span>
               </div>
             ))}
-            {activeSlide.live_links && activeSlide.live_links.length > 0 && (
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.7rem', textAlign: 'center', marginTop: '0.25rem' }}>
-                <span style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }}>🔗 Mock Live Prototype URL:</span>
-                <a href={activeSlide.live_links[0]} target="_blank" rel="noopener noreferrer" style={{ color: brandColor, textDecoration: 'underline', fontWeight: 'bold' }}>Interactive App Prototype</a>
-              </div>
-            )}
+            <button 
+              className="btn-primary" 
+              onClick={() => {
+                fetch(`${getBackendUrl()}/api/v2/reports/mvp-workspace`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.markdown) {
+                      const blob = new Blob([data.markdown], { type: 'text/markdown;charset=utf-8;' });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', 'mvp_prototype_spec.md');
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    } else {
+                      alert("Prototype markdown not available yet.");
+                    }
+                  })
+                  .catch(err => alert("Error downloading prototype markdown: " + err.message));
+              }}
+              style={{ 
+                marginTop: '0.5rem', padding: '0.4rem 0.75rem', fontSize: '0.72rem', 
+                background: brandColor, color: '#000', border: 'none', borderRadius: '6px', 
+                fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem'
+              }}
+            >
+              📥 Download Complete Prototype Markdown (.MD)
+            </button>
           </div>
         </div>
       );
@@ -1506,7 +1529,11 @@ const Dashboard = () => {
             </button>
             <button className="btn-secondary" onClick={handleExportSource} disabled={exportSourceLoading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {exportSourceLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={16} />}
-              Download Markdown
+              Download Deep Dive MD
+            </button>
+            <button className="btn-primary" onClick={handleDownloadPrototypeMarkdown} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Download size={16} />
+              Download Prototype PRD (.MD)
             </button>
           </div>
 
