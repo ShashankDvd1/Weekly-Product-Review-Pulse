@@ -121,16 +121,19 @@ def get_google_credentials():
     token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
     if token_json_str:
         try:
-            info = json.loads(token_json_str)
+            cleaned_str = token_json_str.strip()
+            if (cleaned_str.startswith("'") and cleaned_str.endswith("'")) or (cleaned_str.startswith('"') and cleaned_str.endswith('"')):
+                cleaned_str = cleaned_str[1:-1]
+            info = json.loads(cleaned_str)
             creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
             if creds and creds.valid:
                 return creds
-            if creds and creds.expired and creds.refresh_token:
+            if creds and creds.refresh_token:
                 from google.auth.transport.requests import Request
                 creds.refresh(Request())
                 return creds
         except Exception as e:
-            print(f"Warning: Could not load user token from env var: {e}")
+            logger.error(f"Error initializing credentials from GOOGLE_TOKEN_JSON env var: {e}")
 
     if os.path.exists(GOOGLE_TOKEN_FILE):
         try:
@@ -139,26 +142,32 @@ def get_google_credentials():
             creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
             if creds and creds.valid:
                 return creds
-            if creds and creds.expired and creds.refresh_token:
+            if creds and creds.refresh_token:
                 from google.auth.transport.requests import Request
                 creds.refresh(Request())
-                with open(GOOGLE_TOKEN_FILE, 'w') as token:
-                    token.write(creds.to_json())
+                try:
+                    with open(GOOGLE_TOKEN_FILE, 'w') as token:
+                        token.write(creds.to_json())
+                except Exception:
+                    pass
                 return creds
         except Exception as e:
-            print(f"Warning: Could not load user token from file: {e}")
+            logger.error(f"Error loading user token from token.json file: {e}")
 
     # 2. Check client_secret (env var or file)
     client_secret_env = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
     if client_secret_env:
         try:
-            secret_info = json.loads(client_secret_env)
+            cleaned_secret = client_secret_env.strip()
+            if (cleaned_secret.startswith("'") and cleaned_secret.endswith("'")) or (cleaned_secret.startswith('"') and cleaned_secret.endswith('"')):
+                cleaned_secret = cleaned_secret[1:-1]
+            secret_info = json.loads(cleaned_secret)
             from google_auth_oauthlib.flow import InstalledAppFlow
             flow = InstalledAppFlow.from_client_config(secret_info, GOOGLE_API_SCOPES)
             creds = flow.run_local_server(port=0)
             return creds
         except Exception as e:
-            print(f"Warning: InstalledAppFlow from env secret failed: {e}")
+            logger.error(f"InstalledAppFlow from env secret failed: {e}")
 
     if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
         try:
@@ -177,25 +186,31 @@ def get_google_credentials():
             from google_auth_oauthlib.flow import InstalledAppFlow
             flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CLIENT_SECRET_FILE, GOOGLE_API_SCOPES)
             creds = flow.run_local_server(port=0)
-            with open(GOOGLE_TOKEN_FILE, 'w') as token:
-                token.write(creds.to_json())
+            try:
+                with open(GOOGLE_TOKEN_FILE, 'w') as token:
+                    token.write(creds.to_json())
+            except Exception:
+                pass
             return creds
         except Exception as e:
-            print(f"Warning: InstalledAppFlow failed: {e}")
+            logger.error(f"InstalledAppFlow failed: {e}")
 
     # 3. Fallback to Service Account (env var or file)
     sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
     if sa_env:
         try:
-            sa_info = json.loads(sa_env)
+            cleaned_sa = sa_env.strip()
+            if (cleaned_sa.startswith("'") and cleaned_sa.endswith("'")) or (cleaned_sa.startswith('"') and cleaned_sa.endswith('"')):
+                cleaned_sa = cleaned_sa[1:-1]
+            sa_info = json.loads(cleaned_sa)
             return ServiceAccountCredentials.from_service_account_info(sa_info, scopes=GOOGLE_API_SCOPES)
         except Exception as e:
-            print(f"Warning: Service Account from env failed: {e}")
+            logger.error(f"Service Account from env failed: {e}")
 
     if os.path.exists(GOOGLE_SERVICE_ACCOUNT_FILE):
         return ServiceAccountCredentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
 
-    raise FileNotFoundError("Neither client_secret.json nor service_account.json found in backend/credentials/, and no GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON environment variable is set.")
+    raise FileNotFoundError("Google credentials not configured on server. Please ensure GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON is set in Render Environment Variables.")
 
 
 
