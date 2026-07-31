@@ -581,12 +581,22 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
             final_slides.append(fallback_by_num[n])
 
     # Brand metadata from batch A if available, else from fallback
-    app_name = meta_a.get("app_name") or fallback["app_name"]
-    primary_color = meta_a.get("primary_color") or fallback["primary_color"]
-    secondary_color = meta_a.get("secondary_color") or fallback["secondary_color"]
+    detected_name, detected_pcolor, detected_scolor = _detect_brand(strategy_data)
+    app_name = meta_a.get("app_name") if meta_a.get("app_name") in ["Blinkit", "Zepto", "Swiggy Instamart"] else detected_name
+    
+    if app_name == "Blinkit":
+        primary_color, secondary_color, theme = "#ffc20e", "#3182ce", "Blinkit Yellow"
+    elif app_name == "Zepto":
+        primary_color, secondary_color, theme = "#5c2c90", "#e28743", "Zepto Purple"
+    elif app_name == "Swiggy Instamart":
+        primary_color, secondary_color, theme = "#fc8019", "#8a3ab9", "Swiggy Instamart Orange"
+    else:
+        primary_color = detected_pcolor
+        secondary_color = detected_scolor
+        theme = f"{app_name} Theme"
+
     presentation_title = meta_a.get("presentation_title") or fallback["presentation_title"]
     subtitle = meta_a.get("subtitle") or fallback["subtitle"]
-    theme = meta_a.get("presentation_theme") or fallback["presentation_theme"]
 
     result = {
         "presentation_title": presentation_title,
@@ -598,6 +608,7 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
         "slides": final_slides,
     }
     logger.info(f"Board presentation complete: {len(final_slides)} slides.")
+
     return result
 
 
