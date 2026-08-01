@@ -111,19 +111,19 @@ def generate_survey_structure(project_data: dict) -> SurveyForm:
 def get_google_credentials():
     """
     Returns valid Google Credentials. Priority:
-    1. Service Account credentials (GOOGLE_SERVICE_ACCOUNT_JSON env var, service_account.json, or root *.json service key)
-    2. Saved user OAuth token (GOOGLE_TOKEN_JSON env var or token.json file)
-    3. OAuth client_secret (GOOGLE_CLIENT_SECRET_JSON env var or client_secret.json file)
+    1. Saved user OAuth token (GOOGLE_TOKEN_JSON env var or token.json file) - prioritized to avoid 0MB storage quota on personal Drive
+    2. Service Account credentials (GOOGLE_SERVICE_ACCOUNT_JSON env var or service_account key files)
     """
     from core.config import GOOGLE_CLIENT_SECRET_FILE, GOOGLE_TOKEN_FILE, GOOGLE_SERVICE_ACCOUNT_FILE, GOOGLE_API_SCOPES
     from google.oauth2.credentials import Credentials as UserCredentials
     from google.oauth2.service_account import Credentials as ServiceAccountCredentials
+    from google.auth.transport.requests import Request
     import json
     import glob
     
     auth_errors = []
 
-    # 1. Check existing user OAuth token (GOOGLE_TOKEN_JSON or file) for storage quota
+    # 1. Check existing user OAuth token (GOOGLE_TOKEN_JSON env var or token.json files)
     token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
     if token_json_str:
         try:
@@ -136,7 +136,6 @@ def get_google_credentials():
                 logger.info("Authenticated using valid GOOGLE_TOKEN_JSON user OAuth credentials.")
                 return creds
             if creds and creds.refresh_token:
-                from google.auth.transport.requests import Request
                 creds.refresh(Request())
                 logger.info("Refreshed user OAuth token from GOOGLE_TOKEN_JSON successfully.")
                 return creds
@@ -144,6 +143,31 @@ def get_google_credentials():
             err_msg = f"GOOGLE_TOKEN_JSON env var auth failed: {e}"
             logger.warning(err_msg)
             auth_errors.append(err_msg)
+
+    token_candidate_files = [
+        GOOGLE_TOKEN_FILE,
+        os.path.join("backend", "credentials", "token.json"),
+        os.path.join("credentials", "token.json"),
+        "token.json"
+    ]
+    for token_path in token_candidate_files:
+        if token_path and os.path.exists(token_path) and os.path.getsize(token_path) > 0:
+            try:
+                with open(token_path, "r", encoding="utf-8") as f:
+                    info = json.load(f)
+                if isinstance(info, dict) and "refresh_token" in info:
+                    creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
+                    if creds and creds.valid:
+                        logger.info(f"Authenticated using valid user OAuth token file: {token_path}")
+                        return creds
+                    if creds and creds.refresh_token:
+                        creds.refresh(Request())
+                        logger.info(f"Refreshed user OAuth token file: {token_path}")
+                        return creds
+            except Exception as e:
+                err_msg = f"token file {token_path} auth failed: {e}"
+                logger.warning(err_msg)
+                auth_errors.append(err_msg)
 
     # 2. Service Account credentials (GOOGLE_SERVICE_ACCOUNT_JSON env var or key files)
     sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -180,44 +204,9 @@ def get_google_credentials():
                 logger.error(err_msg)
                 auth_errors.append(err_msg)
 
-    # 2. Check existing user OAuth token (env var or file) as fallback
-    token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
-    if token_json_str:
-        try:
-            cleaned_str = token_json_str.strip()
-            if (cleaned_str.startswith("'") and cleaned_str.endswith("'")) or (cleaned_str.startswith('"') and cleaned_str.endswith('"')):
-                cleaned_str = cleaned_str[1:-1]
-            info = json.loads(cleaned_str)
-            creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
-            if creds and creds.valid:
-                return creds
-            if creds and creds.refresh_token:
-                from google.auth.transport.requests import Request
-                creds.refresh(Request())
-                return creds
-        except Exception as e:
-            err_msg = f"GOOGLE_TOKEN_JSON env var auth failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    if os.path.exists(GOOGLE_TOKEN_FILE):
-        try:
-            with open(GOOGLE_TOKEN_FILE) as f:
-                info = json.load(f)
-            creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
-            if creds and creds.valid:
-                return creds
-            if creds and creds.refresh_token:
-                from google.auth.transport.requests import Request
-                creds.refresh(Request())
-                return creds
-        except Exception as e:
-            err_msg = f"token.json file auth failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    details = " | ".join(auth_errors) if auth_errors else "No GOOGLE_SERVICE_ACCOUNT_JSON or valid Service Account key file found."
+    details = " | ".join(auth_errors) if auth_errors else "No valid OAuth token or Service Account key file found."
     raise FileNotFoundError(f"Google authentication failed on server: {details}")
+
 
 
 

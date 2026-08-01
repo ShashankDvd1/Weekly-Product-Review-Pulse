@@ -2,6 +2,7 @@ import logging
 import json
 from reasoning.form_generator import get_google_credentials
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 logger = logging.getLogger(__name__)
 
@@ -519,51 +520,54 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
                         'text': full_col_text
                     }
                 })
-                style_requests.append({
-                    'updateTextStyle': {
-                        'objectId': txt_id,
-                        'style': {
-                            'fontFamily': 'Georgia',
-                            'fontSize': {'magnitude': 15, 'unit': 'PT'},
-                            'bold': True,
-                            'foregroundColor': {
-                                'opaqueColor': {
-                                    'rgbColor': {
-                                        'red': brand_r, 'green': brand_g, 'blue': brand_b
+                header_len = len(col_title) + 2
+                if header_len > 0 and len(full_col_text) > 0:
+                    style_requests.append({
+                        'updateTextStyle': {
+                            'objectId': txt_id,
+                            'style': {
+                                'fontFamily': 'Georgia',
+                                'fontSize': {'magnitude': 15, 'unit': 'PT'},
+                                'bold': True,
+                                'foregroundColor': {
+                                    'opaqueColor': {
+                                        'rgbColor': {
+                                            'red': brand_r, 'green': brand_g, 'blue': brand_b
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        'textRange': {
-                            'type': 'FIXED_RANGE',
-                            'startIndex': 0,
-                            'endIndex': len(col_title) + 2
-                        },
-                        'fields': 'fontFamily,fontSize,bold,foregroundColor'
-                    }
-                })
-                style_requests.append({
-                    'updateTextStyle': {
-                        'objectId': txt_id,
-                        'style': {
-                            'fontFamily': 'Arial',
-                            'fontSize': {'magnitude': 14, 'unit': 'PT'},
-                            'foregroundColor': {
-                                'opaqueColor': {
-                                    'rgbColor': {
-                                        'red': 0.85, 'green': 0.88, 'blue': 0.93
+                            },
+                            'textRange': {
+                                'type': 'FIXED_RANGE',
+                                'startIndex': 0,
+                                'endIndex': min(header_len, len(full_col_text))
+                            },
+                            'fields': 'fontFamily,fontSize,bold,foregroundColor'
+                        }
+                    })
+                if len(full_col_text) > header_len:
+                    style_requests.append({
+                        'updateTextStyle': {
+                            'objectId': txt_id,
+                            'style': {
+                                'fontFamily': 'Arial',
+                                'fontSize': {'magnitude': 14, 'unit': 'PT'},
+                                'foregroundColor': {
+                                    'opaqueColor': {
+                                        'rgbColor': {
+                                            'red': 0.85, 'green': 0.88, 'blue': 0.93
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        'textRange': {
-                            'type': 'FIXED_RANGE',
-                            'startIndex': len(col_title) + 2,
-                            'endIndex': len(full_col_text)
-                        },
-                        'fields': 'fontFamily,fontSize,foregroundColor'
-                    }
-                })
+                            },
+                            'textRange': {
+                                'type': 'FIXED_RANGE',
+                                'startIndex': header_len,
+                                'endIndex': len(full_col_text)
+                            },
+                            'fields': 'fontFamily,fontSize,foregroundColor'
+                        }
+                    })
         else:
             # 2 Column layout: Left at translateX 40, Right at translateX 365
             columns = [(left_title, left_lines, 40), (right_title, right_lines, 365)]
@@ -646,51 +650,54 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
                         'text': full_col_text
                     }
                 })
-                style_requests.append({
-                    'updateTextStyle': {
-                        'objectId': txt_id,
-                        'style': {
-                            'fontFamily': 'Georgia',
-                            'fontSize': {'magnitude': 15, 'unit': 'PT'},
-                            'bold': True,
-                            'foregroundColor': {
-                                'opaqueColor': {
-                                    'rgbColor': {
-                                        'red': brand_r, 'green': brand_g, 'blue': brand_b
+                header_len = len(c_title) + 2
+                if header_len > 0 and len(full_col_text) > 0:
+                    style_requests.append({
+                        'updateTextStyle': {
+                            'objectId': txt_id,
+                            'style': {
+                                'fontFamily': 'Georgia',
+                                'fontSize': {'magnitude': 15, 'unit': 'PT'},
+                                'bold': True,
+                                'foregroundColor': {
+                                    'opaqueColor': {
+                                        'rgbColor': {
+                                            'red': brand_r, 'green': brand_g, 'blue': brand_b
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        'textRange': {
-                            'type': 'FIXED_RANGE',
-                            'startIndex': 0,
-                            'endIndex': len(c_title) + 2
-                        },
-                        'fields': 'fontFamily,fontSize,bold,foregroundColor'
-                    }
-                })
-                style_requests.append({
-                    'updateTextStyle': {
-                        'objectId': txt_id,
-                        'style': {
-                            'fontFamily': 'Arial',
-                            'fontSize': {'magnitude': 14, 'unit': 'PT'},
-                            'foregroundColor': {
-                                'opaqueColor': {
-                                    'rgbColor': {
-                                        'red': 0.85, 'green': 0.88, 'blue': 0.93
+                            },
+                            'textRange': {
+                                'type': 'FIXED_RANGE',
+                                'startIndex': 0,
+                                'endIndex': min(header_len, len(full_col_text))
+                            },
+                            'fields': 'fontFamily,fontSize,bold,foregroundColor'
+                        }
+                    })
+                if len(full_col_text) > header_len:
+                    style_requests.append({
+                        'updateTextStyle': {
+                            'objectId': txt_id,
+                            'style': {
+                                'fontFamily': 'Arial',
+                                'fontSize': {'magnitude': 14, 'unit': 'PT'},
+                                'foregroundColor': {
+                                    'opaqueColor': {
+                                        'rgbColor': {
+                                            'red': 0.85, 'green': 0.88, 'blue': 0.93
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        'textRange': {
-                            'type': 'FIXED_RANGE',
-                            'startIndex': len(c_title) + 2,
-                            'endIndex': len(full_col_text)
-                        },
-                        'fields': 'fontFamily,fontSize,foregroundColor'
-                    }
-                })
+                            },
+                            'textRange': {
+                                'type': 'FIXED_RANGE',
+                                'startIndex': header_len,
+                                'endIndex': len(full_col_text)
+                            },
+                            'fields': 'fontFamily,fontSize,foregroundColor'
+                        }
+                    })
 
     if style_requests:
         slides_service.presentations().batchUpdate(presentationId=pres_id, body={'requests': style_requests}).execute()
