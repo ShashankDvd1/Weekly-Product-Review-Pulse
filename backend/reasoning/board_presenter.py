@@ -508,7 +508,7 @@ Return exactly this JSON (slides 6-10 only):
 }"""
 
 
-def _call_batch(client: LLMClient, system: str, user: str) -> list:
+def _call_batch(client: LLMClient, system: str, user: str) -> tuple[list, dict]:
     """Call LLM for one batch of slides, return the slides list or [] on failure."""
     import time
     try:
@@ -518,7 +518,11 @@ def _call_batch(client: LLMClient, system: str, user: str) -> list:
             creative=False,
             max_tokens=5500,
         )
+        if not isinstance(result, dict):
+            result = {}
         slides = result.get("slides", [])
+        if not isinstance(slides, list):
+            slides = []
         logger.info(f"Batch returned {len(slides)} slides.")
         return slides, result
     except Exception as e:

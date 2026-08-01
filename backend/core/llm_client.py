@@ -150,6 +150,36 @@ class LLMClient:
                         raise
         raise RuntimeError("LLM call failed after all retries")
 
+    def _parse_json(self, raw: str) -> dict:
+        """Helper to robustly parse JSON from LLM outputs into a dict."""
+        if not raw or not isinstance(raw, str):
+            return {}
+        cleaned = raw.strip()
+        if cleaned.startswith("```"):
+            lines = cleaned.splitlines()
+            if lines and lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            cleaned = "\n".join(lines).strip()
+
+        try:
+            parsed = json.loads(cleaned)
+            if isinstance(parsed, str):
+                try:
+                    parsed = json.loads(parsed)
+                except Exception:
+                    pass
+            if isinstance(parsed, dict):
+                return parsed
+            elif isinstance(parsed, list):
+                return {"items": parsed}
+            else:
+                return {"text": str(parsed)}
+        except Exception as e:
+            logger.error(f"Failed to parse LLM JSON output: {cleaned[:200]}... Error: {e}")
+            return {"error": "Failed to parse LLM response", "raw": raw}
+
     # ── public API ──────────────────────────────
     def analyze(self, system_prompt: str, user_prompt: str, use_reasoning: bool = False, max_tokens: int = None) -> dict:
         """
@@ -185,11 +215,7 @@ class LLMClient:
             else:
                 raise
 
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError:
-            logger.error(f"Failed to parse LLM JSON output: {raw[:200]}...")
-            return {"error": "Failed to parse LLM response", "raw": raw}
+        return self._parse_json(raw)
 
     def generate(self, system_prompt: str, user_prompt: str, creative: bool = False, max_tokens: int = None) -> dict:
         """
@@ -225,11 +251,7 @@ class LLMClient:
             else:
                 raise
 
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError:
-            logger.error(f"Failed to parse LLM JSON output: {raw[:200]}...")
-            return {"error": "Failed to parse LLM response", "raw": raw}
+        return self._parse_json(raw)
 
     def batch_analyze(self, system_prompt: str, text_chunks: list[str], use_reasoning: bool = False) -> list[dict]:
         """

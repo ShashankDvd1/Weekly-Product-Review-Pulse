@@ -29,6 +29,14 @@ def export_strategy_deep_dive_doc(strategy_data: dict) -> str:
     Formats Strategy Deep Dive results into a Google Doc and saves it inside target Drive folder.
     Returns the Google Doc edit URL on success.
     """
+    if isinstance(strategy_data, str):
+        try:
+            strategy_data = json.loads(strategy_data)
+        except Exception:
+            strategy_data = {}
+    if not isinstance(strategy_data, dict):
+        strategy_data = {}
+
     creds = get_google_credentials()
     drive_service = build('drive', 'v3', credentials=creds)
     docs_service = build('docs', 'v1', credentials=creds)
@@ -126,6 +134,14 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
     Formats the synthesized 10-slide Board Presentation into a Google Slides presentation.
     Generates slides programmatically from scratch using custom brand coloring.
     """
+    if isinstance(board_deck, str):
+        try:
+            board_deck = json.loads(board_deck)
+        except Exception:
+            board_deck = {}
+    if not isinstance(board_deck, dict):
+        board_deck = {}
+
     creds = get_google_credentials()
     drive_service = build('drive', 'v3', credentials=creds)
     slides_service = build('slides', 'v1', credentials=creds)
@@ -136,12 +152,16 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
     title = f"NL {app_name}"
     
     slides = board_deck.get("slides", [])
+    if not isinstance(slides, list):
+        slides = []
     primary_color_hex = board_deck.get("primary_color", "#3b82f6")
     secondary_color_hex = board_deck.get("secondary_color", "#10b981")
     
     brand_r, brand_g, brand_b = hex_to_rgb(primary_color_hex)
 
     def serialize_board_slide_body(slide):
+        if not isinstance(slide, dict):
+            return str(slide or "")
         lines = []
         skip_keys = {"title", "headline", "slide_number", "type", "speaker_notes"}
         for k, v in slide.items():
@@ -719,6 +739,14 @@ def export_executive_deck_slides(deck_data: dict) -> str:
     Formats Executive Deck results into a Google Slides presentation.
     Saves it inside the target Google Drive folder and returns the edit URL.
     """
+    if isinstance(deck_data, str):
+        try:
+            deck_data = json.loads(deck_data)
+        except Exception:
+            deck_data = {}
+    if not isinstance(deck_data, dict):
+        deck_data = {}
+
     creds = get_google_credentials()
     drive_service = build('drive', 'v3', credentials=creds)
     slides_service = build('slides', 'v1', credentials=creds)
@@ -730,6 +758,8 @@ def export_executive_deck_slides(deck_data: dict) -> str:
     title = "Pulse Intelligence — Executive Insight Deck"
     
     slides = deck_data.get("slides", [])
+    if not isinstance(slides, list):
+        slides = []
     
     def get_slide_content(slide):
         if slide.get('slide_number') == 3 and slide.get('mvp_details'):
