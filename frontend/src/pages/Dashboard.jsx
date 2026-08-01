@@ -1423,12 +1423,12 @@ const Dashboard = () => {
                 </div>
                 <div className="glass-panel metric-card">
                   <div className="metric-icon" style={{ color: 'var(--accent-secondary)' }}><Users size={22} /></div>
-                  <div className="metric-value">{dashboardData.personas_count || 2}</div>
+                  <div className="metric-value">{dashboardData.personas_count ?? 0}</div>
                   <div className="metric-label">User Segments Clustered</div>
                 </div>
                 <div className="glass-panel metric-card">
                   <div className="metric-icon" style={{ color: 'var(--warning)' }}><AlertTriangle size={22} /></div>
-                  <div className="metric-value">{dashboardData.opportunities_count || 4}</div>
+                  <div className="metric-value">{dashboardData.opportunities_count ?? 0}</div>
                   <div className="metric-label">Growth Opportunities Mapped</div>
                 </div>
               </div>
