@@ -1054,7 +1054,7 @@ const Dashboard = () => {
   const handleExportSlides = async () => {
     try {
       setExportSlidesLoading(true);
-      const res = await fetch(`${getBackendUrl()}/api/v2/reports/executive-deck/export-slides`, { method: 'POST' });
+      const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive/export-slides`, { method: 'POST' });
       const resData = await res.json();
       if (res.ok) setExportSlidesUrl(resData.presentation_url);
       else alert(resData.detail || "Export to Google Slides failed.");

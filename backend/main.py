@@ -348,21 +348,30 @@ def get_executive_deck_report():
 def export_executive_deck_slides_endpoint():
     """Export the AI Executive Insight presentation deck into Google Slides."""
     orchestrator = get_orchestrator()
-    if not orchestrator.signals:
-        raise HTTPException(status_code=400, detail="Executive deck data not generated yet. Run the full pipeline first.")
+    if not orchestrator.signals and not orchestrator.board_presentation and not orchestrator.strategy_deep_dive:
+        raise HTTPException(status_code=400, detail="Executive deck data not generated yet. Run ingestion or Deep Strategy Analysis first.")
 
-    from output.report_generator import generate_executive_deck
     try:
-        deck_data = generate_executive_deck(
-            orchestrator.signals,
-            orchestrator.themes,
-            orchestrator.barriers,
-            orchestrator.personas,
-            orchestrator.jobs,
-            orchestrator.opportunities,
-        )
-        from reasoning.mcp_doc_exporter import export_executive_deck_slides
-        presentation_url = export_executive_deck_slides(deck_data)
+        from reasoning.mcp_doc_exporter import export_executive_deck_slides, export_strategy_deep_dive_slides
+        if orchestrator.signals:
+            from output.report_generator import generate_executive_deck
+            deck_data = generate_executive_deck(
+                orchestrator.signals,
+                orchestrator.themes,
+                orchestrator.barriers,
+                orchestrator.personas,
+                orchestrator.jobs,
+                orchestrator.opportunities,
+            )
+            presentation_url = export_executive_deck_slides(deck_data)
+        else:
+            board_deck = orchestrator.board_presentation
+            if not board_deck:
+                from reasoning.board_presenter import synthesize_board_presentation
+                board_deck = synthesize_board_presentation(orchestrator.strategy_deep_dive or {})
+                orchestrator.board_presentation = board_deck
+            presentation_url = export_strategy_deep_dive_slides(board_deck)
+
         return {
             "status": "success",
             "presentation_url": presentation_url
@@ -554,11 +563,15 @@ def export_strategy_deep_dive_doc_endpoint():
     """Export the 16-step Strategy Deep Dive into a Google Doc saved in the target Drive folder."""
     orchestrator = get_orchestrator()
     if not orchestrator.strategy_deep_dive:
-        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+        if orchestrator.signals:
+            logger.info("Strategy Deep Dive not run yet; running deep strategy analysis automatically...")
+            orchestrator.run_deep_strategy_analysis()
+        else:
+            raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run ingestion or Deep Strategy Analysis first.")
 
     try:
         from reasoning.mcp_doc_exporter import export_strategy_deep_dive_doc
-        doc_url = export_strategy_deep_dive_doc(orchestrator.strategy_deep_dive)
+        doc_url = export_strategy_deep_dive_doc(orchestrator.strategy_deep_dive or {})
         return {
             "status": "success",
             "doc_url": doc_url
@@ -572,15 +585,19 @@ def export_strategy_deep_dive_doc_endpoint():
 def export_strategy_deep_dive_slides_endpoint():
     """Export the Strategy Deep Dive into a Google Slides presentation saved in the target Drive folder."""
     orchestrator = get_orchestrator()
-    if not orchestrator.strategy_deep_dive:
-        raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run Deep Strategy Analysis first.")
+    if not orchestrator.strategy_deep_dive and not orchestrator.board_presentation:
+        if orchestrator.signals:
+            logger.info("Strategy Deep Dive not run yet; running deep strategy analysis automatically...")
+            orchestrator.run_deep_strategy_analysis()
+        else:
+            raise HTTPException(status_code=400, detail="Strategy Deep Dive data not generated yet. Run ingestion or Deep Strategy Analysis first.")
 
     try:
         from reasoning.mcp_doc_exporter import export_strategy_deep_dive_slides
         board_deck = orchestrator.board_presentation
         if not board_deck:
             from reasoning.board_presenter import synthesize_board_presentation
-            board_deck = synthesize_board_presentation(orchestrator.strategy_deep_dive)
+            board_deck = synthesize_board_presentation(orchestrator.strategy_deep_dive or {})
             orchestrator.board_presentation = board_deck
             
         presentation_url = export_strategy_deep_dive_slides(board_deck)
