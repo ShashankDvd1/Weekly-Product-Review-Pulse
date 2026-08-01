@@ -123,7 +123,29 @@ def get_google_credentials():
     
     auth_errors = []
 
-    # 1. Service Account credentials (Priority #1)
+    # 1. Check existing user OAuth token (GOOGLE_TOKEN_JSON or file) for storage quota
+    token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
+    if token_json_str:
+        try:
+            cleaned_str = token_json_str.strip()
+            if (cleaned_str.startswith("'") and cleaned_str.endswith("'")) or (cleaned_str.startswith('"') and cleaned_str.endswith('"')):
+                cleaned_str = cleaned_str[1:-1]
+            info = json.loads(cleaned_str)
+            creds = UserCredentials.from_authorized_user_info(info, GOOGLE_API_SCOPES)
+            if creds and creds.valid:
+                logger.info("Authenticated using valid GOOGLE_TOKEN_JSON user OAuth credentials.")
+                return creds
+            if creds and creds.refresh_token:
+                from google.auth.transport.requests import Request
+                creds.refresh(Request())
+                logger.info("Refreshed user OAuth token from GOOGLE_TOKEN_JSON successfully.")
+                return creds
+        except Exception as e:
+            err_msg = f"GOOGLE_TOKEN_JSON env var auth failed: {e}"
+            logger.warning(err_msg)
+            auth_errors.append(err_msg)
+
+    # 2. Service Account credentials (GOOGLE_SERVICE_ACCOUNT_JSON env var or key files)
     sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
     if sa_env:
         try:

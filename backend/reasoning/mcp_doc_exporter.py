@@ -43,12 +43,21 @@ def export_strategy_deep_dive_doc(strategy_data: dict) -> str:
         'mimeType': 'application/vnd.google-apps.document',
         'parents': [folder_id]
     }
-    file = drive_service.files().create(
-        body=file_metadata,
-        fields='id',
-        supportsAllDrives=True
-    ).execute()
-    doc_id = file.get('id')
+    from googleapiclient.errors import HttpError
+    try:
+        file = drive_service.files().create(
+            body=file_metadata,
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        doc_id = file.get('id')
+    except HttpError as err:
+        if "storageQuotaExceeded" in str(err):
+            raise RuntimeError(
+                "Google Service Accounts have 0 MB storage quota in personal Gmail Drive folders. "
+                "To export to Google Docs/Slides, please keep GOOGLE_TOKEN_JSON set in Render Environment Variables, or use a Google Workspace Shared Drive."
+            )
+        raise err
 
     # 2. Build document text
     doc_text = f"# {title}\n\n"
@@ -153,12 +162,20 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
         'mimeType': 'application/vnd.google-apps.presentation',
         'parents': [folder_id]
     }
-    file = drive_service.files().create(
-        body=file_metadata,
-        fields='id',
-        supportsAllDrives=True
-    ).execute()
-    pres_id = file.get('id')
+    try:
+        file = drive_service.files().create(
+            body=file_metadata,
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        pres_id = file.get('id')
+    except HttpError as err:
+        if "storageQuotaExceeded" in str(err):
+            raise RuntimeError(
+                "Google Service Accounts have 0 MB storage quota in personal Gmail Drive folders. "
+                "To export to Google Docs/Slides, please keep GOOGLE_TOKEN_JSON set in Render Environment Variables, or use a Google Workspace Shared Drive."
+            )
+        raise err
 
     requests = []
     
