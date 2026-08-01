@@ -51,6 +51,9 @@ Follow this sequence before proposing any product solution:
   * Always defensively cast LLM fields to their expected types before instantiating Pydantic schemas (e.g., `int(float(value))`) to prevent validation crashes.
 
 ## Slide Generation & Design Rules
+* **Export Engine UI Alignment**:
+  * Programmatic Google Slides generators (`mcp_doc_exporter.py`) MUST implement explicit formatters for all 10 active McKinsey slide types (`market_gap`, `user_research`, `personas_journey`, `problem_framing`, `hypotheses_rice`, `solution_comparison`, `mvp_spec`, `data_flow_edges`, `metrics_indicators`, `failure_mitigations`).
+  * Never allow exported slides to fall through to generic text-only cards. The exported Google Slides deck layout must match the visual component structure displayed in the React frontend UI.
 * **Bypass Static Template Copying (Dynamic Branded Decks)**:
   * Do not copy static Google Slides presentation files from fixed URLs or templates.
   * Construct Google Slides programmatically from scratch using the Google Slides API `batchUpdate` requests.

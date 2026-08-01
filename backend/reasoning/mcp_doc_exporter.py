@@ -364,93 +364,207 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
                 return "\n".join(f"- {item}" for item in val[:4])
             return str(val or "")
         
-        if slide_type == 'executive_summary':
-            left_title = "Strategic Opportunity"
-            left_lines = [f"Why Now: {val_to_str(slide.get('why_now'))}", f"Recommendation: {val_to_str(slide.get('recommendation'))}"]
-            right_title = "Business Impact"
-            right_lines = [f"Problem Focus: {val_to_str(slide.get('problem'))}", f"Expected ROI: {val_to_str(slide.get('business_impact'))}"]
+        if slide_type == 'market_gap':
+            left_title = "Platform Market Comparison"
+            mg_table = slide.get('market_gap_table', [])
+            if isinstance(mg_table, list):
+                for row in mg_table[:5]:
+                    if isinstance(row, dict):
+                        left_lines.append(f"• {row.get('platform')}: {row.get('offer')} (Missing: {row.get('missing')})")
+            why_solve = slide.get('why_solve_first', [])
+            if why_solve:
+                left_lines.append("\nWhy Solve First:")
+                left_lines.extend([f"- {w}" for w in (why_solve if isinstance(why_solve, list) else [why_solve])])
+                
+            right_title = "Market Size & Key Statistics"
+            stats = slide.get('stats', {})
+            if isinstance(stats, dict):
+                for k, v in stats.items():
+                    right_lines.append(f"• {k.replace('_', ' ').title()}: {v}")
+            bullets = slide.get('bullets', [])
+            if bullets:
+                right_lines.append("\nStrategic Context:")
+                right_lines.extend([f"- {b}" for b in (bullets if isinstance(bullets, list) else [bullets])])
+
+        elif slide_type == 'user_research':
+            left_title = "Research Findings & Sentiment"
+            findings = slide.get('findings', {})
+            if isinstance(findings, dict):
+                left_lines.append(f"• Analyzed Reviews: {findings.get('total_analyzed')}")
+                left_lines.append(f"• LLM Labeled: {findings.get('llm_labeled')}")
+                left_lines.append(f"• Discovery Pain Rate: {findings.get('discovery_pain_rate')}")
+                left_lines.append(f"• Primary Friction: {findings.get('top_theme')}")
+            sent = slide.get('sentiment', {})
+            if isinstance(sent, dict):
+                left_lines.append(f"\nSentiment Breakdown:")
+                left_lines.append(f"Negative: {sent.get('negative')} | Neutral: {sent.get('neutral')} | Positive: {sent.get('positive')}")
+                
+            right_title = "Cited Verbatim User Quotes"
+            quotes = slide.get('cited_quotes', [])
+            if isinstance(quotes, list):
+                for q in quotes[:4]:
+                    if isinstance(q, dict):
+                        right_lines.append(f"\"{q.get('quote')}\"")
+                        right_lines.append(f"  — {q.get('source')}\n")
+            bullets = slide.get('bullets', [])
+            if bullets:
+                right_lines.extend([f"- {b}" for b in (bullets if isinstance(bullets, list) else [bullets])[:3]])
+
+        elif slide_type == 'personas_journey':
+            left_title = "Target Segment Personas"
+            personas = slide.get('personas', [])
+            if isinstance(personas, list):
+                for p in personas[:2]:
+                    if isinstance(p, dict):
+                        left_lines.append(f"👤 {p.get('name')} ({p.get('title')})")
+                        left_lines.append(f"  Trust Pattern: {p.get('trust_pattern')}")
+                        left_lines.append(f"  Unmet Need: {p.get('unmet_need')}")
+                        left_lines.append(f"  Behavioral Trap: {p.get('behavioral_trap')}")
+                        left_lines.append(f"  Quote: \"{p.get('quote')}\"\n")
+                        
+            right_title = "User Journey Habit Loop"
+            uj = slide.get('user_journey', [])
+            if isinstance(uj, list):
+                for idx, st in enumerate(uj[:5]):
+                    if isinstance(st, dict):
+                        right_lines.append(f"Stage {idx+1}: {st.get('stage')} — {st.get('behavior')}")
+                        right_lines.append(f"  Friction: {st.get('friction')}\n")
+
+        elif slide_type == 'problem_framing':
+            val_gen = slide.get('value_generated', {})
+            if not isinstance(val_gen, dict): val_gen = {}
+            why_now = slide.get('why_now', {})
+            if not isinstance(why_now, dict): why_now = {}
+            evidences = slide.get('evidences', [])
             
-        elif slide_type == 'customer_problem':
-            left_title = "User Pain Points"
-            pains = slide.get('top_3_user_pains', [])
-            left_lines = [f"- {p}" for p in (pains if isinstance(pains, list) else [pains])]
-            left_lines.append(f"Behavior Patterns:\n{val_to_str(slide.get('behavior_patterns'))}")
-            
-            right_title = "Jobs To Be Done & Quotes"
-            jtbd = slide.get('jobs_to_be_done', [])
-            right_lines = [f"JTBD: {j}" for j in (jtbd if isinstance(jtbd, list) else [jtbd])]
-            quotes = slide.get('customer_quotes', [])
-            right_lines.extend([f"Quote: \"{q}\"" for q in (quotes if isinstance(quotes, list) else [quotes])])
-            
-        elif slide_type == 'root_cause':
-            left_title = "Root Cause Analysis (5 Whys)"
-            rcs = slide.get('root_causes', [])
-            left_lines = [f"- {r}" for r in (rcs if isinstance(rcs, list) else [rcs])]
-            
-            right_title = "Assumption Validation"
-            vals = slide.get('validated_assumptions', [])
-            right_lines = [f"Validated: {v}" for v in (vals if isinstance(vals, list) else [vals])]
-            fals = slide.get('false_assumptions', [])
-            right_lines.extend([f"Refuted: {f}" for f in (fals if isinstance(fals, list) else [fals])])
-            
-        elif slide_type == 'landscape':
-            left_title = "Market Landscape"
-            left_lines = [f"Summary:\n{val_to_str(slide.get('competitor_summary'))}", f"Market Gap:\n{val_to_str(slide.get('market_gap'))}"]
-            
-            right_title = "White Space Moat"
-            right_lines = [f"White Space:\n{val_to_str(slide.get('white_space'))}"]
-            opps = slide.get('opportunities', [])
-            right_lines.extend([f"- {o}" for o in (opps if isinstance(opps, list) else [opps])])
-            
-        elif slide_type == 'ai_opportunity':
-            left_title = "AI Intervention Strategy"
-            left_lines = [f"Current Process:\n{val_to_str(slide.get('current_process'))}", f"AI Optimizations:\n{val_to_str(slide.get('ai_can_improve'))}"]
-            
-            right_title = "Personalization & Predictions"
-            right_lines = [f"Automation: {val_to_str(slide.get('automation'))}", f"Personalization: {val_to_str(slide.get('personalization'))}", f"Predictions: {val_to_str(slide.get('predictions'))}"]
-            
-        elif slide_type == 'solutions':
             col3_data = [
-                ("Conservative Option", [val_to_str(slide.get('conservative'))]),
-                ("Innovative (Recommended)", [val_to_str(slide.get('innovative')), f"Rationale:\n{val_to_str(slide.get('recommended'))}"]),
-                ("Moonshot Option", [val_to_str(slide.get('moonshot'))])
+                ("1. Problem & Cohort", [
+                    f"TRUE PROBLEM:\n{val_to_str(slide.get('true_problem'))}\n",
+                    f"TARGET COHORT:\n{val_to_str(slide.get('target_cohort'))}"
+                ]),
+                ("2. Evidence & Value", [
+                    f"EVIDENCES:\n" + "\n".join(f"- {e}" for e in (evidences if isinstance(evidences, list) else [evidences])[:3]),
+                    f"\nVALUE GENERATED:\nUser: {val_gen.get('for_user')}\nPlatform: {val_gen.get('for_platform')}"
+                ]),
+                ("3. Urgency (Why Now)", [
+                    f"Saturation: {why_now.get('saturation')}\n",
+                    f"AI Unlock: {why_now.get('ai_unlock')}\n",
+                    f"First-Mover: {why_now.get('first_mover')}"
+                ])
             ]
-            
-        elif slide_type == 'business_impact':
-            left_title = "North Star & Core Metrics"
-            left_lines = [f"North Star Metric:\n{val_to_str(slide.get('north_star_metric'))}"]
-            pm = slide.get('primary_metrics', [])
-            left_lines.extend([f"KPI: {m}" for m in (pm if isinstance(pm, list) else [pm])])
-            
-            right_title = "Guardrails & Risk Moats"
-            gm = slide.get('guardrail_metrics', [])
-            right_lines = [f"Guardrail: {g}" for g in (gm if isinstance(gm, list) else [gm])]
-            risks = slide.get('risks', [])
-            right_lines.extend([f"Risk: {r}" for r in (risks if isinstance(risks, list) else [risks])])
-            
-        elif slide_type == 'roadmap':
-            col3_data = [
-                ("Phase 1: Discovery", [val_to_str(slide.get('phase_1'))]),
-                ("Phase 2: Scale", [val_to_str(slide.get('phase_2')), f"Timeline: {val_to_str(slide.get('timeline'))}"]),
-                ("Phase 3: Optimization", [val_to_str(slide.get('phase_3'))])
-            ]
-            
-        elif slide_type == 'moat':
-            left_title = "Customer Moat"
-            left_lines = [f"Switching Costs:\n{val_to_str(slide.get('switching_costs'))}", f"Data Moat:\n{val_to_str(slide.get('data_advantage'))}"]
-            
-            right_title = "Network Advantage"
-            right_lines = [f"Network Effect:\n{val_to_str(slide.get('network_effect'))}", f"Flywheel:\n{val_to_str(slide.get('flywheel'))}"]
-            
-        elif slide_type == 'executive_recommendation':
-            left_title = "CPO Decision Requested"
-            left_lines = [f"Decision:\n{val_to_str(slide.get('decision'))}"]
-            prio = slide.get('top_priorities', [])
-            left_lines.extend([f"Priority: {p}" for p in (prio if isinstance(prio, list) else [prio])])
-            
-            right_title = "Resource & ROI Projections"
-            right_lines = [f"Investment Required:\n{val_to_str(slide.get('investment_required'))}", f"Projected ROI:\n{val_to_str(slide.get('expected_roi'))}"]
-            
+
+        elif slide_type == 'hypotheses_rice':
+            left_title = "Hypotheses Evaluated"
+            hyps = slide.get('hypotheses', [])
+            if isinstance(hyps, list):
+                for h in hyps[:4]:
+                    if isinstance(h, dict):
+                        chosen = " [CHOSEN WINNER]" if h.get('id') == 'H1' else ""
+                        left_lines.append(f"• {h.get('id')}: {h.get('name')}{chosen}")
+                        left_lines.append(f"  {h.get('statement')}\n")
+                        
+            right_title = "RICE Framework & Rationale"
+            rice = slide.get('rice_scores', [])
+            if isinstance(rice, list):
+                for r in rice[:4]:
+                    if isinstance(r, dict):
+                        left_r = f"{r.get('hypothesis_id')}: Reach {r.get('reach')}/10 | Impact {r.get('impact')}/10 | Conf {r.get('confidence')}/10 | Effort {r.get('effort')}/10 => SCORE {r.get('score')}"
+                        right_lines.append(left_r)
+            win = slide.get('winning_rationale')
+            if win:
+                right_lines.append(f"\nWinning Rationale:\n{win}")
+
+        elif slide_type == 'solution_comparison':
+            left_title = "Evaluated Solutions (S1–S4)"
+            sols = slide.get('solutions', [])
+            if isinstance(sols, list):
+                for s in sols[:4]:
+                    if isinstance(s, dict):
+                        left_lines.append(f"• {s.get('id')}: {s.get('name')} [{s.get('status')}]")
+                        left_lines.append(f"  Desc: {s.get('description')}")
+                        left_lines.append(f"  Feedback: \"{s.get('feedback')}\"\n")
+                        
+            right_title = "Trade-off Justifications"
+            vs = slide.get('vs_comparison', [])
+            if isinstance(vs, list):
+                for v in vs[:4]:
+                    if isinstance(v, dict):
+                        right_lines.append(f"• vs {v.get('against')}: {v.get('justification')}\n")
+
+        elif slide_type == 'mvp_spec':
+            left_title = "MVP Specifications & Trust Cues"
+            bullets = slide.get('bullets', [])
+            if bullets:
+                left_lines.extend([f"• {b}" for b in (bullets if isinstance(bullets, list) else [bullets])])
+            cues = slide.get('trust_cues', [])
+            if cues:
+                left_lines.append("\nConfigured Trust Cues:")
+                left_lines.extend([f"- {c}" for c in (cues if isinstance(cues, list) else [cues])])
+                
+            right_title = "MVP Screen Mapping Spec"
+            screens = slide.get('screens', [])
+            if isinstance(screens, list):
+                for idx, scr in enumerate(screens[:5]):
+                    if isinstance(scr, dict):
+                        right_lines.append(f"{idx+1}. {scr.get('name')}")
+                        right_lines.append(f"   Spec: {scr.get('spec')}\n")
+
+        elif slide_type == 'data_flow_edges':
+            left_title = "System Pipelines & Nudges"
+            df = slide.get('data_flow', {})
+            if isinstance(df, dict):
+                left_lines.append(f"① Review Engine:\n{df.get('review_engine')}\n")
+                left_lines.append(f"② Product Engine:\n{df.get('product_engine')}\n")
+            nudges = slide.get('nudges', [])
+            if nudges:
+                left_lines.append("Behavioral Nudges:")
+                left_lines.extend([f"- {n}" for n in (nudges if isinstance(nudges, list) else [nudges])[:3]])
+                
+            right_title = "Edge Cases & Mitigations"
+            edges = slide.get('edge_cases', [])
+            if isinstance(edges, list):
+                for ec in edges[:4]:
+                    if isinstance(ec, dict):
+                        right_lines.append(f"• {ec.get('id')}: {ec.get('title')}")
+                        right_lines.append(f"  → Mitigation: {ec.get('mitigation')}\n")
+
+        elif slide_type == 'metrics_indicators':
+            left_title = "North Star Metric"
+            ns = slide.get('north_star', {})
+            if isinstance(ns, dict):
+                left_lines.append(f"★ {ns.get('name')}")
+                left_lines.append(f"Target Shift: {ns.get('target')}")
+                left_lines.append(f"Definition:\n{ns.get('definition')}\n")
+                
+            right_title = "Leading Indicators & Actions"
+            lis = slide.get('leading_indicators', [])
+            if isinstance(lis, list):
+                for li in lis[:3]:
+                    if isinstance(li, dict):
+                        right_lines.append(f"• {li.get('name')} (Target: {li.get('target')})")
+                        right_lines.append(f"  Proves: {li.get('proves')}")
+                        right_lines.append(f"  Below Target: {li.get('below_target_action')}\n")
+
+        elif slide_type == 'failure_mitigations':
+            left_title = "Failure Modes & Severity"
+            failures = slide.get('failures', [])
+            if isinstance(failures, list):
+                for f in failures[:4]:
+                    if isinstance(f, dict):
+                        left_lines.append(f"• [{f.get('severity')}] {f.get('risk')}")
+                        left_lines.append(f"  Handling: {f.get('handling')}\n")
+            msg = slide.get('closing_message')
+            if msg:
+                left_lines.append(f"Note: \"{msg}\"")
+                
+            right_title = "Guardrails & Risk Thresholds"
+            guardrails = slide.get('guardrails', [])
+            if isinstance(guardrails, list):
+                for g in guardrails[:4]:
+                    if isinstance(g, dict):
+                        right_lines.append(f"• {g.get('name')}: {g.get('threshold')}")
+                        right_lines.append(f"  Purpose: {g.get('purpose')}\n")
+
         else:
             left_title = "Strategic Synthesis"
             left_lines = [serialize_board_slide_body(slide)[:250]]
@@ -737,7 +851,7 @@ def export_strategy_deep_dive_slides(board_deck: dict) -> str:
 def export_executive_deck_slides(deck_data: dict) -> str:
     """
     Formats Executive Deck results into a Google Slides presentation.
-    Saves it inside the target Google Drive folder and returns the edit URL.
+    Bypasses static template copying and constructs branded decks programmatically from scratch.
     """
     if isinstance(deck_data, str):
         try:
@@ -747,92 +861,7 @@ def export_executive_deck_slides(deck_data: dict) -> str:
     if not isinstance(deck_data, dict):
         deck_data = {}
 
-    creds = get_google_credentials()
-    drive_service = build('drive', 'v3', credentials=creds)
-    slides_service = build('slides', 'v1', credentials=creds)
-
-    from core.config import GOOGLE_DRIVE_FOLDER_ID, GOOGLE_SLIDES_TEMPLATE_ID
-    folder_id = GOOGLE_DRIVE_FOLDER_ID or "1-KqYGsX7eUVmo9ShlXx0i2c0tg8EnbsB"
-
-    # 1. Create file inside target folder (either clone template or create blank)
-    title = "Pulse Intelligence — Executive Insight Deck"
-    
-    slides = deck_data.get("slides", [])
-    if not isinstance(slides, list):
-        slides = []
-    
-    def get_slide_content(slide):
-        if slide.get('slide_number') == 3 and slide.get('mvp_details'):
-            d = slide['mvp_details']
-            features = ", ".join(d.get('core_features', []))
-            metrics = ", ".join(d.get('success_metrics', []))
-            return f"Proposed Solution: {d.get('proposed_solution')}\nTarget Users: {d.get('target_users')}\nPain Points: {d.get('pain_points')}\nCore Features: {features}\nSuccess Metrics: {metrics}"
-        
-        content = slide.get('content')
-        if isinstance(content, list):
-            return "\n".join(f"- {item}" for item in content)
-        return str(content or "")
-
-    if GOOGLE_SLIDES_TEMPLATE_ID:
-        try:
-            delete_existing_file(drive_service, title, 'application/vnd.google-apps.presentation', folder_id)
-            file = drive_service.files().copy(
-                fileId=GOOGLE_SLIDES_TEMPLATE_ID,
-                body={
-                    'name': title,
-                    'parents': [folder_id]
-                },
-                supportsAllDrives=True
-            ).execute()
-            pres_id = file.get('id')
-            
-            # Map dynamic text replacements for Slide 1 to 4
-            replacements = []
-            for idx, slide in enumerate(slides):
-                slide_num = idx + 1
-                slide_title = slide.get('title', f"Slide {slide_num}")
-                slide_headline = slide.get('headline', '')
-                slide_body = get_slide_content(slide)
-                
-                metrics_str = ""
-                metrics = slide.get('key_metrics', [])
-                if metrics:
-                    metrics_str = "\n\nKEY METRICS:\n" + "\n".join(f"- {m.get('label')}: {m.get('value')}" for m in metrics)
-                
-                full_content = f"{slide_headline}\n\n{slide_body}{metrics_str}"
-                
-                replacements.append({"match": f"{{{{Slide{slide_num}_Title}}}}", "replace": slide_title})
-                replacements.append({"match": f"{{{{Slide{slide_num}_Content}}}}", "replace": full_content})
-
-            # Run replaceAllText updates
-            replace_requests = []
-            for rep in replacements:
-                replace_requests.append({
-                    'replaceAllText': {
-                        'containsText': {
-                            'text': rep['match'],
-                            'matchCase': True
-                        },
-                        'replaceText': rep['replace']
-                    }
-                })
-                
-            if replace_requests:
-                slides_service.presentations().batchUpdate(presentationId=pres_id, body={'requests': replace_requests}).execute()
-                
-            # Set reader permissions
-            try:
-                drive_service.permissions().create(
-                    fileId=pres_id,
-                    body={"type": "anyone", "role": "reader"},
-                    supportsAllDrives=True
-                ).execute()
-            except Exception as e:
-                logger.warning(f"Could not set public permissions on presentation: {e}")
-                
-            return f"https://docs.google.com/presentation/d/{pres_id}/edit"
-        except Exception as e:
-            logger.exception("Failed to create presentation from template. Falling back to blank deck creation.")
+    return export_strategy_deep_dive_slides(deck_data)
 
     # Fallback to creating blank presentation
     delete_existing_file(drive_service, title, 'application/vnd.google-apps.presentation', folder_id)
