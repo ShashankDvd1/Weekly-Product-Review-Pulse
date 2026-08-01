@@ -120,6 +120,8 @@ def get_google_credentials():
     from google.oauth2.service_account import Credentials as ServiceAccountCredentials
     import json
     
+    auth_errors = []
+
     # 1. Check existing user OAuth token (env var or file)
     token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
     if token_json_str:
@@ -136,7 +138,9 @@ def get_google_credentials():
                 creds.refresh(Request())
                 return creds
         except Exception as e:
-            logger.error(f"Error initializing credentials from GOOGLE_TOKEN_JSON env var: {e}")
+            err_msg = f"GOOGLE_TOKEN_JSON env var auth failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
     if os.path.exists(GOOGLE_TOKEN_FILE):
         try:
@@ -155,7 +159,9 @@ def get_google_credentials():
                     pass
                 return creds
         except Exception as e:
-            logger.error(f"Error loading user token from token.json file: {e}")
+            err_msg = f"token.json file auth failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
     # 2. Check client_secret (env var or file)
     client_secret_env = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
@@ -170,7 +176,9 @@ def get_google_credentials():
             creds = flow.run_local_server(port=0)
             return creds
         except Exception as e:
-            logger.error(f"InstalledAppFlow from env secret failed: {e}")
+            err_msg = f"InstalledAppFlow from env secret failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
     if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
         try:
@@ -196,7 +204,9 @@ def get_google_credentials():
                 pass
             return creds
         except Exception as e:
-            logger.error(f"InstalledAppFlow failed: {e}")
+            err_msg = f"InstalledAppFlow from client_secret.json failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
     # 3. Fallback to Service Account (env var or file)
     sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
@@ -208,12 +218,20 @@ def get_google_credentials():
             sa_info = json.loads(cleaned_sa)
             return ServiceAccountCredentials.from_service_account_info(sa_info, scopes=GOOGLE_API_SCOPES)
         except Exception as e:
-            logger.error(f"Service Account from env failed: {e}")
+            err_msg = f"Service Account from GOOGLE_SERVICE_ACCOUNT_JSON env failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
     if os.path.exists(GOOGLE_SERVICE_ACCOUNT_FILE):
-        return ServiceAccountCredentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
+        try:
+            return ServiceAccountCredentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
+        except Exception as e:
+            err_msg = f"Service Account from file failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
 
-    raise FileNotFoundError("Google credentials not configured on server. Please ensure GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON is set in Render Environment Variables.")
+    details = " | ".join(auth_errors) if auth_errors else "No GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON env var found."
+    raise FileNotFoundError(f"Google authentication failed on server: {details}")
 
 
 
