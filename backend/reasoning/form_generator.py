@@ -111,18 +111,54 @@ def generate_survey_structure(project_data: dict) -> SurveyForm:
 def get_google_credentials():
     """
     Returns valid Google Credentials. Priority:
-    1. Saved user OAuth token (token.json file or GOOGLE_TOKEN_JSON env var)
-    2. OAuth client_secret (client_secret.json file or GOOGLE_CLIENT_SECRET_JSON env var)
-    3. Service Account credentials (service_account.json file or GOOGLE_SERVICE_ACCOUNT_JSON env var)
+    1. Service Account credentials (GOOGLE_SERVICE_ACCOUNT_JSON env var, service_account.json, or root *.json service key)
+    2. Saved user OAuth token (GOOGLE_TOKEN_JSON env var or token.json file)
+    3. OAuth client_secret (GOOGLE_CLIENT_SECRET_JSON env var or client_secret.json file)
     """
     from core.config import GOOGLE_CLIENT_SECRET_FILE, GOOGLE_TOKEN_FILE, GOOGLE_SERVICE_ACCOUNT_FILE, GOOGLE_API_SCOPES
     from google.oauth2.credentials import Credentials as UserCredentials
     from google.oauth2.service_account import Credentials as ServiceAccountCredentials
     import json
+    import glob
     
     auth_errors = []
 
-    # 1. Check existing user OAuth token (env var or file)
+    # 1. Service Account credentials (Priority #1)
+    sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if sa_env:
+        try:
+            cleaned_sa = sa_env.strip()
+            if (cleaned_sa.startswith("'") and cleaned_sa.endswith("'")) or (cleaned_sa.startswith('"') and cleaned_sa.endswith('"')):
+                cleaned_sa = cleaned_sa[1:-1]
+            sa_info = json.loads(cleaned_sa)
+            logger.info("Authenticated using GOOGLE_SERVICE_ACCOUNT_JSON environment variable.")
+            return ServiceAccountCredentials.from_service_account_info(sa_info, scopes=GOOGLE_API_SCOPES)
+        except Exception as e:
+            err_msg = f"Service Account from GOOGLE_SERVICE_ACCOUNT_JSON env failed: {e}"
+            logger.error(err_msg)
+            auth_errors.append(err_msg)
+
+    # Check designated service account file or any mcpreviewserver / service_account *.json files
+    sa_candidate_files = [
+        GOOGLE_SERVICE_ACCOUNT_FILE,
+        os.path.join("backend", "credentials", "service_account.json"),
+        os.path.join("credentials", "service_account.json")
+    ] + glob.glob("mcpreviewserver-*.json") + glob.glob("backend/credentials/*.json")
+
+    for sa_path in sa_candidate_files:
+        if sa_path and os.path.exists(sa_path) and os.path.getsize(sa_path) > 0:
+            try:
+                with open(sa_path, "r", encoding="utf-8") as f:
+                    sa_data = json.load(f)
+                if isinstance(sa_data, dict) and sa_data.get("type") == "service_account":
+                    logger.info(f"Authenticated using Service Account key file: {sa_path}")
+                    return ServiceAccountCredentials.from_service_account_file(sa_path, scopes=GOOGLE_API_SCOPES)
+            except Exception as e:
+                err_msg = f"Service Account file {sa_path} failed: {e}"
+                logger.error(err_msg)
+                auth_errors.append(err_msg)
+
+    # 2. Check existing user OAuth token (env var or file) as fallback
     token_json_str = os.getenv("GOOGLE_TOKEN_JSON")
     if token_json_str:
         try:
@@ -152,85 +188,13 @@ def get_google_credentials():
             if creds and creds.refresh_token:
                 from google.auth.transport.requests import Request
                 creds.refresh(Request())
-                try:
-                    with open(GOOGLE_TOKEN_FILE, 'w') as token:
-                        token.write(creds.to_json())
-                except Exception:
-                    pass
                 return creds
         except Exception as e:
             err_msg = f"token.json file auth failed: {e}"
             logger.error(err_msg)
             auth_errors.append(err_msg)
 
-    # 2. Check client_secret (env var or file)
-    client_secret_env = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
-    if client_secret_env:
-        try:
-            cleaned_secret = client_secret_env.strip()
-            if (cleaned_secret.startswith("'") and cleaned_secret.endswith("'")) or (cleaned_secret.startswith('"') and cleaned_secret.endswith('"')):
-                cleaned_secret = cleaned_secret[1:-1]
-            secret_info = json.loads(cleaned_secret)
-            from google_auth_oauthlib.flow import InstalledAppFlow
-            flow = InstalledAppFlow.from_client_config(secret_info, GOOGLE_API_SCOPES)
-            creds = flow.run_local_server(port=0)
-            return creds
-        except Exception as e:
-            err_msg = f"InstalledAppFlow from env secret failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    if os.path.exists(GOOGLE_CLIENT_SECRET_FILE):
-        try:
-            import webbrowser
-            import subprocess
-            
-            def powershell_open(url, new=0, autoraise=True):
-                try:
-                    subprocess.run(["powershell", "-Command", f"Start-Process '{url}'"], shell=True)
-                    return True
-                except Exception:
-                    return False
-            
-            webbrowser.open = powershell_open
-            
-            from google_auth_oauthlib.flow import InstalledAppFlow
-            flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CLIENT_SECRET_FILE, GOOGLE_API_SCOPES)
-            creds = flow.run_local_server(port=0)
-            try:
-                with open(GOOGLE_TOKEN_FILE, 'w') as token:
-                    token.write(creds.to_json())
-            except Exception:
-                pass
-            return creds
-        except Exception as e:
-            err_msg = f"InstalledAppFlow from client_secret.json failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    # 3. Fallback to Service Account (env var or file)
-    sa_env = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
-    if sa_env:
-        try:
-            cleaned_sa = sa_env.strip()
-            if (cleaned_sa.startswith("'") and cleaned_sa.endswith("'")) or (cleaned_sa.startswith('"') and cleaned_sa.endswith('"')):
-                cleaned_sa = cleaned_sa[1:-1]
-            sa_info = json.loads(cleaned_sa)
-            return ServiceAccountCredentials.from_service_account_info(sa_info, scopes=GOOGLE_API_SCOPES)
-        except Exception as e:
-            err_msg = f"Service Account from GOOGLE_SERVICE_ACCOUNT_JSON env failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    if os.path.exists(GOOGLE_SERVICE_ACCOUNT_FILE):
-        try:
-            return ServiceAccountCredentials.from_service_account_file(GOOGLE_SERVICE_ACCOUNT_FILE, scopes=GOOGLE_API_SCOPES)
-        except Exception as e:
-            err_msg = f"Service Account from file failed: {e}"
-            logger.error(err_msg)
-            auth_errors.append(err_msg)
-
-    details = " | ".join(auth_errors) if auth_errors else "No GOOGLE_TOKEN_JSON or GOOGLE_SERVICE_ACCOUNT_JSON env var found."
+    details = " | ".join(auth_errors) if auth_errors else "No GOOGLE_SERVICE_ACCOUNT_JSON or valid Service Account key file found."
     raise FileNotFoundError(f"Google authentication failed on server: {details}")
 
 
