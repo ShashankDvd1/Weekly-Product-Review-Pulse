@@ -745,6 +745,8 @@ const Dashboard = () => {
     swiggy_instamart: true
   });
 
+  const [appUrl, setAppUrl] = useState('');
+
   const [promptMode, setPromptMode] = useState('quick'); // 'quick' or 'ai_prompt'
   const [prompt, setPrompt] = useState('');
   const [parsing, setParsing] = useState(false);
@@ -951,13 +953,49 @@ const Dashboard = () => {
     }
   };
 
+  const getParsedUrlConfig = () => {
+    if (!appUrl.trim()) return null;
+    let playStorePackage = null;
+    let appStoreId = null;
+    let detectedApp = "custom";
+    let detectedAppName = "Custom App";
+
+    if (appUrl.includes('play.google.com') || appUrl.includes('details?id=')) {
+      const match = appUrl.match(/(?:id=)([^&?#\s]+)/);
+      if (match) playStorePackage = match[1];
+    } else if (appUrl.includes('apps.apple.com') || appUrl.includes('/id')) {
+      const match = appUrl.match(/\/id(\d+)/) || appUrl.match(/id[=]?(\d+)/);
+      if (match) appStoreId = match[1];
+    }
+
+    if (!playStorePackage && !appStoreId) return null;
+
+    if (playStorePackage === 'com.zeptoconsumerapp' || appStoreId === '1575323645') {
+      detectedApp = 'zepto';
+      detectedAppName = 'Zepto';
+    } else if (playStorePackage === 'com.grofers.customerapp' || appStoreId === '960335206') {
+      detectedApp = 'blinkit';
+      detectedAppName = 'Blinkit';
+    } else if (playStorePackage === 'in.swiggy.android' || appStoreId === '989540920') {
+      detectedApp = 'swiggy_instamart';
+      detectedAppName = 'Swiggy Instamart';
+    }
+
+    return {
+      apps: detectedApp !== 'custom' ? [detectedApp] : [],
+      play_store_package: playStorePackage,
+      app_store_id: appStoreId,
+      appName: detectedAppName
+    };
+  };
+
   const handleRunPipeline = async () => {
-    const appsToRun = Object.keys(selectedApps).filter(key => selectedApps[key]);
-    if (appsToRun.length === 0) {
-      alert("Please select at least one app to analyze.");
+    const parsed = getParsedUrlConfig();
+    if (!parsed) {
+      alert("Please enter a valid Google Play Store or Apple App Store URL (e.g. for Blinkit or Zepto).");
       return;
     }
-    const confirm = window.confirm(`This will trigger collection & multi-agent strategy analysis for [${appsToRun.join(', ')}]. Continue?`);
+    const confirm = window.confirm(`This will trigger collection & multi-agent strategy analysis for ${parsed.appName}. Continue?`);
     if (!confirm) return;
     
     try {
@@ -967,7 +1005,9 @@ const Dashboard = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apps: appsToRun,
+          apps: parsed.apps,
+          play_store_package: parsed.play_store_package,
+          app_store_id: parsed.app_store_id,
           from_date: fromDate,
           to_date: toDate,
           include_reddit: true,
@@ -1240,21 +1280,21 @@ const Dashboard = () => {
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
               
-              {/* App Targets */}
-              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>APP SOURCE TARGETS</span>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  {Object.keys(selectedApps).map(appKey => (
-                    <label key={appKey} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedApps[appKey]}
-                        onChange={(e) => setSelectedApps(prev => ({ ...prev, [appKey]: e.target.checked }))}
-                      />
-                      {appKey.replace('_', ' ').toUpperCase()}
-                    </label>
-                  ))}
-                </div>
+              {/* URL Input */}
+              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', fontWeight: 'bold' }}>APP STORE OR PLAY STORE URL</span>
+                <input 
+                  type="text" 
+                  value={appUrl} 
+                  onChange={(e) => setAppUrl(e.target.value)}
+                  placeholder="Enter Play Store / App Store URL (Zepto, Blinkit, etc.)"
+                  style={{ width: '100%', background: 'var(--bg-secondary)', color: '#fff', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.35rem 0.5rem', fontSize: '0.85rem' }}
+                />
+                {appUrl.trim() && (
+                  <div style={{ fontSize: '0.75rem', color: getParsedUrlConfig() ? 'var(--accent-primary)' : 'var(--danger)', marginTop: '0.1rem' }}>
+                    {getParsedUrlConfig() ? `Detected: ${getParsedUrlConfig().appName} (${getParsedUrlConfig().play_store_package || getParsedUrlConfig().app_store_id})` : '⚠️ Invalid App/Play Store URL'}
+                  </div>
+                )}
               </div>
 
               {/* Date Filters */}
