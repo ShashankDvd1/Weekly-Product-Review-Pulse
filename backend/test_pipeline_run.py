@@ -9,18 +9,19 @@ def test_run():
     print("Initializing PipelineOrchestrator...")
     orchestrator = PipelineOrchestrator()
     
-    # Run from 2025 to today to capture the most recent reviews fetched by the scraper
-    yesterday = "2025-01-01"
-    today = "2026-07-15"
+    # Ingest past 30 days of Nykaa Fashion reviews
+    today = datetime.now().strftime("%Y-%m-%d")
+    thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
     
     req = FullPipelineRequest(
-        apps=["blinkit"],
-        from_date=yesterday,
+        apps=[],
+        play_store_package="com.fsn.nds",
+        from_date=thirty_days_ago,
         to_date=today,
         include_reddit=False
     )
     
-    print(f"Running pipeline from {yesterday} to {today}...")
+    print(f"Running pipeline for Nykaa Fashion (com.fsn.nds) from {thirty_days_ago} to {today}...")
     try:
         results = orchestrator.run_full_pipeline(req)
         print("\n=== PIPELINE RUN SUCCESS ===")
