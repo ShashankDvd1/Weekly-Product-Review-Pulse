@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Terminal, Send, Play, CheckCircle2, AlertTriangle, Calendar, Search, Layers, RefreshCw } from 'lucide-react';
+import { Terminal, Send, Play, CheckCircle2, AlertTriangle, Calendar, Search, Layers, RefreshCw, Globe, Link as LinkIcon } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
 const ControlCenter = () => {
+  const [ingestMode, setIngestMode] = useState('prompt'); // 'prompt' | 'url'
   const [prompt, setPrompt] = useState('');
   const [parsing, setParsing] = useState(false);
   const [parsedConfig, setParsedConfig] = useState(null);
+  
+  // URL Mode States
+  const [appUrl, setAppUrl] = useState('');
+  const [daysToFetch, setDaysToFetch] = useState(30);
+  const [includeReddit, setIncludeReddit] = useState(false);
+
   const [running, setRunning] = useState(false);
   const [pipelineStatus, setPipelineStatus] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -61,17 +68,84 @@ const ControlCenter = () => {
     }
   };
 
+  // URL Parsing Logic
+  const getParsedUrlConfig = () => {
+    if (!appUrl.trim()) return null;
+    let playStorePackage = null;
+    let appStoreId = null;
+    let detectedApp = "custom";
+    let detectedAppName = "Custom App";
+
+    // Play Store Package Extraction
+    if (appUrl.includes('play.google.com') || appUrl.includes('details?id=')) {
+      const match = appUrl.match(/(?:id=)([^&?#\s]+)/);
+      if (match) {
+        playStorePackage = match[1];
+      }
+    }
+    // App Store ID Extraction
+    else if (appUrl.includes('apps.apple.com') || appUrl.includes('/id')) {
+      const match = appUrl.match(/\/id(\d+)/) || appUrl.match(/id[=]?(\d+)/);
+      if (match) {
+        appStoreId = match[1];
+      }
+    }
+
+    if (!playStorePackage && !appStoreId) {
+      return null;
+    }
+
+    // Detect App Brand
+    if (playStorePackage === 'com.zeptoconsumerapp' || appStoreId === '1575323645') {
+      detectedApp = 'zepto';
+      detectedAppName = 'Zepto (Quick Commerce)';
+    } else if (playStorePackage === 'com.grofers.customerapp' || appStoreId === '960335206') {
+      detectedApp = 'blinkit';
+      detectedAppName = 'Blinkit (Quick Commerce)';
+    } else if (playStorePackage === 'in.swiggy.android' || appStoreId === '989540920') {
+      detectedApp = 'swiggy_instamart';
+      detectedAppName = 'Swiggy Instamart';
+    }
+
+    const toDate = new Date().toISOString().split('T')[0];
+    const fromDateObj = new Date();
+    fromDateObj.setDate(fromDateObj.getDate() - parseInt(daysToFetch));
+    const fromDate = fromDateObj.toISOString().split('T')[0];
+
+    return {
+      apps: detectedApp !== 'custom' ? [detectedApp] : [],
+      play_store_package: playStorePackage,
+      app_store_id: appStoreId,
+      from_date: fromDate,
+      to_date: toDate,
+      include_reddit: includeReddit,
+      reddit_subreddits: [],
+      reddit_search_terms: includeReddit && detectedApp !== 'custom' ? [detectedApp] : [],
+      appName: detectedAppName
+    };
+  };
+
   const handleLaunchPipeline = async () => {
-    if (!parsedConfig) return;
+    let configToLaunch = parsedConfig;
+    if (ingestMode === 'url') {
+      configToLaunch = getParsedUrlConfig();
+      if (!configToLaunch) {
+        setError("Invalid URL. Please enter a valid App Store or Google Play Store URL.");
+        return;
+      }
+    }
+
+    if (!configToLaunch) return;
 
     setRunning(true);
     setLogs(["[SYSTEM] Initiating custom intelligence run..."]);
+    setError(null);
     
     try {
       const res = await fetch(`${getBackendUrl()}/api/v2/pipeline/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsedConfig)
+        body: JSON.stringify(configToLaunch)
       });
       if (!res.ok) throw new Error("Pipeline run encountered a server error");
       const result = await res.json();
@@ -82,52 +156,143 @@ const ControlCenter = () => {
     }
   };
 
+  const urlConfigPreview = ingestMode === 'url' ? getParsedUrlConfig() : null;
+
   return (
     <div>
       <div className="page-header">
         <h1 className="page-title text-gradient">Pipeline Control Center</h1>
-        <p className="page-subtitle">Configure and run data ingestion using natural language prompts.</p>
+        <p className="page-subtitle">Configure and run data ingestion using natural language or direct app store URLs.</p>
+      </div>
+
+      {/* Mode Selector Tabs */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+        <button 
+          onClick={() => { setIngestMode('prompt'); setError(null); }}
+          className={`btn-secondary ${ingestMode === 'prompt' ? 'btn-active' : ''}`}
+          style={{
+            background: ingestMode === 'prompt' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.05)',
+            border: ingestMode === 'prompt' ? 'none' : '1px solid var(--border-glass)',
+            color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s'
+          }}
+        >
+          ✨ AI Prompt Compiler
+        </button>
+        <button 
+          onClick={() => { setIngestMode('url'); setError(null); }}
+          className={`btn-secondary ${ingestMode === 'url' ? 'btn-active' : ''}`}
+          style={{
+            background: ingestMode === 'url' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.05)',
+            border: ingestMode === 'url' ? 'none' : '1px solid var(--border-glass)',
+            color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s'
+          }}
+        >
+          📱 Direct App URL Scraper
+        </button>
       </div>
 
       <div className="grid-2">
         {/* Input Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="glass-card">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#fff' }}>
-              <Terminal size={20} color="var(--accent-primary)" /> Ingestion Prompt Bar
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Describe what app reviews, Reddit topics, or dates you want the pipeline to ingest. 
-              You can paste full Play Store/App Store URLs directly.
-            </p>
-            
-            <form onSubmit={handleParsePrompt} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <textarea 
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g. 'Fetch Zepto and Blinkit reviews for the last 30 days and search reddit for instant grocery delivery keywords'"
-                disabled={parsing || running}
-                style={{ 
-                  width: '100%', minHeight: '120px', background: 'var(--bg-secondary)', 
-                  border: '1px solid var(--border-glass)', borderRadius: '8px', color: '#fff', 
-                  padding: '1rem', fontFamily: 'inherit', resize: 'vertical'
-                }}
-              />
+          
+          {ingestMode === 'prompt' ? (
+            <div className="glass-card">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#fff' }}>
+                <Terminal size={20} color="var(--accent-primary)" /> Ingestion Prompt Bar
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                Describe what app reviews, Reddit topics, or dates you want the pipeline to ingest. 
+                You can paste full Play Store/App Store URLs directly.
+              </p>
               
-              <button 
-                type="submit" 
-                className="btn-primary" 
-                disabled={parsing || running || !prompt.trim()}
-                style={{ alignSelf: 'flex-end' }}
-              >
-                {parsing ? <RefreshCw className="loader" size={16} /> : <Send size={16} />}
-                {parsing ? 'Compiling Command...' : 'Parse Command'}
-              </button>
-            </form>
-          </div>
+              <form onSubmit={handleParsePrompt} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <textarea 
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="e.g. 'Fetch Zepto and Blinkit reviews for the last 30 days and search reddit for instant grocery delivery keywords'"
+                  disabled={parsing || running}
+                  style={{ 
+                    width: '100%', minHeight: '120px', background: 'var(--bg-secondary)', 
+                    border: '1px solid var(--border-glass)', borderRadius: '8px', color: '#fff', 
+                    padding: '1rem', fontFamily: 'inherit', resize: 'vertical'
+                  }}
+                />
+                
+                <button 
+                  type="submit" 
+                  className="btn-primary" 
+                  disabled={parsing || running || !prompt.trim()}
+                  style={{ alignSelf: 'flex-end' }}
+                >
+                  {parsing ? <RefreshCw className="loader" size={16} /> : <Send size={16} />}
+                  {parsing ? 'Compiling Command...' : 'Parse Command'}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="glass-card">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#fff' }}>
+                <Globe size={20} color="var(--accent-primary)" /> App Store URL Ingestor
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                Enter the Google Play Store or Apple App Store URL for Blinkit, Zepto, or any other application to fetch reviews.
+              </p>
 
-          {/* Configuration Preview Card */}
-          {parsedConfig && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>App Link</label>
+                  <input 
+                    type="text"
+                    value={appUrl}
+                    onChange={(e) => setAppUrl(e.target.value)}
+                    placeholder="e.g. https://play.google.com/store/apps/details?id=com.zeptoconsumerapp"
+                    disabled={running}
+                    style={{
+                      width: '100%', padding: '0.75rem', background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Scrape Window (Days)</label>
+                    <select
+                      value={daysToFetch}
+                      onChange={(e) => setDaysToFetch(parseInt(e.target.value))}
+                      disabled={running}
+                      style={{
+                        width: '100%', padding: '0.6rem', background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff'
+                      }}
+                    >
+                      <option value={7}>Last 7 Days</option>
+                      <option value={15}>Last 15 Days</option>
+                      <option value={30}>Last 30 Days</option>
+                      <option value={90}>Last 90 Days</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
+                    <input 
+                      type="checkbox"
+                      id="include-reddit"
+                      checked={includeReddit}
+                      onChange={(e) => setIncludeReddit(e.target.checked)}
+                      disabled={running}
+                      style={{ transform: 'scale(1.25)', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="include-reddit" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                      Include Competitor Reddit Search
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Configuration Preview Card (Prompt Mode) */}
+          {ingestMode === 'prompt' && parsedConfig && (
             <div className="glass-card" style={{ borderLeft: '4px solid var(--success)', animation: 'fadeIn 0.3s ease-out' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: '#fff' }}>
                 <CheckCircle2 size={20} color="var(--success)" /> Command Compiled Successfully
@@ -179,6 +344,55 @@ const ControlCenter = () => {
 
               <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <button className="btn-primary" onClick={handleLaunchPipeline} disabled={running} style={{ background: 'var(--success)' }}>
+                  <Play size={16} /> Launch Ingestion Pipeline
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Configuration Preview Card (URL Mode) */}
+          {ingestMode === 'url' && urlConfigPreview && (
+            <div className="glass-card" style={{ borderLeft: '4px solid var(--accent-primary)', animation: 'fadeIn 0.3s ease-out' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: '#fff' }}>
+                <CheckCircle2 size={20} color="var(--accent-primary)" /> Target App Detected
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.95rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Layers size={16} color="var(--text-muted)" />
+                  <span style={{ color: 'var(--text-secondary)' }}>App Name:</span>
+                  <strong style={{ color: '#fff' }}>{urlConfigPreview.appName}</strong>
+                </div>
+
+                {urlConfigPreview.play_store_package && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1.5rem' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Play Store Package:</span>
+                    <code style={{ fontSize: '0.85rem', color: 'var(--accent-secondary)' }}>{urlConfigPreview.play_store_package}</code>
+                  </div>
+                )}
+
+                {urlConfigPreview.app_store_id && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1.5rem' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>App Store ID:</span>
+                    <code style={{ fontSize: '0.85rem', color: 'var(--accent-secondary)' }}>{urlConfigPreview.app_store_id}</code>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Calendar size={16} color="var(--text-muted)" />
+                  <span style={{ color: 'var(--text-secondary)' }}>Range:</span>
+                  <strong style={{ color: '#fff' }}>Last {daysToFetch} Days ({urlConfigPreview.from_date} to {urlConfigPreview.to_date})</strong>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Search size={16} color="var(--text-muted)" />
+                  <span style={{ color: 'var(--text-secondary)' }}>Reddit Competitor Analysis:</span>
+                  <strong style={{ color: '#fff' }}>{urlConfigPreview.include_reddit ? 'Enabled' : 'Disabled'}</strong>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="btn-primary" onClick={handleLaunchPipeline} disabled={running} style={{ background: 'var(--accent-primary)' }}>
                   <Play size={16} /> Launch Ingestion Pipeline
                 </button>
               </div>
