@@ -1,6 +1,7 @@
 import json
 import logging
 from core.llm_client import get_llm_client
+from core.config import LLM_MODEL_REASONING
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ STRUCTURE YOUR MARKDOWN AS FOLLOWS:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            model="llama-3.3-70b-versatile",
+            model=LLM_MODEL_REASONING,
             temperature=0.3,
             max_tokens=6000,
             is_json=False

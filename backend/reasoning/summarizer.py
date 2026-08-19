@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from groq import Groq
 import tiktoken
+from core.config import LLM_MODEL_FAST
 
 # Initialize tokenizer (cl100k_base provides a rough but safe upper bound for Llama3)
 encoding = tiktoken.get_encoding("cl100k_base")
@@ -81,7 +82,7 @@ def extract_insights(centroid_reviews: pd.DataFrame):
                     {"role": "system", "content": "You are a helpful assistant that outputs only valid JSON."},
                     {"role": "user", "content": prompt}
                 ],
-                model="llama-3.1-8b-instant",
+                model=LLM_MODEL_FAST,
                 temperature=0.1, 
                 response_format={"type": "json_object"}
             )
