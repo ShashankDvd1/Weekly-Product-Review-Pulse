@@ -7,6 +7,7 @@ Filters out noise and extracts specific human motivations behind behaviors (like
 
 import logging
 import json
+import numpy as np
 from typing import List
 
 from core.llm_client import get_llm_client
@@ -14,6 +15,43 @@ from core.schemas import UnifiedSignal, QualityCategory
 from core.config import LLM_MODEL_FAST
 
 logger = logging.getLogger(__name__)
+
+def semantic_prefilter(signals: List[UnifiedSignal], problem_statement: str, max_results: int = 300) -> List[UnifiedSignal]:
+    """
+    Blazing fast pre-filter using local vector embeddings. 
+    Drops completely irrelevant reviews before they hit the LLM.
+    """
+    if not signals or not problem_statement:
+        return signals
+        
+    logger.info(f"Running Fast Semantic Pre-filter on {len(signals)} raw signals against the Problem Statement...")
+    
+    from core.vector_store import generate_embedding, generate_embeddings
+    
+    try:
+        prob_emb = np.array(generate_embedding(problem_statement))
+    except Exception as e:
+        logger.error(f"Failed to generate embedding for problem statement: {e}")
+        return signals # fallback to all
+        
+    texts = [sig.content for sig in signals]
+    try:
+        sig_embs = np.array(generate_embeddings(texts))
+    except Exception as e:
+        logger.error(f"Failed to generate embeddings for signals: {e}")
+        return signals
+        
+    # Since generate_embeddings uses normalize_embeddings=True, dot product is cosine similarity
+    similarities = np.dot(sig_embs, prob_emb)
+    
+    scored_signals = list(zip(signals, similarities))
+    scored_signals.sort(key=lambda x: x[1], reverse=True)
+    
+    # Keep top results with decent similarity
+    filtered = [s for s, sim in scored_signals if sim > 0.05][:max_results]
+    
+    logger.info(f"Semantic Pre-filter reduced {len(signals)} -> {len(filtered)} signals.")
+    return filtered
 
 def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_prompt: str) -> List[UnifiedSignal]:
     """
