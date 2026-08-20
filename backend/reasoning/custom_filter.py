@@ -90,11 +90,18 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
                 messages=messages,
                 model=LLM_MODEL_FAST,
                 temperature=0.1,
-                is_json=True
+                is_json=False
             )
             
             try:
-                data = json.loads(response)
+                # Clean response (often has ```json or ``` wrappers)
+                clean_resp = response.strip()
+                if "```json" in clean_resp:
+                    clean_resp = clean_resp.split("```json")[1].split("```")[0].strip()
+                elif "```" in clean_resp:
+                    clean_resp = clean_resp.split("```")[1].strip()
+                    
+                data = json.loads(clean_resp)
                 if isinstance(data, dict):
                     key = list(data.keys())[0]
                     results = data[key]
@@ -108,6 +115,9 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
 
             for res in results:
                 try:
+                    if not isinstance(res, dict):
+                        continue
+                    
                     raw_id = str(res.get("review_id", ""))
                     idx_str = ''.join(filter(str.isdigit, raw_id))
                     
