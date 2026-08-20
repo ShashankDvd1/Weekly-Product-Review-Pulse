@@ -63,12 +63,12 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
     logger.info(f"Applying Custom NLP Filter to {len(signals)} signals...")
     llm = get_llm_client()
     
+    from concurrent.futures import ThreadPoolExecutor
+    
     # Process in batches to avoid token limits (e.g. 50 reviews per batch)
     BATCH_SIZE = 30
     
-    for i in range(0, len(signals), BATCH_SIZE):
-        batch = signals[i:i + BATCH_SIZE]
-        
+    def process_batch(batch):
         # Prepare the reviews block
         reviews_block = ""
         for idx, sig in enumerate(batch):
@@ -150,6 +150,13 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
 
         except Exception as e:
             logger.error(f"Error calling LLM for custom filter batch: {e}")
+
+    # Split signals into batches
+    batches = [signals[i:i + BATCH_SIZE] for i in range(0, len(signals), BATCH_SIZE)]
+    
+    # Run batches concurrently (using 8 threads to avoid rate limit spikes on Free Tier)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        executor.map(process_batch, batches)
             
     logger.info(f"Custom NLP Extractor finished processing {len(signals)} signals.")
     return signals
