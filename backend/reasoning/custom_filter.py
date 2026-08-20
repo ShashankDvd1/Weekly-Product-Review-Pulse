@@ -78,7 +78,8 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
         system_prompt = custom_prompt
         
         user_message = f"Here are the reviews to process:\n\n{reviews_block}\n\n"
-        user_message += "Return a valid JSON array of objects following the exact requested output format. For example: [{\"review_id\": \"0\", ...}, {\"review_id\": \"1\", ...}]. The review_id should be the index [X] provided above."
+        user_message += "Return a valid JSON array of objects following the exact requested output format. For example: [{\"review_id\": \"0\", ...}, {\"review_id\": \"1\", ...}]. The review_id should be the index [X] provided above.\n"
+        user_message += "IMPORTANT INSTRUCTION: The user has requested that you be LENIENT. If a review is even somewhat related to the core problem statement or contains any useful insight, DO NOT return [FILTERED_OUT]. Instead, extract a verbatim quote and actionable insight, and assign the closest category (or use 'RELATED_ISSUE' if none fit perfectly)."
 
         messages = [
             {"role": "system", "content": system_prompt},
@@ -122,10 +123,10 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
                         intent = res.get("wishlist_intent", "")
                         drop_off = res.get("drop_off_reason", "")
                         
+                        # We are less harsh here: only discard if explicitly marked as [FILTERED_OUT]
                         is_filtered = (
                             intent == "[FILTERED_OUT]" or 
-                            drop_off == "[FILTERED_OUT]" or
-                            (intent in ["NONE", ""] and drop_off in ["NONE", ""])
+                            drop_off == "[FILTERED_OUT]"
                         )
                         
                         if is_filtered:
