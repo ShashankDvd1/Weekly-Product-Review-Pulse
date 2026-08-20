@@ -1,0 +1,61 @@
+{
+  "strategy_deep_dive": {
+    "planning": {
+      "dataset_types": [
+        "App Store Reviews"
+      ],
+      "quality_assessment": "The dataset contains 214 Play Store reviews, but the sample reveals a severe misalignment with the target problem. Signals are dominated by generic app praise, post-purchase logistics (returns, delivery), and customer support feedback. There is a critical absence of mentions regarding wishlist behavior, pre-purchase hesitation, or saving psychology. Applying the provided noise filtering rules would likely classify >90% of the dataset as [FILTERED_OUT], leaving insufficient evidence to model wishlist intent or non-monetary drop-off friction. The data suffers from high noise-to-signal ratio and lacks the behavioral depth required for consumer psychology analysis.",
+      "selected_frameworks": [],
+      "confidence_assessment": "Low"
+    },
+    "processing": {
+      "error": "Error code: 400 - {'error': {'message': \"Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details.\", 'type': 'invalid_request_error', 'code': 'json_validate_failed', 'failed_generation': ''}}"
+    },
+    "discovery": {
+      "error": "Error code: 400 - {'error': {'message': \"Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details.\", 'type': 'invalid_request_error', 'code': 'json_validate_failed', 'failed_generation': ''}}"
+    },
+    "segmentation": {
+      "error": "Error code: 400 - {'error': {'message': \"Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details.\", 'type': 'invalid_request_error', 'code': 'json_validate_failed', 'failed_generation': ''}}"
+    },
+    "root_cause": {
+      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199987, Requested 1268. Please try again in 9m2.159999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+    },
+    "steps": {
+      "step_1": {
+        "title": "Problem Discovery Plan",
+        "status": "complete",
+        "data": {
+          "dataset_types": [
+            "App Store Reviews"
+          ],
+          "quality_assessment": "The dataset contains 214 Play Store reviews, but the sample reveals a severe misalignment with the target problem. Signals are dominated by generic app praise, post-purchase logistics (returns, delivery), and customer support feedback. There is a critical absence of mentions regarding wishlist behavior, pre-purchase hesitation, or saving psychology. Applying the provided noise filtering rules would likely classify >90% of the dataset as [FILTERED_OUT], leaving insufficient evidence to model wishlist intent or non-monetary drop-off friction. The data suffers from high noise-to-signal ratio and lacks the behavioral depth required for consumer psychology analysis.",
+          "selected_frameworks": [],
+          "confidence_assessment": "Low"
+        }
+      },
+      "step_2": {
+        "title": "Data Processing & Stats",
+        "status": "complete",
+        "data": {
+          "error": "Error code: 400 - {'error': {'message': \"Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details.\", 'type': 'invalid_request_error', 'code': 'json_validate_failed', 'failed_generation': ''}}"
+        }
+      },
+      "step_4": {
+        "title": "Research Discoveries",
+        "status": "complete",
+        "data": {
+          "error": "Error code: 400 - {'error': {'message': \"Failed to validate JSON. Please adjust your prompt. See 'failed_generation' for more details.\", 'type': 'invalid_request_error', 'code': 'json_validate_failed', 'failed_generation': ''}}"
+        }
+      },
+      "step_8": {
+        "title": "Root Causes",
+        "status": "complete",
+        "data": {
+          "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199987, Requested 1268. Please try again in 9m2.159999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+        }
+      }
+    }
+  },
+  "board_presentation": null,
+  "active_problem_statement": "You are an expert NLP Data Analyst specializing in E-commerce Growth and Consumer Psychology. Your sole mission is to process raw scraped reviews and extract precise human motivations behind two behaviors:\n1. WISHLIST INTENT (Why users add items to a wishlist instead of buying)\n2. NON-MONETARY DROP-OFF (Why users leave items in a wishlist without purchasing, excluding discounts/price issues)\n\n---\n### INSTRUCTIONS:\nProcess each review strictly through the following classification framework. Ignore all generic feedback, post-purchase shipping complaints, app crashes, or payment failure bugs. Focus ONLY on pre-purchase hesitation and saving psychology.\n\n1. CLASSIFY INTENT (Select one if present):\n   - [MOODBOARD]: Saving for style inspiration, aesthetic matching, or social media outfit ideas (Reels/TikTok/Instagram).\n   - [DEFERRED_PURCHASE]: Intending to buy later (salary delay, occasion planning, waiting to buy multiple items together).\n   - [COMPARISON]: Saving to compare against alternative fits, brands, or platforms later.\n\n2. CLASSIFY DROP-OFF FRICTION (Select one if present - NON-MONETARY ONLY):\n   - [FIT_UNCERTAINTY]: Lack of confidence in sizing, real-life fabric quality, or how it looks on real body types.\n   - [TREND_DECAY]: Loss of interest over time, trend expired, or realization that it was an impulse save.\n   - [WISHLIST_CLUTTER]: The saved list became too large, disorganized, or overwhelming to review.\n   - [STOCK_SENSITIVITY]: Size went out of stock before decision was made, leading to abandonment.\n\n3. NOISE FILTERING RULE:\n   - If a review mentions \"refund\", \"delivery boy\", \"damaged package\", \"app crash\", \"OTP\", or contains fewer than 4 meaningful words, MARK AS: [FILTERED_OUT]."
+}

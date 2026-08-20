@@ -42,24 +42,19 @@ def main():
         problem_statement=prompt
     )
     
-    print("Running collect_all directly to verify ingestion and filtering...")
-    # Just run the collection portion to verify filtering
-    signals = orchestrator.collect_all(
-        apps=req.apps,
-        from_date=req.from_date,
-        to_date=req.to_date,
-        include_reddit=req.include_reddit,
-        play_store_package=req.play_store_package,
-        app_store_id=req.app_store_id,
-        reddit_subreddits=req.reddit_subreddits,
-        reddit_search_terms=req.reddit_search_terms,
-        problem_statement=req.problem_statement,
-    )
+    print("Running run_full_pipeline to verify full cycle...")
+    results = orchestrator.run_full_pipeline(req)
     
-    print(f"\nSUCCESS! Pipeline completed collection.")
-    print(f"Total accepted signals: {len(signals)}")
-    if signals:
-        print(f"Sample review insight: {signals[0].extracted_insights}")
+    print(f"\nSUCCESS! Pipeline completed.")
+    print(f"Total accepted signals: {len(orchestrator.signals)}")
+    print(f"Total themes generated: {len(orchestrator.themes)}")
+    print(f"Total personas generated: {len(orchestrator.personas)}")
+    print(f"Total hypotheses generated: {len(orchestrator.hypotheses)}")
+    
+    if orchestrator.themes:
+        print(f"Sample theme: {orchestrator.themes[0].name}")
+    if orchestrator.personas:
+        print(f"Sample persona: {orchestrator.personas[0].name}")
         
 if __name__ == "__main__":
     main()

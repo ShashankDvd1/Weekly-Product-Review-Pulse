@@ -17,7 +17,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # ─────────────────────────────────────────────
 # LLM Configuration
 # ─────────────────────────────────────────────
-LLM_MODEL_FAST = "openai/gpt-oss-20b"                 # Fast, cheap: sentiment, classification
+LLM_MODEL_FAST = "qwen/qwen3.6-27b"                 # Fast, cheap: sentiment, classification
 LLM_MODEL_REASONING = "openai/gpt-oss-120b"     # Deep reasoning: behavior, personas, JTBD
 LLM_TEMPERATURE_ANALYTICAL = 0.2                # Low creativity for analysis
 LLM_TEMPERATURE_CREATIVE = 0.4                  # Moderate creativity for personas/JTBD

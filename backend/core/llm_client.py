@@ -81,7 +81,7 @@ class LLMClient:
             time.sleep(sleep_time)
         self._last_call_time = time.time()
 
-    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5, max_tokens: int = None, is_json: bool = True) -> str:
+    def _call(self, messages: list[dict], model: str, temperature: float, retries: int = 5, max_tokens: int = None, is_json: bool = False) -> str:
         """Make a single LLM call with retries."""
         # Estimate input tokens + expected output
         estimated_input = sum(count_tokens(m.get("content", "")) for m in messages)
@@ -209,6 +209,7 @@ class LLMClient:
             raw = self._call(messages, model, temperature, max_tokens=max_tokens)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
+                print(f"REASONING MODEL FAILURE DETECTED: {e}")
                 logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
                 raw = self._call(messages, model, temperature, max_tokens=max_tokens)
@@ -245,6 +246,7 @@ class LLMClient:
             raw = self._call(messages, model, temperature, max_tokens=max_tokens)
         except Exception as e:
             if model == LLM_MODEL_REASONING:
+                print(f"REASONING MODEL FAILURE DETECTED IN GENERATE: {e}")
                 logger.warning(f"Reasoning model {LLM_MODEL_REASONING} failed: {e}. Falling back to fast model {LLM_MODEL_FAST}...")
                 model = LLM_MODEL_FAST
                 raw = self._call(messages, model, temperature, max_tokens=max_tokens)
