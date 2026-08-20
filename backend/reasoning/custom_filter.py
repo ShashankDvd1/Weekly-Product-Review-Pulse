@@ -47,10 +47,10 @@ def semantic_prefilter(signals: List[UnifiedSignal], problem_statement: str, max
     scored_signals = list(zip(signals, similarities))
     scored_signals.sort(key=lambda x: x[1], reverse=True)
     
-    # Keep top results with decent similarity
-    filtered = [s for s, sim in scored_signals if sim > 0.05][:max_results]
+    # Keep top results sorted by similarity to ensure we don't drop everything
+    filtered = [s for s, sim in scored_signals][:max_results]
     
-    logger.info(f"Semantic Pre-filter reduced {len(signals)} -> {len(filtered)} signals.")
+    logger.info(f"Semantic Pre-filter reduced {len(signals)} -> {len(filtered)} signals (kept top closest matches).")
     return filtered
 
 def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_prompt: str) -> List[UnifiedSignal]:
