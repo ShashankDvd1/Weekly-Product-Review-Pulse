@@ -12,6 +12,7 @@ const ControlCenter = () => {
   const [appUrl, setAppUrl] = useState('');
   const [daysToFetch, setDaysToFetch] = useState(30);
   const [includeReddit, setIncludeReddit] = useState(false);
+  const [problemStatement, setProblemStatement] = useState('');
 
   const [running, setRunning] = useState(false);
   const [pipelineStatus, setPipelineStatus] = useState(null);
@@ -121,6 +122,7 @@ const ControlCenter = () => {
       include_reddit: includeReddit,
       reddit_subreddits: [],
       reddit_search_terms: includeReddit && detectedApp !== 'custom' ? [detectedApp] : [],
+      problem_statement: problemStatement || undefined,
       appName: detectedAppName
     };
   };
@@ -250,6 +252,21 @@ const ControlCenter = () => {
                     style={{
                       width: '100%', padding: '0.75rem', background: 'var(--bg-secondary)',
                       border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Custom NLP Prompt (Optional)</label>
+                  <textarea 
+                    value={problemStatement}
+                    onChange={(e) => setProblemStatement(e.target.value)}
+                    placeholder="Paste your specific NLP extraction prompt or problem statement here to rigorously filter the reviews before ingestion."
+                    disabled={running}
+                    style={{
+                      width: '100%', minHeight: '120px', padding: '0.75rem', background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-glass)', borderRadius: '6px', color: '#fff',
+                      fontFamily: 'inherit', resize: 'vertical'
                     }}
                   />
                 </div>

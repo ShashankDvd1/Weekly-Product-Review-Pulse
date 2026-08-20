@@ -577,6 +577,7 @@ class PipelineOrchestrator:
         include_reddit: bool = True,
         reddit_subreddits: list[str] = None,
         reddit_search_terms: list[str] = None,
+        problem_statement: str = None,
     ) -> list[UnifiedSignal]:
         """
         Collect data, deduplicate, and run the Intelligent Review Quality Filter.
@@ -703,6 +704,11 @@ class PipelineOrchestrator:
             from reasoning.quality_filter import assess_review_quality_batch
             assessed_signals = assess_review_quality_batch(unique_signals)
             
+            if problem_statement:
+                self._log_progress(f"🧠 Running Custom NLP Filter on {len(assessed_signals)} reviews using provided Problem Statement...")
+                from reasoning.custom_filter import assess_reviews_with_custom_prompt
+                assessed_signals = assess_reviews_with_custom_prompt(assessed_signals, problem_statement)
+            
             accepted_signals = [
                 s for s in assessed_signals 
                 if getattr(s, 'quality_category', QualityCategory.DISCARD) in [
@@ -824,6 +830,7 @@ class PipelineOrchestrator:
                 app_store_id=request.app_store_id,
                 reddit_subreddits=request.reddit_subreddits,
                 reddit_search_terms=request.reddit_search_terms,
+                problem_statement=request.problem_statement,
             )
 
             if not self.signals:
