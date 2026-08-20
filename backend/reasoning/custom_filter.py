@@ -77,7 +77,7 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
         system_prompt = custom_prompt
         
         user_message = f"Here are the reviews to process:\n\n{reviews_block}\n\n"
-        user_message += "Return a valid JSON array of objects following the exact requested output format. For example: [{\"review_id\": \"0\", ...}, {\"review_id\": \"1\", ...}]. The review_id should be the index [X] provided above.\n"
+        user_message += "Return a valid JSON object with a single key 'results' containing an array of objects following the exact requested output format. For example: {\"results\": [{\"review_id\": \"0\", ...}, {\"review_id\": \"1\", ...}]}. The review_id should be the index [X] provided above.\n"
         user_message += "IMPORTANT INSTRUCTION: The user has requested that you be LENIENT. If a review is even somewhat related to the core problem statement or contains any useful insight, DO NOT return [FILTERED_OUT]. Instead, extract a verbatim quote and actionable insight, and assign the closest category (or use 'RELATED_ISSUE' if none fit perfectly)."
 
         messages = [
