@@ -56,7 +56,7 @@ def main():
         problem_statement=req.problem_statement,
     )
     
-    print(f"\n✅ SUCCESS! Pipeline completed collection.")
+    print(f"\nSUCCESS! Pipeline completed collection.")
     print(f"Total accepted signals: {len(signals)}")
     if signals:
         print(f"Sample review insight: {signals[0].extracted_insights}")
