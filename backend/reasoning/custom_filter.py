@@ -65,7 +65,6 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
     
     # Process in batches to avoid token limits (e.g. 50 reviews per batch)
     BATCH_SIZE = 30
-    accepted_signals = []
     
     for i in range(0, len(signals), BATCH_SIZE):
         batch = signals[i:i + BATCH_SIZE]
@@ -123,15 +122,12 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
                         intent = res.get("wishlist_intent", "")
                         drop_off = res.get("drop_off_reason", "")
                         
-                        # We are less harsh here: only discard if explicitly marked as [FILTERED_OUT]
                         is_filtered = (
                             intent == "[FILTERED_OUT]" or 
                             drop_off == "[FILTERED_OUT]"
                         )
                         
-                        if is_filtered:
-                            sig.quality_category = QualityCategory.DISCARD
-                        else:
+                        if not is_filtered:
                             sig.quality_category = QualityCategory.GOLD_INSIGHT
                             sig.extracted_insights = {
                                 "wishlist_intent": intent,
@@ -139,12 +135,11 @@ def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_promp
                                 "verbatim_quote": res.get("verbatim_quote", ""),
                                 "actionable_insight": res.get("actionable_insight", "")
                             }
-                            accepted_signals.append(sig)
                 except Exception as map_err:
                     logger.warning(f"Error mapping custom filter result: {map_err}")
 
         except Exception as e:
             logger.error(f"Error calling LLM for custom filter batch: {e}")
             
-    logger.info(f"Custom filter accepted {len(accepted_signals)} out of {len(signals)} signals.")
-    return accepted_signals
+    logger.info(f"Custom NLP Extractor finished processing {len(signals)} signals.")
+    return signals
