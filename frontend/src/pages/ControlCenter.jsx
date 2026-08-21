@@ -93,7 +93,8 @@ const ControlCenter = () => {
     }
 
     if (!playStorePackage && !appStoreId) {
-      return null;
+      playStorePackage = appUrl.trim();
+      detectedAppName = appUrl.trim();
     }
 
     // Detect App Brand

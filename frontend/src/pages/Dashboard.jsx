@@ -968,7 +968,10 @@ const Dashboard = () => {
       if (match) appStoreId = match[1];
     }
 
-    if (!playStorePackage && !appStoreId) return null;
+    if (!playStorePackage && !appStoreId) {
+      playStorePackage = appUrl.trim();
+      detectedAppName = appUrl.trim();
+    }
 
     if (playStorePackage === 'com.zeptoconsumerapp' || appStoreId === '1575323645') {
       detectedApp = 'zepto';

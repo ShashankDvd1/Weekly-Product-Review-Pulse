@@ -619,6 +619,37 @@ class PipelineOrchestrator:
             self._log_progress(f"\n🚀 Collection Attempt {attempt + 1}/{MAX_RETRIES + 1} (From: {current_from_date} To: {current_to_date})")
             batch_signals = []
             
+            # Resolve custom app name if it's not a package ID
+            if play_store_package and "." not in play_store_package and not app_store_id:
+                search_query = play_store_package
+                self._log_progress(f"🔍 Searching App Store and Play Store for custom app name: '{search_query}'...")
+                
+                resolved_package = None
+                try:
+                    import requests, re
+                    url = f"https://play.google.com/store/search?q={search_query}&c=apps"
+                    html = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}).text
+                    results = re.findall(r'details\?id=([a-zA-Z0-9\._]+)', html)
+                    if results:
+                        resolved_package = results[0]
+                        self._log_progress(f"  📱 Resolved Play Store package: {resolved_package}")
+                except Exception as e:
+                    self._log_progress(f"  ⚠️ Play Store resolution failed: {e}")
+                    
+                resolved_app_store_id = None
+                try:
+                    import requests
+                    url = f"https://itunes.apple.com/search?term={search_query}&entity=software&limit=1"
+                    res = requests.get(url).json()
+                    if res.get("results"):
+                        resolved_app_store_id = str(res["results"][0].get("trackId"))
+                        self._log_progress(f"  🍎 Resolved App Store ID: {resolved_app_store_id}")
+                except Exception as e:
+                    self._log_progress(f"  ⚠️ App Store resolution failed: {e}")
+                
+                play_store_package = resolved_package
+                app_store_id = resolved_app_store_id
+            
             # 1. Custom app targets
             if play_store_package or app_store_id:
                 app_name = "Custom Target"
