@@ -159,6 +159,8 @@ class LLMClient:
         # Strip thinking blocks from reasoning models (e.g. <think>...</think>)
         import re
         cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
+        if "<think>" in cleaned:
+            cleaned = cleaned.split("<think>")[0].strip()
         
         if cleaned.startswith("```"):
             lines = cleaned.splitlines()

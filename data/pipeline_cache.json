@@ -1,33 +1,33 @@
 {
   "status": "complete",
   "progress": [
-    "[11:53:37] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
-    "[11:55:55] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-21 To: 2026-08-20)",
-    "[11:55:55] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
-    "[11:56:06]   \u2705 2615 custom Play Store reviews",
-    "[11:56:06] \u26a1 Fast Semantic Pre-filtering 2615 raw signals against Problem Statement...",
-    "[11:57:14] \u2705 Kept 450 semantically relevant signals.",
-    "[11:57:14] \ud83d\udd04 Deduplicating 450 cumulative signals...",
-    "[11:57:51] \u2705 Current unique dataset: 320 signals",
-    "[11:57:51] \ud83e\udde0 Running Intelligent Quality Filter on 320 reviews...",
-    "[11:57:51] \ud83e\udde0 Running Custom NLP Filter on 320 reviews using provided Problem Statement...",
-    "[12:00:40] \ud83c\udfc6 Accepted high-signal genuine reviews: 222",
-    "[12:00:40] \u2705 Reached target of 150 genuine reviews. Proceeding to analysis.",
-    "[12:00:40] \ud83d\udd12 Scrubbing PII from final 222 accepted signals...",
-    "[12:00:48] \ud83c\udfad Running sentiment analysis...",
-    "[12:00:48]   \u2705 Sentiment analysis complete",
-    "[12:00:48] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
-    "[12:00:48] Running Stage 1/9: Research Planning Agent...",
-    "[12:01:05] Stage 1/9: Research Planning Agent completed successfully.",
-    "[12:01:05] Running Stage 2/9: Data Processing Agent...",
-    "[12:01:27] Stage 2/9: Data Processing Agent completed successfully.",
-    "[12:01:27] Running Stage 3/9: Research Discovery Agent...",
-    "[12:02:24] Stage 3/9: Research Discovery Agent completed successfully.",
-    "[12:02:24] Running Stage 4/9: Pattern & Segmentation Agent...",
-    "[12:03:03] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
-    "[12:03:03] Running Stage 5/9: Root Cause & Strategy Agent...",
-    "[12:03:59] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
-    "[12:03:59] \ud83c\udf89 Analysis pipeline complete!"
+    "[12:04:43] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
+    "[12:05:31] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-21 To: 2026-08-20)",
+    "[12:05:31] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
+    "[12:05:43]   \u2705 2611 custom Play Store reviews",
+    "[12:05:43] \u26a1 Fast Semantic Pre-filtering 2611 raw signals against Problem Statement...",
+    "[12:06:14] \u2705 Kept 450 semantically relevant signals.",
+    "[12:06:14] \ud83d\udd04 Deduplicating 450 cumulative signals...",
+    "[12:06:36] \u2705 Current unique dataset: 320 signals",
+    "[12:06:36] \ud83e\udde0 Running Intelligent Quality Filter on 320 reviews...",
+    "[12:06:36] \ud83e\udde0 Running Custom NLP Filter on 320 reviews using provided Problem Statement...",
+    "[12:10:12] \ud83c\udfc6 Accepted high-signal genuine reviews: 222",
+    "[12:10:12] \u2705 Reached target of 150 genuine reviews. Proceeding to analysis.",
+    "[12:10:12] \ud83d\udd12 Scrubbing PII from final 222 accepted signals...",
+    "[12:10:17] \ud83c\udfad Running sentiment analysis...",
+    "[12:10:17]   \u2705 Sentiment analysis complete",
+    "[12:10:17] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
+    "[12:10:17] Running Stage 1/9: Research Planning Agent...",
+    "[12:10:17] Stage 1/9: Research Planning Agent completed successfully.",
+    "[12:10:17] Running Stage 2/9: Data Processing Agent...",
+    "[12:10:19] Stage 2/9: Data Processing Agent completed successfully.",
+    "[12:10:19] Running Stage 3/9: Research Discovery Agent...",
+    "[12:10:21] Stage 3/9: Research Discovery Agent completed successfully.",
+    "[12:10:21] Running Stage 4/9: Pattern & Segmentation Agent...",
+    "[12:10:27] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
+    "[12:10:27] Running Stage 5/9: Root Cause & Strategy Agent...",
+    "[12:10:27] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
+    "[12:10:27] \ud83c\udf89 Analysis pipeline complete!"
   ],
   "signals": [
     {
@@ -699,11 +699,12 @@
         "package_name": "com.myntra.android"
       },
       "quality_score": 50,
-      "quality_category": "Medium Signal",
+      "quality_category": "Gold Insight",
       "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it is very good app for shopping clothes and beaut...",
-        "context": "Rule-based fast extraction"
+        "wishlist_intent": "",
+        "drop_off_reason": "",
+        "verbatim_quote": "...",
+        "actionable_insight": "..."
       }
     },
     {
@@ -2808,9 +2809,10 @@
       "quality_score": 100,
       "quality_category": "Gold Insight",
       "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "myntra is my Go-to app for almost everything since...",
-        "context": "Rule-based fast extraction"
+        "wishlist_intent": null,
+        "drop_off_reason": "",
+        "verbatim_quote": "",
+        "actionable_insight": ""
       }
     },
     {
