@@ -1,35 +1,85 @@
 {
   "status": "complete",
   "progress": [
-    "[12:11:05] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
-    "[12:11:21] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-21 To: 2026-08-20)",
-    "[12:11:21] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
-    "[12:11:28]   \u2705 2607 custom Play Store reviews",
-    "[12:11:28] \u26a1 Fast Semantic Pre-filtering 2607 raw signals against Problem Statement...",
-    "[12:12:00] \u2705 Kept 350 semantically relevant signals.",
-    "[12:12:00] \ud83d\udd04 Deduplicating 350 cumulative signals...",
-    "[12:12:17] \u2705 Current unique dataset: 233 signals",
-    "[12:12:17] \ud83e\udde0 Running Intelligent Quality Filter on 233 reviews...",
-    "[12:12:17] \ud83e\udde0 Running Custom NLP Filter on 233 reviews using provided Problem Statement...",
-    "[12:12:21] \ud83c\udfc6 Accepted high-signal genuine reviews: 156",
-    "[12:12:21] \u2705 Reached target of 150 genuine reviews. Proceeding to analysis.",
-    "[12:12:21] \ud83d\udd12 Scrubbing PII from final 156 accepted signals...",
-    "[12:12:24] \ud83c\udfad Running sentiment analysis...",
-    "[12:12:24]   \u2705 Sentiment analysis complete",
-    "[12:12:24] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
-    "[12:12:24] Running Stage 1/9: Research Planning Agent...",
-    "[12:12:24] Stage 1/9: Research Planning Agent completed successfully.",
-    "[12:12:24] Running Stage 2/9: Data Processing Agent...",
-    "[12:12:26] Stage 2/9: Data Processing Agent completed successfully.",
-    "[12:12:26] Running Stage 3/9: Research Discovery Agent...",
-    "[12:12:28] Stage 3/9: Research Discovery Agent completed successfully.",
-    "[12:12:28] Running Stage 4/9: Pattern & Segmentation Agent...",
-    "[12:12:30] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
-    "[12:12:30] Running Stage 5/9: Root Cause & Strategy Agent...",
-    "[12:12:32] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
-    "[12:12:32] \ud83c\udf89 Analysis pipeline complete!"
+    "[12:13:07] \ud83d\ude80 Ingestion pipeline initialized. Booting NLP engines...",
+    "[12:13:23] \n\ud83d\ude80 Collection Attempt 1/3 (From: 2026-07-21 To: 2026-08-20)",
+    "[12:13:23] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
+    "[12:13:30]   \u2705 2606 custom Play Store reviews",
+    "[12:13:30] \u26a1 Fast Semantic Pre-filtering 2606 raw signals against Problem Statement...",
+    "[12:13:58] \u2705 Kept 180 semantically relevant signals.",
+    "[12:13:58] \ud83d\udd04 Deduplicating 180 cumulative signals...",
+    "[12:14:05] \u2705 Current unique dataset: 103 signals",
+    "[12:14:05] \ud83e\udde0 Running Intelligent Quality Filter on 103 reviews...",
+    "[12:14:05] \ud83e\udde0 Running Custom NLP Filter on 103 reviews using provided Problem Statement...",
+    "[12:14:08] \ud83c\udfc6 Accepted high-signal genuine reviews: 72",
+    "[12:14:08] \u26a0\ufe0f Only 72 valid reviews found (Target: 150). Expanding date range backward...",
+    "[12:14:08] \n\ud83d\ude80 Collection Attempt 2/3 (From: 2026-04-22 To: 2026-07-21)",
+    "[12:14:08] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
+    "[12:14:21]   \u2705 2800 custom Play Store reviews",
+    "[12:14:21] \u26a1 Fast Semantic Pre-filtering 2980 raw signals against Problem Statement...",
+    "[12:14:50] \u2705 Kept 180 semantically relevant signals.",
+    "[12:14:50] \ud83d\udd04 Deduplicating 180 cumulative signals...",
+    "[12:14:54] \u2705 Current unique dataset: 45 signals",
+    "[12:14:54] \ud83e\udde0 Running Intelligent Quality Filter on 45 reviews...",
+    "[12:14:54] \ud83e\udde0 Running Custom NLP Filter on 45 reviews using provided Problem Statement...",
+    "[12:14:57] \ud83c\udfc6 Accepted high-signal genuine reviews: 36",
+    "[12:14:57] \u26a0\ufe0f Only 36 valid reviews found (Target: 150). Expanding date range backward...",
+    "[12:14:57] \n\ud83d\ude80 Collection Attempt 3/3 (From: 2026-01-22 To: 2026-04-22)",
+    "[12:14:57] \ud83d\udcf1 Collecting Play Store reviews for custom package: com.myntra.android...",
+    "[12:15:04]   \u2705 2800 custom Play Store reviews",
+    "[12:15:04] \u26a1 Fast Semantic Pre-filtering 2980 raw signals against Problem Statement...",
+    "[12:15:35] \u2705 Kept 180 semantically relevant signals.",
+    "[12:15:35] \ud83d\udd04 Deduplicating 180 cumulative signals...",
+    "[12:15:39] \u2705 Current unique dataset: 26 signals",
+    "[12:15:39] \ud83e\udde0 Running Intelligent Quality Filter on 26 reviews...",
+    "[12:15:39] \ud83e\udde0 Running Custom NLP Filter on 26 reviews using provided Problem Statement...",
+    "[12:15:39] \ud83c\udfc6 Accepted high-signal genuine reviews: 21",
+    "[12:15:39] \u26a0\ufe0f Reached max retries. Proceeding with 21 valid reviews.",
+    "[12:15:39] \ud83d\udd12 Scrubbing PII from final 21 accepted signals...",
+    "[12:15:40] \ud83c\udfad Running sentiment analysis...",
+    "[12:15:40]   \u2705 Sentiment analysis complete",
+    "[12:15:40] \ud83e\udde0 Running Phase 1 of Multi-Agent Strategy Deep Dive (Planning, Processing, Discovery, Segmentation, Root Cause)...",
+    "[12:15:40] Running Stage 1/9: Research Planning Agent...",
+    "[12:15:43] Stage 1/9: Research Planning Agent completed successfully.",
+    "[12:15:43] Running Stage 2/9: Data Processing Agent...",
+    "[12:15:45] Stage 2/9: Data Processing Agent completed successfully.",
+    "[12:15:45] Running Stage 3/9: Research Discovery Agent...",
+    "[12:15:49] Stage 3/9: Research Discovery Agent completed successfully.",
+    "[12:15:49] Running Stage 4/9: Pattern & Segmentation Agent...",
+    "[12:15:57] Stage 4/9: Pattern & Segmentation Agent completed successfully.",
+    "[12:15:57] Running Stage 5/9: Root Cause & Strategy Agent...",
+    "[12:16:41] Stage 5/9: Root Cause & Strategy Agent completed successfully.",
+    "[12:16:41] \ud83c\udf89 Analysis pipeline complete!"
   ],
   "signals": [
+    {
+      "unified_id": "0ea88af1fea4c45fe5a925b213afe3d3",
+      "source": "play_store",
+      "source_id": "4890ec5d3060",
+      "app_name": "Custom Target",
+      "content": "this app is best for online shopping because this app gives you reward in form of cash and many biggest offer",
+      "title": null,
+      "rating": 5,
+      "sentiment_score": 0.8,
+      "date": "2026-08-20T08:50:40",
+      "author_anon": "A G***",
+      "categories_mentioned": [],
+      "behavioral_signals": [
+        "price_sensitivity"
+      ],
+      "word_count": 21,
+      "url": null,
+      "metadata": {
+        "package_name": "com.myntra.android"
+      },
+      "quality_score": 70,
+      "quality_category": "Gold Insight",
+      "extracted_insights": {
+        "user_goal": "Derived from context",
+        "pain_point": "this app is best for online shopping because this ...",
+        "context": "Rule-based fast extraction"
+      }
+    },
     {
       "unified_id": "fb46fd478cd937d03502e6299a47677b",
       "source": "play_store",
@@ -568,3713 +618,333 @@
         "pain_point": "Crazy good app for quality shopping.. Love their c...",
         "context": "Rule-based fast extraction"
       }
-    },
-    {
-      "unified_id": "124e439c77c496901ee47b8c2a7ec955",
-      "source": "play_store",
-      "source_id": "8fb79fbecb35",
-      "app_name": "Custom Target",
-      "content": "My go-to online shopping platform. The quality of the products is too good. I would recommend everyone to try at least once.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T11:12:07",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "habit_loop"
-      ],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "My go-to online shopping platform. The quality of ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "3bdfe959cdd71b215c3a4963b2ec2fa1",
-      "source": "play_store",
-      "source_id": "920d796bb8f6",
-      "app_name": "Custom Target",
-      "content": "loved the app Myntra rewards cashback on every purchase...there products are also good \ud83d\udc4d",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T11:08:27",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "loved the app Myntra rewards cashback on every pur...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "dfa29b132f3343c479d63c77e3834f17",
-      "source": "play_store",
-      "source_id": "0ba11cada1c6",
-      "app_name": "Custom Target",
-      "content": "Myntra app use karna bahut easy hai. Collection bahut achha hai, delivery time par milti hai aur return/exchange process bhi smooth hai. Offers aur discounts bhi kaafi achhe mil jate hain. Overall shopping experience bahut accha raha. \u2764\ufe0f",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T22:21:09",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 38,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Myntra app use karna bahut easy hai. Collection ba...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "1f6f1473cae247c64a2130d7988e206e",
-      "source": "play_store",
-      "source_id": "eb7d260467a0",
-      "app_name": "Custom Target",
-      "content": "myntra shoping app products are very wonderful and satisfying items. my four years experience and uses experience .",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T16:19:31",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 18,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "myntra shoping app products are very wonderful and...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "88e6d448aaef1b20ca3d431894a68591",
-      "source": "play_store",
-      "source_id": "93b5bf569e02",
-      "app_name": "Custom Target",
-      "content": "it is very good app for shopping clothes and beauty products. I like this app very much",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T17:54:27",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "beauty"
-      ],
-      "behavioral_signals": [],
-      "word_count": 17,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it is very good app for shopping clothes and beaut...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "40a29bc4b24376fa239e3190092311d3",
-      "source": "play_store",
-      "source_id": "d1d27bf3a745",
-      "app_name": "Custom Target",
-      "content": "Excellent service and product quality. One of the best shopping app , You needn't think twice before purchasing any product from this app",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T20:33:00",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Excellent service and product quality. One of the ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "9965f32efe1f30ea0993831493f42975",
-      "source": "play_store",
-      "source_id": "4458747fe77b",
-      "app_name": "Custom Target",
-      "content": "Fantastic experience in ordering, payment and product detailing",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T14:22:26",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Fantastic experience in ordering, payment and prod...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "19d37fe077fdb52d73050de409d178fe",
-      "source": "play_store",
-      "source_id": "73974dfd4012",
-      "app_name": "Custom Target",
-      "content": "A reliable and trustworthy ecommerce brand with great experiences and value for money conveniences.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T00:23:42",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "A reliable and trustworthy ecommerce brand with gr...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c21a780a9c9ddeadf42dba3ac4c8457b",
-      "source": "play_store",
-      "source_id": "6309d1008156",
-      "app_name": "Custom Target",
-      "content": "This app is very helpful for shopping \ud83d\uded2 and I am very happy to use .it gives original products. thank you mantra.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T11:09:29",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "This app is very helpful for shopping \ud83d\uded2 and I am v...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e46dfdbc7459a863d26365d44017c435",
-      "source": "play_store",
-      "source_id": "646c06a43b18",
-      "app_name": "Custom Target",
-      "content": "Easy to use and has a great variety of products. The search, filters, reviews, and delivery tracking are really helpful. Overall, a convenient and reliable shopping app.\ud83d\udc4c\ud83c\udffb",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T15:19:18",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 27,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Easy to use and has a great variety of products. T...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "94f22b0e493ddcaeac8945aaa0c1bbd3",
-      "source": "play_store",
-      "source_id": "277d7b8df22c",
-      "app_name": "Custom Target",
-      "content": "very good experience timely delivery easy returns or exchanges option and many more options for shopping thankyou Myntra",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T20:04:24",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 18,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good experience timely delivery easy returns ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "fc8a31f95c2dca22f0d5a6c838df6374",
-      "source": "play_store",
-      "source_id": "2e8a064a275e",
-      "app_name": "Custom Target",
-      "content": "nice app for online shopping.... They give what they show..",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T16:12:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "nice app for online shopping.... They give what th...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "46f5c97e535e02cdbf1d4c90abaf9236",
-      "source": "play_store",
-      "source_id": "28856e296b3c",
-      "app_name": "Custom Target",
-      "content": "The items purchased from Myntra app are very good and I have been using this app for a long time \ud83d\udc4d\ud83d\ude0a Amazing app",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T20:29:09",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "The items purchased from Myntra app are very good ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4551bde89cc3447d9d5b010b01f759eb",
-      "source": "play_store",
-      "source_id": "dc598fde4d0a",
-      "app_name": "Custom Target",
-      "content": "this app is trustable my shopping is very easy with this app easy return fast delivery",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T16:25:08",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 16,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this app is trustable my shopping is very easy wit...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "3d5e56e3a8a589e037b2f8f50028f70a",
-      "source": "play_store",
-      "source_id": "700a3e9e44e3",
-      "app_name": "Custom Target",
-      "content": "luv to shop my desired items through this platform",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-17T11:18:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "luv to shop my desired items through this platform",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "19d35afd6563dc49b3e601f15056c4e6",
-      "source": "play_store",
-      "source_id": "9498ad7306ad",
-      "app_name": "Custom Target",
-      "content": "very nice app for ordering clothes, quality is also very nice",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T11:50:54",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very nice app for ordering clothes, quality is als...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "b526ae8180e731e8eff4a07605c73f77",
-      "source": "play_store",
-      "source_id": "195fd37acbe9",
-      "app_name": "Custom Target",
-      "content": "superb platform for shopping any kind of necessaries",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T17:31:36",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "superb platform for shopping any kind of necessari...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "6a8574373df4d8174381d41fe86041ee",
-      "source": "play_store",
-      "source_id": "31007e5be9f0",
-      "app_name": "Custom Target",
-      "content": "best app to buy clothes with Best price and good quality. go for it",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T05:50:49",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "best app to buy clothes with Best price and good q...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0ff6759e250cd5135a8a5dcb0f796afd",
-      "source": "play_store",
-      "source_id": "615df401346d",
-      "app_name": "Custom Target",
-      "content": "last 4 year i have been using this app. all the products on this site are amazing.with genuine quality and reliable price you can go for anything which is available on this platform.if anything happened all the customers executive team help you in a better way. all those who go for shopping can choose this app upon another app. return and exchange option are very reliable for anyone.... i have a great experience with this app... i genuinely appreciate all the things about this .. yogesh verma",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T21:12:38",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery",
-        "stationery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 87,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "last 4 year i have been using this app. all the pr...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "987ee2c0b74fe20e95a61830c95bfbf3",
-      "source": "play_store",
-      "source_id": "f28fb0e55641",
-      "app_name": "Custom Target",
-      "content": "app is good but I'm very disappointed because there is only one payment app that is phone pe and what about other apps because many people including me many people do not use phonepe then how could we buy the items please it's my humble request to check it",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-15T12:05:12",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 49,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "app is good but I'm very disappointed because ther...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "bda7eee582b440535872799e7fcd8bd6",
-      "source": "play_store",
-      "source_id": "efc051d49645",
-      "app_name": "Custom Target",
-      "content": "I have almost stopped buying clothes offlline since last 6-7 years. Myntra has nice collection and prices are nearly always lower than offline for same item. No questions asked return and exchange is the biggest reason for me to move away from offline",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T15:02:54",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 43,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I have almost stopped buying clothes offlline sinc...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "261deb8d2f30129fcf97d92e107b4954",
-      "source": "play_store",
-      "source_id": "a3546f91685c",
-      "app_name": "Custom Target",
-      "content": "Good for shopping ... but at times prices are too high, return policy is good",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T21:57:38",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 15,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Good for shopping ... but at times prices are too ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "2b292224dfe802231378f618bc287699",
-      "source": "play_store",
-      "source_id": "7f9d0ee6a59d",
-      "app_name": "Custom Target",
-      "content": "nice app and great product take a but longer for deliver products",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T12:51:43",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "nice app and great product take a but longer for d...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "6e4d178affe85c3c56c9ad0d5947eacf",
-      "source": "play_store",
-      "source_id": "00be5ff7b5d1",
-      "app_name": "Custom Target",
-      "content": "excellent customer service app \ud83d\udc4d product quality always in good condition and service is good I am always purchasing by this app",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T14:19:07",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "excellent customer service app \ud83d\udc4d product quality a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "5e665014abdd1542d1ff946a912d9744",
-      "source": "play_store",
-      "source_id": "74ac6635b1cd",
-      "app_name": "Custom Target",
-      "content": "the worst possible app. products come without brand tagn poor quality. delivery guys refuse pick up. then customer care does not co-operate.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T15:26:31",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "trust_issue"
-      ],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "the worst possible app. products come without bran...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "b6521188dd3296864080fa831094ec5a",
-      "source": "play_store",
-      "source_id": "e464b8161d5f",
-      "app_name": "Custom Target",
-      "content": "This is the best shopping app I ever witnessed .",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T23:01:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "This is the best shopping app I ever witnessed .",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "5a12642519a8aa61ddeacf5b770099f8",
-      "source": "play_store",
-      "source_id": "b66cfe8ae7a0",
-      "app_name": "Custom Target",
-      "content": "faster delever. \ud83d\udc4d\ud83d\ude0a product is best \ud83d\udcaf\ud83d\udc4d myntra is best shopping app",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-16T18:43:33",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "faster delever. \ud83d\udc4d\ud83d\ude0a product is best \ud83d\udcaf\ud83d\udc4d myntra is be...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "6cdfedce7e834d4759afba1994feea90",
-      "source": "play_store",
-      "source_id": "89aea3d2139a",
-      "app_name": "Custom Target",
-      "content": "my best one and only shopping app. go for itt!!!",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T15:18:00",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "my best one and only shopping app. go for itt!!!",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "81c140d8be0261aae018c0152a7c8d13",
-      "source": "play_store",
-      "source_id": "a8e7935564c2",
-      "app_name": "Custom Target",
-      "content": "besttttt app for purchase any products.. quality of the products is quite good.. please guys go for it",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T18:05:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 18,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "besttttt app for purchase any products.. quality o...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4c3a33e59e18652b69a4bef759b4dcaa",
-      "source": "play_store",
-      "source_id": "1126c15e18af",
-      "app_name": "Custom Target",
-      "content": "very good app for online shopping, i think best in India , it's items are really good quality, and also good policies of payment returns or exchanges or refund",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T16:38:39",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 29,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good app for online shopping, i think best in...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c558f82463778617cd9c4364b103c13d",
-      "source": "play_store",
-      "source_id": "a4ecb38fa84c",
-      "app_name": "Custom Target",
-      "content": "Great experience with myntra fast delivery and loyalty app I've been shopping with myntra for the last 1-2years",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T00:26:38",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 18,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Great experience with myntra fast delivery and loy...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "a832144028fa723bbd7600ffa9e5e47a",
-      "source": "play_store",
-      "source_id": "d440cec0e767",
-      "app_name": "Custom Target",
-      "content": "good quality and best offers discount by myntra fashion shopping",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T10:52:01",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "good quality and best offers discount by myntra fa...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "d05c1f85aad2e06bb2522b35a4790714",
-      "source": "play_store",
-      "source_id": "82065f39d368",
-      "app_name": "Custom Target",
-      "content": "Best for online shopping \ud83d\udecd \ud83d\ude0c Using this app for more than 5 years.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T17:52:05",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Best for online shopping \ud83d\udecd \ud83d\ude0c Using this app for mo...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "07a6203203b10dacb64fa0eea64d29ed",
-      "source": "play_store",
-      "source_id": "130540d3f9d6",
-      "app_name": "Custom Target",
-      "content": "I really had a great experience using the Myntra app. The app is easy to use, well-designed, and has a wide variety of products to choose from. I especially like the easy search, filters, product details, and smooth shopping experience. The delivery process is also convenient, and the products I received were good in quality. Overall, Myntra makes online shopping simple, comfortable, and enjoyable. I am very satisfied with the app and would definitely recommend it to others. \u2b50\u2b50\u2b50\u2b50\u2b50",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T08:07:23",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 79,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I really had a great experience using the Myntra a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "2d90d6253b13071db2cb2e6a8f31c01e",
-      "source": "play_store",
-      "source_id": "83561f7f5c4c",
-      "app_name": "Custom Target",
-      "content": "excellent, mujhe Myntra par buy karke bahut achcha <PERSON> good experience, colour quality delivery abhi tak sab <PERSON> bahut achcha rha Hai sabhi to isse buy karne chahiye everything is too good but cost bhi shai honi chahiye thaki sabhi is par apni shoping <PERSON> ha baby boy y girl <PERSON> bhi acche acche offer aane chahie thaki buy kar sake",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T18:55:22",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "baby_care"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 63,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "excellent, mujhe Myntra par buy karke bahut achcha...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "d174be34615b43eb5a483a7329cd84ae",
-      "source": "play_store",
-      "source_id": "85827c55670a",
-      "app_name": "Custom Target",
-      "content": "one of the worst online shopping apps I have ever seen. i ordered something on this aap everything was going right before, I was waiting 4 to 5 days and suddenly one day before the delivery date my order got cancelled.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T20:02:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 41,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "one of the worst online shopping apps I have ever ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "bb2e20dc5f6d4ac02ad73abaad707d60",
-      "source": "play_store",
-      "source_id": "2dbd891e7601",
-      "app_name": "Custom Target",
-      "content": "Trusted app for shopping , genuine brands and on time delivery. Never faced any issue. love shopping from myntra easy interface to use",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T13:08:29",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Trusted app for shopping , genuine brands and on t...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "574f87042a9ca7c7d21e2f6c938c0b26",
-      "source": "play_store",
-      "source_id": "065d2a6fc2a4",
-      "app_name": "Custom Target",
-      "content": "bhut hi ghatiya D gred e commerce platform iski delivery kbhi nhi hoti hai maine <PERSON> bar try kiya hai iska costumer support bhi nhi hai I will never use this again in my hole life ................",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T19:34:07",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 38,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "bhut hi ghatiya D gred e commerce platform iski de...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4ab6d74b57ca732d79b0914a113e6831",
-      "source": "play_store",
-      "source_id": "f68637202f3f",
-      "app_name": "Custom Target",
-      "content": "this is a good app i like it very very much.. i all time use this app for purchase purpose.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T23:26:22",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 20,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this is a good app i like it very very much.. i al...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0c0b72901bcc67f791d0ed5f5c5b4cb0",
-      "source": "play_store",
-      "source_id": "41b798e6f9d1",
-      "app_name": "Custom Target",
-      "content": "very good app for shopping according to trend",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T11:12:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good app for shopping according to trend",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "79b138ec872324ed90933354bb600eb1",
-      "source": "play_store",
-      "source_id": "4359b4461691",
-      "app_name": "Custom Target",
-      "content": "Value for money, Good Quality, <PERSON>, Excellent",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T18:28:42",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Value for money, Good Quality, Quick Delivery, Exc...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "768eb308d52048f9efa231ef1463f712",
-      "source": "play_store",
-      "source_id": "34a0267355ea",
-      "app_name": "Custom Target",
-      "content": "very good app affordable rates ,new designs,better quality",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T19:15:01",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good app affordable rates ,new designs,better...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "14fd2cfe33c325c40b3c11c897f85eaf",
-      "source": "play_store",
-      "source_id": "f026e1286f1a",
-      "app_name": "Custom Target",
-      "content": "Worst app ever.. Have been shopping here for more than 4 years and first time have faced such a terrible experience... Ordered 2 shirts for \u20b91300 and received None of the 2 shirts and a totally wrong product (ponds cream \u20b9150).. Been following up for my refund for more than 15 days now but still not received the amount..customer care is also useless everytime they give a new timeline...Worst experience ever.... Will never recommend to anyone.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T19:12:58",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 76,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Worst app ever.. Have been shopping here for more ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "fd4b864daee77cf74fdfc798e456af8c",
-      "source": "play_store",
-      "source_id": "e8b299297d54",
-      "app_name": "Custom Target",
-      "content": "super app to buy clothes,shoes and many more things",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T08:16:29",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "super app to buy clothes,shoes and many more thing...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "5b6c59386729fbc22b35d7253b5c5bed",
-      "source": "play_store",
-      "source_id": "329c082bba2c",
-      "app_name": "Custom Target",
-      "content": "this app was very nice deliever product in less time good offers",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T22:07:10",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this app was very nice deliever product in less ti...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "34a33f1a79e4a371443d006914e5a79b",
-      "source": "play_store",
-      "source_id": "ec92bcaaa595",
-      "app_name": "Custom Target",
-      "content": "this is the first time I am using this app for my online purchase i am satisfied.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T11:04:59",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 17,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this is the first time I am using this app for my ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "a8fa1f21e7b18db2916ee1beb33fbd58",
-      "source": "play_store",
-      "source_id": "3192eda43265",
-      "app_name": "Custom Target",
-      "content": "It has good-quality products and a colorful, attractive app. The prices are fair, and there are plenty of offers and discounts. The app is easy to use, and overall, I\u2019m happy with the shopping experience. \ud83d\udc4d\u2728",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T00:38:52",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 36,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "It has good-quality products and a colorful, attra...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "9ade8e27b568f67342871533e3143903",
-      "source": "play_store",
-      "source_id": "1bc1cba277af",
-      "app_name": "Custom Target",
-      "content": "it's an amazing app,gives discount on many occasions.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T19:08:03",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it's an amazing app,gives discount on many occasio...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "655d1cba68e83de095e07ecd5892c825",
-      "source": "play_store",
-      "source_id": "16ab697379fd",
-      "app_name": "Custom Target",
-      "content": "I really appericiate myntra for its good quality products and great pricings.It is my pleasure shopping here everytime and i never get disappointed hope the same in future",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T04:51:36",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 28,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I really appericiate myntra for its good quality p...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "fa84065a851b63b6bc8010736c7b8c4c",
-      "source": "play_store",
-      "source_id": "48c7f5ca5cea",
-      "app_name": "Custom Target",
-      "content": "Although the parcel was received one day late, it was without any reminder from me. The quality of the product is very good.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T17:45:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Although the parcel was received one day late, it ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "39fb2a34699826bfa60240d90a3b72cb",
-      "source": "play_store",
-      "source_id": "7141e5361430",
-      "app_name": "Custom Target",
-      "content": "although expensive quality don't lie moreover friendly app with good customer care is just cherry on top",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T12:05:06",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "stationery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 17,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "although expensive quality don't lie moreover frie...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "eda174e0d189a4d0605aeffcdbcde433",
-      "source": "play_store",
-      "source_id": "f463c9698d76",
-      "app_name": "Custom Target",
-      "content": "found it best among all other shopping apps.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T19:10:34",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "found it best among all other shopping apps.",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "a0b0a9cd548ca9843551cdd18fa38d03",
-      "source": "play_store",
-      "source_id": "9be9d79fd151",
-      "app_name": "Custom Target",
-      "content": "fraud app.. product picked up by the delivery boy however myntra said that product is not picked up and did not provide refund.. they don't even post your review on product if reviews are negative.. they have moderated the reviews as only positive reviews are being allowed to post",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T22:13:51",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 49,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "fraud app.. product picked up by the delivery boy ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "3641766d7aceaa23be765a924626b308",
-      "source": "play_store",
-      "source_id": "db6ce31702e8",
-      "app_name": "Custom Target",
-      "content": "I got an amazing product deal and quality products on time.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T14:09:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I got an amazing product deal and quality products...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e025cc66ab641e6c01591a587abc71a2",
-      "source": "play_store",
-      "source_id": "d055fdaf1c59",
-      "app_name": "Custom Target",
-      "content": "easy returns and good communication and quick response better deals",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T12:44:47",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "easy returns and good communication and quick resp...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "f471cdfd4ef2a166fd69c99c0d03f97c",
-      "source": "play_store",
-      "source_id": "6a21be4b766d",
-      "app_name": "Custom Target",
-      "content": "it shows good quality products and best in budget",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T13:37:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it shows good quality products and best in budget",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e28e8057468c4a40d4b791c475d0002c",
-      "source": "play_store",
-      "source_id": "c61100517f45",
-      "app_name": "Custom Target",
-      "content": "not many good options in shoes otherwise good app",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-17T09:56:46",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "not many good options in shoes otherwise good app",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "1f2936caa46d8591cb45543098327517",
-      "source": "play_store",
-      "source_id": "df0ce8618d43",
-      "app_name": "Custom Target",
-      "content": "best offers till yet according to other shopping apps \u2665\ufe0f\ud83d\udc4c",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T23:53:51",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "best offers till yet according to other shopping a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "b230a583cff714fcf9b499c63ba351a7",
-      "source": "play_store",
-      "source_id": "ca4a69e7d3d1",
-      "app_name": "Custom Target",
-      "content": "shopping on myntra is next level i toh love using myntra top notch quality, unlimited offers, best price, over all is very good",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T14:18:50",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "shopping on myntra is next level i toh love using ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "bd7005d00d314deb54bbd7c3370caee5",
-      "source": "play_store",
-      "source_id": "93338b7915d2",
-      "app_name": "Custom Target",
-      "content": "\u200b\"Extremely disappointed with Myntra's terrible service and policies. I ordered an iron, but they refused to process either a return or an exchange, completely forcing the item on me. To make matters worse, I ordered a pair of trousers from a different account, and the exact same thing happened\u2014they forced me to keep it and refused to take it back. Myntra has become the worst and most unreliable shopping app. I strongly advise everyone to avoid buying anything from here.\"",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T19:11:46",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "stationery"
-      ],
-      "behavioral_signals": [
-        "habit_loop"
-      ],
-      "word_count": 80,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "\u200b\"Extremely disappointed with Myntra's terrible se...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "34ab0bdffbf58a3fcb9e0903721ac54e",
-      "source": "play_store",
-      "source_id": "850a7ab113a1",
-      "app_name": "Custom Target",
-      "content": "The only online shopping app I've been using for 10 years.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T09:55:49",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "The only online shopping app I've been using for 1...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "eac6666ef32803c9708f7dcdea581f6c",
-      "source": "play_store",
-      "source_id": "65fe7f8b7b68",
-      "app_name": "Custom Target",
-      "content": "very third class app ,delivery boy didn't exchange a product and show delivered, regarding that we complain,they investigate and then they dont do exchange , product returned ,same delivery boy picked up return , although they didn't created amount ,everytime again and again they ask every details , when you inform they say aapki aawaj sahi <PERSON>, they don't have proper sytem which show costomer complain for and they accept return was happed on 10 august,so why not creadited",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T17:15:07",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 82,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very third class app ,delivery boy didn't exchange...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "56002250fc1605dec8640f5b75685ee3",
-      "source": "play_store",
-      "source_id": "3ff958d3193c",
-      "app_name": "Custom Target",
-      "content": "this app is becoming rubbish day by day , just to order they required payment app on the device, very disappointing app",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-15T16:15:54",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this app is becoming rubbish day by day , just to ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "55d12f21e9a4a36d4221822c68d8ae98",
-      "source": "play_store",
-      "source_id": "043b28c26b6f",
-      "app_name": "Custom Target",
-      "content": "I wish there was an option for zero review, would have given that only. I was delivered a wrong product and when i tried returning, myntra refused to process the same. I even wrote an email to them attaching the video of me opening the product that was delivered to me, still nothing from their end, their customer support is useless. Such a waste of time and money this was.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T09:00:37",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery",
-        "stationery"
-      ],
-      "behavioral_signals": [],
-      "word_count": 70,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I wish there was an option for zero review, would ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c32da4991312f4da0dbbe165afa400ca",
-      "source": "play_store",
-      "source_id": "8d3ad90d6aef",
-      "app_name": "Custom Target",
-      "content": "it was nice and easy for me to shop and look for items i needed",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T12:33:31",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 15,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it was nice and easy for me to shop and look for i...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c4ebeb18540b35d2a8cfd6400e8dd96d",
-      "source": "play_store",
-      "source_id": "be7c656a4e2c",
-      "app_name": "Custom Target",
-      "content": "quality products fashion at amazing prices i buy almost everything from myntra clothes,bags,shoes n jewellery best in quality and amazing custimer service superfast delivery easy exchange n refunds go for it",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T18:40:06",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 31,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "quality products fashion at amazing prices i buy a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "d452b2e5cdced62185dd10a024e97d47",
-      "source": "play_store",
-      "source_id": "65e34059f8b6",
-      "app_name": "Custom Target",
-      "content": "very good products <PERSON> whi deliver kiya aankh bnd <PERSON> plz go for myntra for more trusted\ud83d\udc4c shoping",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-15T11:01:08",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 27,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good products jo dikhaya whi deliver kiya aan...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "6a4025b16bbb4e3eaf3e63b71d4d5b13",
-      "source": "play_store",
-      "source_id": "737d3e59949d",
-      "app_name": "Custom Target",
-      "content": "worst app maine ek bedsheet order kii thi <PERSON> mujhe different color kii mili thi 1 week <PERSON> raise kiye 5 baar customer care pe baat kri abhi tak return <PERSON> I am highly disappointed \u2639\ufe0f isse achha flipkart hai wrong product delivered hone pe return ho jaata hai myntra what is this behaviour \ud83d\ude21 I am ur insider member why u are not returning my product",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T14:35:46",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 72,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "worst app maine ek bedsheet order kii thi jo kii m...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "7047f291f336eaa35724dd1f9ea4068a",
-      "source": "play_store",
-      "source_id": "59b4409383f0",
-      "app_name": "Custom Target",
-      "content": "Thanks for myntra My best option quality products",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T15:55:13",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Thanks for myntra My best option quality products",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "a2a5f13f75c707d87360cacb9d9598d7",
-      "source": "play_store",
-      "source_id": "5768ec47ba9b",
-      "app_name": "Custom Target",
-      "content": "good app but sometimes delivery let and delivery person behavior is not good",
-      "title": null,
-      "rating": 2,
-      "sentiment_score": -0.4,
-      "date": "2026-08-17T03:33:28",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 13,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "good app but sometimes delivery let and delivery p...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "ec168329bfa61bc5be62c4f47df4dea9",
-      "source": "play_store",
-      "source_id": "a8fed5fda975",
-      "app_name": "Custom Target",
-      "content": "good app but prices are higher of products as compared to flipkart and amazon..",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-16T16:42:56",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "comparison_behavior"
-      ],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "good app but prices are higher of products as comp...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "08e5d8757c34580fb8cec10f9569454b",
-      "source": "play_store",
-      "source_id": "d3a595c99280",
-      "app_name": "Custom Target",
-      "content": "very dissatisfied with Myntra. the customer care is waste. the only resolution they have is return the product. they can't handle delivery executives, they just force us to cancel the order so that they can gain platform fee every single time. Very frequent issue of mismatch between the description and actual product. I have raised complaints more than 10 times in this year. Myntra is going to loose lot of customers at this rate. never gonna order from Myntra again.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T17:33:09",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 80,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very dissatisfied with Myntra. the customer care i...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "130a0928dd79073f4725ee913fe04030",
-      "source": "play_store",
-      "source_id": "d17c3c73213a",
-      "app_name": "Custom Target",
-      "content": "very good app,supportive customer care . first delivery",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T22:27:48",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very good app,supportive customer care . first del...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "5db51ad1ed05dd99f98ea28ebf48cbd7",
-      "source": "play_store",
-      "source_id": "98285ba48dc7",
-      "app_name": "Custom Target",
-      "content": "Super quick delivery & quality of products are good \ud83d\ude0a",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T19:51:25",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Super quick delivery & quality of products are goo...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "2285a2bc078305089d18c2349e41c1bf",
-      "source": "play_store",
-      "source_id": "0080413bede9",
-      "app_name": "Custom Target",
-      "content": "Worst shopping experience. The customer executive is unable to give any solution. All my money is gone. Never going to buy from Myntra again.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T17:55:48",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 24,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Worst shopping experience. The customer executive ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "9fa918a5aefe1cc7ebc7e68b99b52758",
-      "source": "play_store",
-      "source_id": "9a0009b6a6ca",
-      "app_name": "Custom Target",
-      "content": "variety of products are available. rate is competitive. easy return in 7/10 days.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T16:18:49",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "pet_care"
-      ],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 13,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "variety of products are available. rate is competi...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "344df62923656fc3ed35dee5e1266a00",
-      "source": "play_store",
-      "source_id": "e2fa540c94c6",
-      "app_name": "Custom Target",
-      "content": "PATHETIC APP FOR SHOPPING. MY RETURN IS PENDING SINCE A MONTH ALMOST. RECIEVED ON 5 JUNE. RETURN FILED ON 7 . TODAY IS 28 JUNE . LAST DATE FOR RETURN WAS 19. ITS BEEN OVER 9 DAYS STILL IT SHOWING THEY ARE SAYING \"\" WE ARE LOOKING INTO YUR RETURN. PLEASE WAIT FOR 24 HOURS\"\" JUST A PATHETIC SERVICE. YOU GUYS DONT EVEN DESERVE A SINGLE STAR FROM MY POINT OF YOU.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T16:08:13",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "stationery"
-      ],
-      "behavioral_signals": [],
-      "word_count": 72,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "PATHETIC APP FOR SHOPPING. MY RETURN IS PENDING SI...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "738c0d3f18a91726b9b4d4b74a9e8620",
-      "source": "play_store",
-      "source_id": "d34cebdaf6e7",
-      "app_name": "Custom Target",
-      "content": "it's good for shopping \ud83d\udecd\ufe0f\ud83d\uded2 and it can be purchaseable because myntra have best quality product and dress also so we can easily buy this and make happy.. if we start for shopping then it can be give a discount on your order and make affordable price their quality it best and also it give free coupons when we finished shopping and then we earn award for it .. I aslo earn mainy rewards and cash price on it so don't waste your time and jont with myntra and start to shopping \ud83d\uded2\ud83d\udecd\ufe0f make your day",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T17:34:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 96,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it's good for shopping \ud83d\udecd\ufe0f\ud83d\uded2 and it can be purchasea...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c5bc3dd324fa1f8a84890c4877d83e10",
-      "source": "play_store",
-      "source_id": "ad51d0023a75",
-      "app_name": "Custom Target",
-      "content": "such a good app for shopping \ud83e\udd29 100\u2105 original brand clothes material",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T20:10:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "such a good app for shopping \ud83e\udd29 100\u2105 original brand...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "6dd86fa3f176448bd7cf681d7f3a7ad0",
-      "source": "play_store",
-      "source_id": "25f2a1fd1e4a",
-      "app_name": "Custom Target",
-      "content": "<PERSON> and trusted app and fast delivery I love it Myntra service and product quality are also so good appreciate it \u2665\ufe0f",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T20:49:53",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 23,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "verry nice and trusted app and fast delivery I lov...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "ff1c93d16933126e89549299549f42e6",
-      "source": "play_store",
-      "source_id": "3b4c887102e6",
-      "app_name": "Custom Target",
-      "content": "I strongly urge everyone to avoid shopping on Myntra. If you choose to order, proceed entirely at your own risk regarding whether your package will ever arrive. Don't trust to myntra. I have placed order multiple time but not received yet everytime they have technical error. I have to give negative rating.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-15T18:41:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "trust_issue"
-      ],
-      "word_count": 52,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I strongly urge everyone to avoid shopping on Mynt...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0727c228f3e627e725189fc6d0024c34",
-      "source": "play_store",
-      "source_id": "7c2aec27970e",
-      "app_name": "Custom Target",
-      "content": "myntra is my Go-to app for almost everything since 9-10 years now...the quality , quantity and even the fit n the design is top notch! prices r always reasonable.. never had I ever faced any trouble or issues in returning or exchanging anything if there was a need. myntra is the best!",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T17:22:49",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "habit_loop",
-        "price_sensitivity"
-      ],
-      "word_count": 52,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "myntra is my Go-to app for almost everything since...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "bd9aab5c3d8bcdf63fa839fa6902c58c",
-      "source": "play_store",
-      "source_id": "0fdd07ff9ea0",
-      "app_name": "Custom Target",
-      "content": "Trusted app, always get genuine brand , good material n exchange n return easily \ud83d\udc4c",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-16T10:48:30",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 15,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Trusted app, always get genuine brand , good mater...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "9c60da0530f55eda6be40ff0c6372691",
-      "source": "play_store",
-      "source_id": "dfa3c71c51b9",
-      "app_name": "Custom Target",
-      "content": "Myntra has become such a terrible shopping app. I ordered a pair of jeans, but the size didn\u2019t fit me, so I placed a return request. However, the delivery person failed the product during the quality check, and now my return is on hold. What is my fault in this? I returned the exact same product that I received. I don\u2019t understand how or why the quality check was failed. Myntra seems to be becoming fraudulent these days. We shop from Myntra trusting the platform please look into this issue.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T19:07:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 90,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 90,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Myntra has become such a terrible shopping app. I ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "be357822319cd4218ee885b3ed0896d4",
-      "source": "play_store",
-      "source_id": "56884850fd62",
-      "app_name": "Custom Target",
-      "content": "nice e commerce app perfect time to delivery",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T14:19:57",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "nice e commerce app perfect time to delivery",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "de33bad6fd5f6e31a9886a334b0be57c",
-      "source": "play_store",
-      "source_id": "e04c2fbe9e0a",
-      "app_name": "Custom Target",
-      "content": "my experience is good with myntra app authentic products good quality of clothes nd unique designs available with reasonable prices nd good offers i m satisfied with all myntra products \ud83d\ude0a\ud83d\udcab",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T22:17:44",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 31,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "my experience is good with myntra app authentic pr...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "548b0d8db4f501fd0f7a81f4913f3605",
-      "source": "play_store",
-      "source_id": "0ba2faabda07",
-      "app_name": "Custom Target",
-      "content": "\u2b50\u2b50\u2b50\u2b50\u2b50 Amazing shopping experience with Myntra! The collection is stylish, trendy, and has something for every budget. The quality is great, delivery is quick, and the packaging is neat. I\u2019ve always had a smooth experience shopping on Myntra. Highly recommended for fashion lovers! \ud83d\udecd\ufe0f\u2728",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T00:43:21",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 44,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "\u2b50\u2b50\u2b50\u2b50\u2b50 Amazing shopping experience with Myntra! The...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "7609d08cac8fd7239b08e733a349ef75",
-      "source": "play_store",
-      "source_id": "609347650c80",
-      "app_name": "Custom Target",
-      "content": "worst app , return experience was worst than any other app . not going to buy any product ever.. I repeat EVER",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T22:49:21",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 22,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "worst app , return experience was worst than any o...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "71451a9f2c6a8463dc37349181d9d502",
-      "source": "play_store",
-      "source_id": "e1929f6648c6",
-      "app_name": "Custom Target",
-      "content": "Very good app and product is also genuine and fast delivery.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T09:10:36",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Very good app and product is also genuine and fast...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "815beaedb882bf9b9defcf27733822d9",
-      "source": "play_store",
-      "source_id": "b6e388b0745a",
-      "app_name": "Custom Target",
-      "content": "Very poor service. They are focused on their app and clothing brands, but not on delivery. My order is highly delayed even after choosing express delivery. Customer service is not giving a proper response about the delay. Whenever I call, they keep me on hold for a long time. Very disappointing experience with both delivery and customer support.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-15T12:47:34",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 58,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Very poor service. They are focused on their app a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4c6804f0e795d38ad5cb41cc66017982",
-      "source": "play_store",
-      "source_id": "9f1dc26f2724",
-      "app_name": "Custom Target",
-      "content": "Hands down the best shopping interface. The 'Liquid <PERSON>' update is super smooth, and the personalized suggestions are actually helpu l.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T17:59:40",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 21,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Hands down the best shopping interface. The 'Liqui...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c6a590d33571c569f9cf5cd4e3164a29",
-      "source": "play_store",
-      "source_id": "a2a45ab03644",
-      "app_name": "Custom Target",
-      "content": "great app affordable price so many rewards..so happy to use this app.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T22:11:44",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "great app affordable price so many rewards..so hap...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e75fc1e83aa2cfa2d0013ef4ed194da4",
-      "source": "play_store",
-      "source_id": "70e7e8a1850b",
-      "app_name": "Custom Target",
-      "content": "very bad experience... i ordered a product in a offer and myntra haven't delivered that product instead of delivering the product they are only showing delay and delay... very bad app and support system is also worst... i am unable to make chat or call with the agent.... worst application don't purchase any product from myntra",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T15:55:57",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 56,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "very bad experience... i ordered a product in a of...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e79499509359c5fed665816a092f6eaa",
-      "source": "play_store",
-      "source_id": "2b3396f52bfa",
-      "app_name": "Custom Target",
-      "content": "It is a great shopping app with a wide variety of cloth footwear , and accessories .... The app is easy to use and the product are usually of good quality I am with my shopping experience on Myntra",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T20:26:16",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "electronics"
-      ],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 39,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "It is a great shopping app with a wide variety of ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "541567244b48453ed6843fbc9bc0de5a",
-      "source": "play_store",
-      "source_id": "55eb76e8195b",
-      "app_name": "Custom Target",
-      "content": "Products are too good.... Quick delivery.... Affordable prices and some products are not in affordable prices... Thank you Myntra",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T13:45:29",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 19,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Products are too good.... Quick delivery.... Affor...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "169a5321c54bc5d12a04f7d0f6b2aa89",
-      "source": "play_store",
-      "source_id": "31d0dd1058c1",
-      "app_name": "Custom Target",
-      "content": "I love almost everything about the app. Only improvement I would suggest is to add more elaborate product descriptions.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T23:12:05",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 19,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I love almost everything about the app. Only impro...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "9cb7756d727f51c2fdd4d5989426b8da",
-      "source": "play_store",
-      "source_id": "648e194ab005",
-      "app_name": "Custom Target",
-      "content": "one of the best app for order stuffs and the my glam clan offers gives you credit money so you can redeem on the orders",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T21:48:03",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 25,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "one of the best app for order stuffs and the my gl...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "acd2d395a0c678a39f323d12e9a962ce",
-      "source": "play_store",
-      "source_id": "7c2236b95cd9",
-      "app_name": "Custom Target",
-      "content": "the quality of the products of Myntra are super and genuine coupons are incredible and arrive on time",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T07:52:08",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 18,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "the quality of the products of Myntra are super an...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4df9a2472f651b01b9823a10fd8c1b6f",
-      "source": "play_store",
-      "source_id": "e40b8befc1d4",
-      "app_name": "Custom Target",
-      "content": "This app Product advertisement coming discount on this app when I'm booking the product it's confirmed same offer at the booking time after 2 days it's getting ato cancelled without any issue I'm seeing worst application.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T05:40:30",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 36,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 90,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "This app Product advertisement coming discount on ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e623074841502bfef0168481d32e939d",
-      "source": "play_store",
-      "source_id": "ee4dcf535b51",
-      "app_name": "Custom Target",
-      "content": "bad service,bad products,bad return policy,They don't have enough people to solve your query efficiently.Dont buy from Them.They don't care about customers",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T19:43:34",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 21,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "bad service,bad products,bad return policy,They do...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "75735e4755eaf3d50fb954698691bde8",
-      "source": "play_store",
-      "source_id": "8011615b9a35",
-      "app_name": "Custom Target",
-      "content": "I am happy with myntra shopping ..the . dresses \ud83d\udc57 and other makeup kits accessary are too good \ud83d\udc4d\ud83c\udfff..kids items are also very nice and my daughter feels very happy... shoes, bally, sleepers are good... the colour and size are perfect .. all the things they showed are same delivered \ud83d\ude0d I am glad ... myntra but my one item is missing.. and I completed it but .. they ignored.. it's not good.. so my experience with this is mixed feelings .. some times good and some time uuuuuffffff shhhhhhaaaaa ...",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T15:23:45",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "beauty"
-      ],
-      "behavioral_signals": [],
-      "word_count": 91,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I am happy with myntra shopping ..the . dresses \ud83d\udc57 ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "468d489c25afa010a5f3a8bdbce73425",
-      "source": "play_store",
-      "source_id": "b1157611376c",
-      "app_name": "Custom Target",
-      "content": "Good product available in best quality and price",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T08:24:23",
-      "author_anon": "A G***",
-      "categories_mentioned": [
-        "grocery"
-      ],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Good product available in best quality and price",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "ecb724694978e8749534860b6679b369",
-      "source": "play_store",
-      "source_id": "c4411f20bc46",
-      "app_name": "Custom Target",
-      "content": "Fashion and Myntra go hand in hand.A perfect app, which gives seamless tech -driven shopping experience. Its trendy designs include both western and ethnic wear.Discounts and offers in every purchase provides a delightful shopping experience. extremely d",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T20:50:13",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity"
-      ],
-      "word_count": 37,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Fashion and Myntra go hand in hand.A perfect app, ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "28748a29c65b7bcb5abeefbfed22dbfa",
-      "source": "play_store",
-      "source_id": "e7478fe072ed",
-      "app_name": "Custom Target",
-      "content": "this app selld orignal brands it is good",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T09:19:05",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "this app selld orignal brands it is good",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "cfb7c388e751bc3c184892175828931e",
-      "source": "play_store",
-      "source_id": "6a734545807c",
-      "app_name": "Custom Target",
-      "content": "nice way too see product best is quality and matrial maintain very well that helps choose product what I want",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T18:17:19",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 20,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "nice way too see product best is quality and matri...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0018c9a75905ac779a34f5ea47777829",
-      "source": "play_store",
-      "source_id": "850f543d785e",
-      "app_name": "Custom Target",
-      "content": "This is a worst app I have ever seen . this app looted my 1500 rupees . I have ordered something and then I cancelled my order now they are not refunding my money . and they also removed help option in the app for my phone . now where should I go . this is a very bad app . I will never suggest my ones to be with this app . it's have been 25 days but they are not responding",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T09:52:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 83,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "This is a worst app I have ever seen . this app lo...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "22b5c42dec57dd7c01865cf6b4f02d99",
-      "source": "play_store",
-      "source_id": "74559261d5d6",
-      "app_name": "Custom Target",
-      "content": "the app is really good. you can purchase branded clothes on this platform,",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T15:00:24",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 13,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "the app is really good. you can purchase branded c...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "8c64724bc25954ddc072d01f9c9c0107",
-      "source": "play_store",
-      "source_id": "c1dbc7f29533",
-      "app_name": "Custom Target",
-      "content": "good in service, budget friendly and good products",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T11:59:55",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 8,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "good in service, budget friendly and good products",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "2abbc285e9a9f7474c94c7cb4f01d746",
-      "source": "play_store",
-      "source_id": "b2affbd66b46",
-      "app_name": "Custom Target",
-      "content": "myntra is trustable app \ud83e\udd0c I have purchased from myntra and i received orders in well manner and quality of cloth is awesome \ud83d\udc4c",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T16:01:10",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 24,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "myntra is trustable app \ud83e\udd0c I have purchased from my...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4e2758878544a5d57379365404266f85",
-      "source": "play_store",
-      "source_id": "008022a5bb00",
-      "app_name": "Custom Target",
-      "content": "Absolute fraud app They censor genuine reviews for some fake rejection reason and ensure they only publish good ones. the products received are always damaged, broken or pre-used. they seem to be the most unethical of ask e- commerce platform.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T02:31:54",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "trust_issue"
-      ],
-      "word_count": 40,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Absolute fraud app They censor genuine reviews for...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0f0c573555b61c438f463898df74d765",
-      "source": "play_store",
-      "source_id": "573cdb6bca80",
-      "app_name": "Custom Target",
-      "content": "clothes are good but it takes much more time to verify return request",
-      "title": null,
-      "rating": 3,
-      "sentiment_score": 0.0,
-      "date": "2026-08-19T08:28:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 13,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "clothes are good but it takes much more time to ve...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4604b0abad5683c8021bcc357839abfb",
-      "source": "play_store",
-      "source_id": "88fce70477e5",
-      "app_name": "Custom Target",
-      "content": "<PERSON> ni karte customer care vale check n krte delivery boy bad behaviour myntra sbse bakwas h.... <PERSON> , ajio , flipkart , amazon , <PERSON> sb best h myntra <PERSON> ban kro",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T22:33:50",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 35,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "product ko exchnge ni karte customer care vale che...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "e6ae40623ded2a501896aa2913d287d5",
-      "source": "play_store",
-      "source_id": "f7ad6b176014",
-      "app_name": "Custom Target",
-      "content": "<PERSON> that sells genuine products Very good UI",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T23:32:09",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Good App that sells genuine products Very good UI",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "0cda8865b4eb738d7ae222934809afa3",
-      "source": "play_store",
-      "source_id": "3292f3c0238e",
-      "app_name": "Custom Target",
-      "content": "One of the best online shopping platform. Good service with best product.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T15:37:16",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 12,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "One of the best online shopping platform. Good ser...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "28aa3ba100e39e81725402bedc10f845",
-      "source": "play_store",
-      "source_id": "2a12b34bb72c",
-      "app_name": "Custom Target",
-      "content": "my fvrt app mai hmesa Myntra se shopping krti hu",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T10:46:49",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 10,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "my fvrt app mai hmesa Myntra se shopping krti hu",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "4a9387af04b7b8e212a00f6ffd8734be",
-      "source": "play_store",
-      "source_id": "58db2dcac2ed",
-      "app_name": "Custom Target",
-      "content": "I enjoy shopping from Myntra and the quality is very good. Thank you so much Myntra\ud83e\udd20\ud83e\udd17\ud83e\udd17\ud83e\udd17\ud83e\udd17\ud83e\udd17",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T18:58:45",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 16,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "I enjoy shopping from Myntra and the quality is ve...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "f0ce84d98517dfca7a835baca88a40b4",
-      "source": "play_store",
-      "source_id": "eaa0a22387ef",
-      "app_name": "Custom Target",
-      "content": "it's a very fun review product are genuine I'm happy to get shopping here",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T19:00:04",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 14,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "it's a very fun review product are genuine I'm hap...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "58b9beaed477cd23ccc7e6dffd1693b5",
-      "source": "play_store",
-      "source_id": "843ab16a1ca3",
-      "app_name": "Custom Target",
-      "content": "amazing application to order the product and hassle free return delivery in many products up to 14 days and your payment also credited in you account in 1 day if you return the parcel and delivery boy has pick-up your return product",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T10:31:04",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 42,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "amazing application to order the product and hassl...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "c8eb970687d90ba6ed59ab88c34de9e9",
-      "source": "play_store",
-      "source_id": "3d987d0c737c",
-      "app_name": "Custom Target",
-      "content": "Awesome Experience of shopping, once my product was showing problem in delivery, but when I raised an issues to the customer service I got the product within 1 day",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-17T17:24:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 29,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Awesome Experience of shopping, once my product wa...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "98cd3ac5d87a57eaf7a128c70ce4fa9c",
-      "source": "play_store",
-      "source_id": "b6f6f8e35adb",
-      "app_name": "Custom Target",
-      "content": "shipping is very late and recorded customer care calls for help, never seen any shipping delay in other apps.also got two dameged product with in 10 order's and deleted my review for saying truth with photos worst app for online shopping",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T22:41:53",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 41,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 70,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "shipping is very late and recorded customer care c...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "5a5eb349a4fd9c78e55d15a72973d295",
-      "source": "play_store",
-      "source_id": "54e3c1a17f1d",
-      "app_name": "Custom Target",
-      "content": "easy to find different kinds of clothes, wide variety of brand, overall great",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T14:36:14",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "convenience_driver"
-      ],
-      "word_count": 13,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "easy to find different kinds of clothes, wide vari...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "d54813baf498779924dd9a9c3a066318",
-      "source": "play_store",
-      "source_id": "3386574f9a8e",
-      "app_name": "Custom Target",
-      "content": "customer care of this app doesn't work. you can't even return or exchange products once bought.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-16T18:34:46",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 16,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "customer care of this app doesn't work. you can't ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "660b44e1aec5e0e11fd1ba0478b0d4ae",
-      "source": "play_store",
-      "source_id": "f8a597417a0f",
-      "app_name": "Custom Target",
-      "content": "products are in good quality and delivered in very less time",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-15T11:18:48",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "products are in good quality and delivered in very...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "614b51234b26dd24cbd193619ba794e6",
-      "source": "play_store",
-      "source_id": "ef256d19c172",
-      "app_name": "Custom Target",
-      "content": "My experience with Myntra was really good. The website is easy to use and offers a wide variety of products. The product I received was of good quality and matched the description.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-18T21:09:56",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "price_sensitivity",
-        "convenience_driver"
-      ],
-      "word_count": 32,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "My experience with Myntra was really good. The web...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "240493649669fd7659fb8fae1e137f2c",
-      "source": "play_store",
-      "source_id": "d36ca452accf",
-      "app_name": "Custom Target",
-      "content": "worst shopping app 6 orders me 5 cancel <PERSON> and only 1 receive hua , very show app",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T10:18:34",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 19,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 40,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "worst shopping app 6 orders me 5 cancel ho gye and...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "98a57b9a5c04deb31f340d43b011c736",
-      "source": "play_store",
-      "source_id": "365be8728380",
-      "app_name": "Custom Target",
-      "content": "i really like to Shop from here but I don't understand what is their issue ? they always cancel my order without giving any reason just by saying sorry. I mean we are not fool. if we are ordering something again and again that's means we really need that thing and uhh fool your customer like this and their customer care support is so bad they don't even allows uh to type your problems. they gives you specific options to choose your problem, like seriously \ud83d\ude12",
-      "title": null,
-      "rating": 3,
-      "sentiment_score": 0.0,
-      "date": "2026-08-19T00:53:07",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 86,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "i really like to Shop from here but I don't unders...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "ba2d43e87db100eb816627a6d5eeec27",
-      "source": "play_store",
-      "source_id": "c5590e06335d",
-      "app_name": "Custom Target",
-      "content": "worst delivery service and worst customer care service , I never recommend anyone to purchase from myntra. I order a HRX T-shirt whose delivery date was 8th august and I m writing this review on 19th august after 11 days, I contacted each and every day to the customer support after promised delivery date but I got zero support for my order, every single day they said wait for 24 hrs, you'll get your order. I got so much frustrated so cancelled my order.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-19T21:55:57",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "habit_loop"
-      ],
-      "word_count": 84,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 90,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "worst delivery service and worst customer care ser...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "148673f16ecae91a95b591837fbf1a69",
-      "source": "play_store",
-      "source_id": "15c3f99bf259",
-      "app_name": "Custom Target",
-      "content": "Now days myntra is selling fake products or low quality products. Stop buying things from this application. now this is the high time for offline shopping. these applications are not convenient or provide any services instead they are just selling fake products. Recently I ordered a black comfy shirt from this app brand here&now and I received a fake cheap quality shirt brand name is \"urban buccachi\" and this is not the single case there are multiple incidents in a row.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T17:42:31",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "trust_issue",
-        "convenience_driver"
-      ],
-      "word_count": 81,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Now days myntra is selling fake products or low qu...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "87f080395efc02a2d55d095b440cb31e",
-      "source": "play_store",
-      "source_id": "b63745f413f3",
-      "app_name": "Custom Target",
-      "content": "This app is good but Myntra now service is very bogus. Since the morning I have ordered 2 items first order has to cancel due to till afternoon no delivery updates. 2nd order I placed for which also no delivery executives have assigned yet. Additionally there is no direct contact available for customer representatives, we have to complaint through chat boat only so no good response.",
-      "title": null,
-      "rating": 2,
-      "sentiment_score": -0.4,
-      "date": "2026-08-17T21:18:31",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 66,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "This app is good but Myntra now service is very bo...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "763fec0a4341c277dacf74040671bab4",
-      "source": "play_store",
-      "source_id": "8aad494f1645",
-      "app_name": "Custom Target",
-      "content": "Very disappointing experience. My issue has been going on for almost a month. I received the wrong product and provided the product tag/code and invoice as evidence, but Myntra kept giving generic responses saying the correct product was dispatched. After repeated complaints, they agreed to take the product back, but pickup failed 3\u20134 times. The agent is either busy or doesn't answer. Still waiting for a proper resolution. Very poor customer support and return experience.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T01:19:02",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 75,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 100,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Very disappointing experience. My issue has been g...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "3609afb67fee849ba3266acefc59a89e",
-      "source": "play_store",
-      "source_id": "58bc559a3904",
-      "app_name": "Custom Target",
-      "content": "BAD EXPERIENCE!!worst app, has no accountability about it's products after booking very bad delivery service as well .Issue gets raised and no one to solve ...zero customer service.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-18T09:43:26",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 28,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 60,
-      "quality_category": "Gold Insight",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "BAD EXPERIENCE!!worst app, has no accountability a...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "acc851695972b3ef4534d5c5c0c5fe44",
-      "source": "play_store",
-      "source_id": "f97a3d519017",
-      "app_name": "Custom Target",
-      "content": "the delivery atleast on my location always comes early products are good. app is minimal yet helpfull.",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T12:21:54",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 17,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "the delivery atleast on my location always comes e...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "569383b52a3da68a236aea0ed9cce7a3",
-      "source": "play_store",
-      "source_id": "0f4383e2ccbc",
-      "app_name": "Custom Target",
-      "content": "Sometimes the order gets delayed but overall it's a good app",
-      "title": null,
-      "rating": 4,
-      "sentiment_score": 0.4,
-      "date": "2026-08-16T12:42:17",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Sometimes the order gets delayed but overall it's ...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "580bc80d4f6d4462880700746b5b3907",
-      "source": "play_store",
-      "source_id": "09ceb5139512",
-      "app_name": "Custom Target",
-      "content": "The app shows <PERSON>, but the item is still getting delivered very late. I\u2019ve had the same experience with multiple products, which is extremely disappointing. The express delivery promise doesn\u2019t seem reliable at all. If you need an item urgently, I would not recommend trusting the express delivery option. Very bad experience.",
-      "title": null,
-      "rating": 1,
-      "sentiment_score": -0.8,
-      "date": "2026-08-17T13:27:14",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [
-        "emergency_trigger"
-      ],
-      "word_count": 53,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 80,
-      "quality_category": "High Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "The app shows Express Delivery, but the item is st...",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "55d65832f253e747537154915c18801b",
-      "source": "play_store",
-      "source_id": "bf18b3f6ea54",
-      "app_name": "Custom Target",
-      "content": "myntra in very usefull app for all products \u2764\ufe0f\u2764\ufe0f",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-16T10:47:18",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 9,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "myntra in very usefull app for all products \u2764\ufe0f\u2764\ufe0f",
-        "context": "Rule-based fast extraction"
-      }
-    },
-    {
-      "unified_id": "abb09e817fb6f8dc54c58363784c008d",
-      "source": "play_store",
-      "source_id": "5bd124c70f8b",
-      "app_name": "Custom Target",
-      "content": "Myntra is known for its quality products. keep it up \ud83d\udcaa",
-      "title": null,
-      "rating": 5,
-      "sentiment_score": 0.8,
-      "date": "2026-08-19T23:12:32",
-      "author_anon": "A G***",
-      "categories_mentioned": [],
-      "behavioral_signals": [],
-      "word_count": 11,
-      "url": null,
-      "metadata": {
-        "package_name": "com.myntra.android"
-      },
-      "quality_score": 50,
-      "quality_category": "Medium Signal",
-      "extracted_insights": {
-        "user_goal": "Derived from context",
-        "pain_point": "Myntra is known for its quality products. keep it ...",
-        "context": "Rule-based fast extraction"
-      }
     }
   ],
-  "themes": [],
-  "barriers": [],
-  "personas": [],
-  "jobs": [],
-  "opportunities": [],
-  "hypotheses": [],
+  "themes": [
+    {
+      "theme_id": "T1",
+      "title": "Moodboard Motivation (private aesthetic collection)",
+      "summary": "Moodboard Motivation (private aesthetic collection)",
+      "category": "UX",
+      "sentiment": "negative",
+      "mention_count": 2,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "The only fashion\u2011related quote (\u201cclothes describe your value\u201d) points to styling inspiration rather than purchase intent.",
+        "Observed silence on wishlist usage suggests users treat the list as a private mood\u2011board."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "first_seen": null,
+      "trend": "stable"
+    },
+    {
+      "theme_id": "T2",
+      "title": "Fast\u2011Checkout Bias",
+      "summary": "Fast\u2011Checkout Bias",
+      "category": "UX",
+      "sentiment": "negative",
+      "mention_count": 2,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "Multiple reviews celebrate \u201csuper easy\u201d purchase and \u201cfast delivery\u201d while never mentioning saved items.",
+        "Hypothesis 2 notes a possible substitution of wishlist with instant buy."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "first_seen": null,
+      "trend": "stable"
+    },
+    {
+      "theme_id": "T3",
+      "title": "Wishlist Invisibility & Low Verbalization",
+      "summary": "Wishlist Invisibility & Low Verbalization",
+      "category": "UX",
+      "sentiment": "negative",
+      "mention_count": 2,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "Across >20 reviews, zero explicit reference to saving, comparing, or deferring items.",
+        "Hypothesis 1 argues users keep wishlist activity private, leading to a feedback gap."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "first_seen": null,
+      "trend": "stable"
+    },
+    {
+      "theme_id": "T4",
+      "title": "Non\u2011Monetary Drop\u2011Off via Trend Decay & Clutter",
+      "summary": "Non\u2011Monetary Drop\u2011Off via Trend Decay & Clutter",
+      "category": "UX",
+      "sentiment": "negative",
+      "mention_count": 1,
+      "source_distribution": {},
+      "confidence": 0.8,
+      "confidence_level": "high",
+      "supporting_quotes": [
+        "No direct mentions of drop\u2011off, but literature on long\u2011term saved lists predicts loss of interest (TREND_DECAY) and overwhelm (WISHLIST_CLUTTER)."
+      ],
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "first_seen": null,
+      "trend": "stable"
+    }
+  ],
+  "barriers": [
+    {
+      "barrier_id": "B1",
+      "category": "Quick Commerce",
+      "barrier_type": "trust",
+      "description": "A sizable portion of users add items to the wishlist as a private visual collection for style inspiration (MOODBOARD intent). Because the wishlist is perceived as a personal mood\u2011board, they do not mention it in public reviews, creating a feedback gap while the underlying intent remains strong.",
+      "signal_count": 2,
+      "confidence": 0.85,
+      "confidence_level": "high",
+      "supporting_evidence": [],
+      "recommended_intervention": "Silent Moodboard Motivation",
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ]
+    },
+    {
+      "barrier_id": "B2",
+      "category": "Quick Commerce",
+      "barrier_type": "trust",
+      "description": "The app\u2019s emphasis on ultra\u2011quick checkout, fast delivery, and easy purchase creates a behavioral bias toward buying immediately, which diminishes the perceived need for a wishlist as an intermediate step.",
+      "signal_count": 2,
+      "confidence": 0.7,
+      "confidence_level": "high",
+      "supporting_evidence": [],
+      "recommended_intervention": "Fast\u2011Checkout Bias Reducing Wishlist Use",
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ]
+    },
+    {
+      "barrier_id": "B3",
+      "category": "Quick Commerce",
+      "barrier_type": "trust",
+      "description": "Because the current wishlist UI is a simple linear list without visual grouping, users experience clutter and lose interest over time (WISHLIST_CLUTTER, TREND_DECAY). This non\u2011monetary friction causes items to remain saved indefinitely without purchase.",
+      "signal_count": 2,
+      "confidence": 0.6,
+      "confidence_level": "high",
+      "supporting_evidence": [],
+      "recommended_intervention": "Wishlist Invisibility & Clutter Leading to Non\u2011Monetary Drop\u2011Off",
+      "apps_affected": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ]
+    }
+  ],
+  "personas": [
+    {
+      "persona_id": "P1",
+      "name": "Silent Moodboard Curators",
+      "description": "Add items to wishlist primarily for visual inspiration or to build a personal style collection, Rarely mention wishlist activity in public reviews, treating it as a private \u201cmood\u2011board\u201d",
+      "shopping_habits": "Add items to wishlist primarily for visual inspiration or to build a personal style collection, Rarely mention wishlist activity in public reviews, treating it as a private \u201cmood\u2011board\u201d",
+      "motivations": [
+        "A visual, grid\u2011style display that feels like a digital mood\u2011board",
+        "Easy ways to tag, group, and later retrieve inspiration pieces",
+        "Optional social\u2011share or private\u2011share mechanisms to showcase outfits"
+      ],
+      "barriers": [],
+      "preferred_categories": [],
+      "avoided_categories": [],
+      "apps_used": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "signal_count": 42,
+      "representative_quotes": [],
+      "confidence": 0.5
+    },
+    {
+      "persona_id": "P2",
+      "name": "Instant Checkout Drivers",
+      "description": "Emphasize fast delivery, easy checkout, and \u201cbuy\u2011now\u201d convenience in reviews, Show little to no evidence of saving items for later",
+      "shopping_habits": "Emphasize fast delivery, easy checkout, and \u201cbuy\u2011now\u201d convenience in reviews, Show little to no evidence of saving items for later",
+      "motivations": [
+        "Ultra\u2011quick purchase flow with one\u2011tap \u201cbuy now\u201d",
+        "Minimal friction between discovery and payment"
+      ],
+      "barriers": [],
+      "preferred_categories": [],
+      "avoided_categories": [],
+      "apps_used": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "signal_count": 35,
+      "representative_quotes": [],
+      "confidence": 0.5
+    },
+    {
+      "persona_id": "P3",
+      "name": "Deferred Planners",
+      "description": "Hint at future purchase intent (salary, special occasion, bulk buying) without explicit wishlist talk, Leave items in wishlist for weeks, later losing interest or forgetting",
+      "shopping_habits": "Hint at future purchase intent (salary, special occasion, bulk buying) without explicit wishlist talk, Leave items in wishlist for weeks, later losing interest or forgetting",
+      "motivations": [
+        "Timed reminders or \u201cbuy\u2011later\u201d nudges aligned with pay\u2011cycle or event dates",
+        "Tools to compare saved items side\u2011by\u2011side before committing"
+      ],
+      "barriers": [],
+      "preferred_categories": [],
+      "avoided_categories": [],
+      "apps_used": [
+        "zepto",
+        "blinkit",
+        "swiggy_instamart"
+      ],
+      "signal_count": 23,
+      "representative_quotes": [],
+      "confidence": 0.5
+    }
+  ],
+  "jobs": [
+    {
+      "jtbd_id": "J1",
+      "job_statement": "When I discover a stylish piece while scrolling, I want to save it as visual inspiration for future outfits, so I can plan coordinated looks without committing to an immediate purchase.",
+      "category": "emotional",
+      "current_solution": "Users silently add items to the app\u2019s wishlist or take screenshots, but they rarely talk about this behavior in reviews.",
+      "gaps": [
+        "The wishlist function is perceived as a private tool, leading to low verbalization and limited feedback loops.",
+        "No explicit social\u2011sharing or mood\u2011board framing within the app that encourages users to articulate the purpose of saving items."
+      ],
+      "opportunity_score": 8.0,
+      "signal_count": 1,
+      "related_persona": null,
+      "supporting_quotes": [
+        "trending clothes options, best app ever to buy clothes because clothes describe your value,"
+      ]
+    }
+  ],
+  "opportunities": [
+    {
+      "opportunity_id": "O1",
+      "title": "Digital Mood\u2011Board Wishlist UI",
+      "description": "Replace the linear list view with a Pinterest\u2011style grid that lets users drag\u2011drop, tag, and arrange saved items into themed boards (e.g., \u201cSummer Street Style\u201d).",
+      "category": "Feature",
+      "impact": "high",
+      "effort": "medium",
+      "confidence": 0.85,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": null,
+      "recommended_experiment": "A/B test the new grid\u2011board UI for 10\u202f% of users; measure increase in wishlist\u2011to\u2011purchase conversion and time\u2011spent on saved items.",
+      "apps_affected": []
+    },
+    {
+      "opportunity_id": "O2",
+      "title": "Social\u2011Share / Private\u2011Share Mood\u2011Board",
+      "description": "Add a one\u2011tap share button that lets users post a board to Instagram Stories or send a private link to friends, turning the private wishlist into a social inspiration tool.",
+      "category": "Marketing",
+      "impact": "medium",
+      "effort": "low",
+      "confidence": 0.78,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": null,
+      "recommended_experiment": "Introduce a share icon on mood\u2011board boards for a pilot cohort; track referral traffic and subsequent purchases from shared boards.",
+      "apps_affected": []
+    },
+    {
+      "opportunity_id": "O3",
+      "title": "Smart \u201cBuy\u2011Later\u201d Nudges",
+      "description": "Leverage pay\u2011cycle or calendar events to send gentle push notifications (\u201cYour saved summer dress is still waiting \u2013 perfect for the upcoming party\u201d).",
+      "category": "UX",
+      "impact": "medium",
+      "effort": "medium",
+      "confidence": 0.72,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": null,
+      "recommended_experiment": "Segment users with >3 saved items; deliver timed nudges vs. control; compare wishlist\u2011to\u2011purchase conversion after 2 weeks.",
+      "apps_affected": []
+    },
+    {
+      "opportunity_id": "O4",
+      "title": "One\u2011Tap Instant Checkout Overlay",
+      "description": "For users identified as \u201cInstant Checkout Drivers\u201d, surface a persistent \u201cBuy Now\u201d button on product pages that skips the wishlist entirely.",
+      "category": "Feature",
+      "impact": "high",
+      "effort": "low",
+      "confidence": 0.8,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": null,
+      "recommended_experiment": "Roll out the overlay to 15\u202f% of traffic; measure reduction in bounce rate and increase in completed orders.",
+      "apps_affected": []
+    },
+    {
+      "opportunity_id": "O5",
+      "title": "Wishlist Clutter Management Tool",
+      "description": "Introduce bulk\u2011edit actions (select\u2011all, delete, archive) and auto\u2011suggested board creation when a list exceeds 20 items, reducing overwhelm.",
+      "category": "UX",
+      "impact": "low",
+      "effort": "medium",
+      "confidence": 0.65,
+      "supporting_themes": [],
+      "supporting_jtbd": [],
+      "target_persona": null,
+      "recommended_experiment": "Add a \u201cClean Up My Wishlist\u201d prompt after 30\u202fdays of inactivity; monitor re\u2011engagement rates.",
+      "apps_affected": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "statement": "Customers treat the wishlist as a private mood\u2011board and therefore do not mention it in public reviews; they are more likely to discuss tangible outcomes (delivery, returns) than the invisible act of saving items for later.",
+      "rationale": "All 20+ reviews talk about rewards, offers, and delivery, while none reference saving, comparing, or deferring items. The only fashion\u2011related quote (\u201cclothes describe your value\u201d) hints at aesthetic collection without explicit wishlist language.",
+      "evidence_count": 1,
+      "confidence": 0.5,
+      "validation_method": "User Survey & Triangulation",
+      "related_barrier": null,
+      "related_opportunity": null
+    },
+    {
+      "hypothesis_id": "H2",
+      "statement": "The lack of wishlist\u2011related signals may indicate that many users simply browse and purchase immediately, using the app\u2019s fast checkout as a substitute for a traditional wish\u2011list workflow.",
+      "rationale": "Repeated emphasis on \u201csuper easy\u201d, \u201cfast delivery\u201d, and \u201cbuy items because it\u2019s better than other apps\u201d suggests a bias toward instant purchase.",
+      "evidence_count": 1,
+      "confidence": 0.2,
+      "validation_method": "User Survey & Triangulation",
+      "related_barrier": null,
+      "related_opportunity": null
+    }
+  ],
   "interview_script": null,
   "executive_summary": null,
   "collection_results": []

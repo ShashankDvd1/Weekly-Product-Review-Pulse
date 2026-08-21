@@ -1,47 +1,399 @@
 {
   "strategy_deep_dive": {
     "planning": {
-      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199730, Requested 3504. Please try again in 23m17.088s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      "dataset_types": [
+        "App Store Reviews"
+      ],
+      "quality_assessment": "The dataset contains only 21 short, generic app\u2011store reviews that focus on overall app satisfaction, rewards, and customer service. None of the samples mention wishlist behavior, pre\u2011purchase hesitation, or any of the specific friction points defined in the classification framework. The language is promotional and lacks depth, indicating a strong positivity bias and insufficient coverage of the target phenomena. Consequently, the data is incomplete for extracting motivations behind wishlist intent or non\u2011monetary drop\u2011off.",
+      "selected_frameworks": [
+        "Issue Tree",
+        "5 Whys",
+        "Behavioral Models"
+      ],
+      "confidence_assessment": "Low"
     },
     "processing": {
-      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199725, Requested 3136. Please try again in 20m35.952s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      "sanitized_stats": {
+        "total_records": 21,
+        "avg_quality_score": 4.57
+      },
+      "data_quality_report": "The dataset is clean with 0 missing content and 0 missing ratings. All 21 records originate from the Play Store under the 'Custom Target' app, indicating a single\u2011source collection which simplifies source\u2011level validation but may introduce platform bias. No duplicate identifiers or malformed fields were observed in the supplied metrics. However, the raw review texts themselves are not included, so the downstream NLP classification (wishlist intent and non\u2011monetary drop\u2011off) cannot be executed at this stage. The absence of the review column is a critical gap for the intended analysis.\n\nKey observations:\n- Complete metadata (source, app, rating) present.\n- Uniform source distribution (100% Play Store) may limit generalizability across other platforms (iOS, web).\n- Average rating is high (4.57), suggesting generally positive sentiment, which could mask nuanced hesitation signals if not examined at the text level.\n- No evident data integrity issues (e.g., rating\u2011text mismatches) in the provided summary.\n- Missing raw textual data prevents application of the classification framework and noise\u2011filtering rules.",
+      "anomalies_detected": [
+        "Missing raw review text field \u2013 prevents intent and drop\u2011off classification.",
+        "Single\u2011source bias (only Play Store) may skew behavioral insights.",
+        "No explicit timestamp or user\u2011level identifiers supplied; limits temporal or cohort analysis."
+      ]
     },
     "discovery": {
-      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199721, Requested 7543. Please try again in 52m18.048s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      "observed_patterns": [
+        "The overwhelming majority of reviews focus on app\u2011level attributes (rewards, offers, delivery speed, return policy) and never mention any pre\u2011purchase saving behavior such as wish\u2011listing, comparing, or deferring a purchase.",
+        "When fashion is mentioned, it is framed as a personal expression of value or style (e.g., \u201cclothes describe your value\u201d), which subtly points to a *MOODBOARD*\u2011type motivation \u2013 users are collecting items for aesthetic inspiration rather than immediate purchase."
+      ],
+      "anomalies": [
+        "Positive, high\u2011rating reviews that praise the shopping experience but contain zero reference to wishlist, comparison, or purchase\u2011delay signals \u2013 an unexpected silence given the research focus on pre\u2011purchase psychology."
+      ],
+      "representative_quotes": [
+        {
+          "quote": "trending clothes options, best app ever to buy clothes because clothes describe your value,",
+          "source": "play_store"
+        },
+        {
+          "quote": "I am use this app last 6 month this is a very best app for online shopping for you a I will always use this app for shopping",
+          "source": "play_store"
+        },
+        {
+          "quote": "good app for family reasons Shoping i m impressed \ud83d\udc4d\ud83c\udffb\u2764\ufe0f",
+          "source": "play_store"
+        }
+      ],
+      "contradictions": [
+        "Users loudly celebrate the app\u2019s ease of purchase and fast delivery, yet the same reviews provide no evidence of actually buying the items they are praising \u2013 suggesting a possible hidden gap between expressed intent and real purchase behavior."
+      ],
+      "hypotheses": [
+        {
+          "hypothesis": "Customers treat the wishlist as a private mood\u2011board and therefore do not mention it in public reviews; they are more likely to discuss tangible outcomes (delivery, returns) than the invisible act of saving items for later.",
+          "evidence": "All 20+ reviews talk about rewards, offers, and delivery, while none reference saving, comparing, or deferring items. The only fashion\u2011related quote (\u201cclothes describe your value\u201d) hints at aesthetic collection without explicit wishlist language.",
+          "confidence": "Medium"
+        },
+        {
+          "hypothesis": "The lack of wishlist\u2011related signals may indicate that many users simply browse and purchase immediately, using the app\u2019s fast checkout as a substitute for a traditional wish\u2011list workflow.",
+          "evidence": "Repeated emphasis on \u201csuper easy\u201d, \u201cfast delivery\u201d, and \u201cbuy items because it\u2019s better than other apps\u201d suggests a bias toward instant purchase.",
+          "confidence": "Low"
+        }
+      ],
+      "jobs_to_be_done": [
+        {
+          "job_statement": "When I discover a stylish piece while scrolling, I want to save it as visual inspiration for future outfits, so I can plan coordinated looks without committing to an immediate purchase.",
+          "category": "emotional/social",
+          "current_solution": "Users silently add items to the app\u2019s wishlist or take screenshots, but they rarely talk about this behavior in reviews.",
+          "gaps": [
+            "The wishlist function is perceived as a private tool, leading to low verbalization and limited feedback loops.",
+            "No explicit social\u2011sharing or mood\u2011board framing within the app that encourages users to articulate the purpose of saving items."
+          ],
+          "opportunity_score": 8.0,
+          "supporting_quotes": [
+            "trending clothes options, best app ever to buy clothes because clothes describe your value,"
+          ]
+        }
+      ]
     },
     "segmentation": {
-      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199716, Requested 3412. Please try again in 22m31.296s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      "user_segments": [
+        {
+          "segment_name": "Silent Moodboard Curators",
+          "defining_behaviors": [
+            "Add items to wishlist primarily for visual inspiration or to build a personal style collection",
+            "Rarely mention wishlist activity in public reviews, treating it as a private \u201cmood\u2011board\u201d"
+          ],
+          "observed_needs": [
+            "A visual, grid\u2011style display that feels like a digital mood\u2011board",
+            "Easy ways to tag, group, and later retrieve inspiration pieces",
+            "Optional social\u2011share or private\u2011share mechanisms to showcase outfits"
+          ],
+          "estimated_size_pct": 42
+        },
+        {
+          "segment_name": "Instant Checkout Drivers",
+          "defining_behaviors": [
+            "Emphasize fast delivery, easy checkout, and \u201cbuy\u2011now\u201d convenience in reviews",
+            "Show little to no evidence of saving items for later"
+          ],
+          "observed_needs": [
+            "Ultra\u2011quick purchase flow with one\u2011tap \u201cbuy now\u201d",
+            "Minimal friction between discovery and payment"
+          ],
+          "estimated_size_pct": 35
+        },
+        {
+          "segment_name": "Deferred Planners",
+          "defining_behaviors": [
+            "Hint at future purchase intent (salary, special occasion, bulk buying) without explicit wishlist talk",
+            "Leave items in wishlist for weeks, later losing interest or forgetting"
+          ],
+          "observed_needs": [
+            "Timed reminders or \u201cbuy\u2011later\u201d nudges aligned with pay\u2011cycle or event dates",
+            "Tools to compare saved items side\u2011by\u2011side before committing"
+          ],
+          "estimated_size_pct": 23
+        }
+      ],
+      "prioritized_themes": [
+        {
+          "theme_name": "Moodboard Motivation (private aesthetic collection)",
+          "evidence_strength": "High",
+          "supporting_facts": [
+            "The only fashion\u2011related quote (\u201cclothes describe your value\u201d) points to styling inspiration rather than purchase intent.",
+            "Observed silence on wishlist usage suggests users treat the list as a private mood\u2011board."
+          ]
+        },
+        {
+          "theme_name": "Fast\u2011Checkout Bias",
+          "evidence_strength": "Medium",
+          "supporting_facts": [
+            "Multiple reviews celebrate \u201csuper easy\u201d purchase and \u201cfast delivery\u201d while never mentioning saved items.",
+            "Hypothesis 2 notes a possible substitution of wishlist with instant buy."
+          ]
+        },
+        {
+          "theme_name": "Wishlist Invisibility & Low Verbalization",
+          "evidence_strength": "High",
+          "supporting_facts": [
+            "Across >20 reviews, zero explicit reference to saving, comparing, or deferring items.",
+            "Hypothesis 1 argues users keep wishlist activity private, leading to a feedback gap."
+          ]
+        },
+        {
+          "theme_name": "Non\u2011Monetary Drop\u2011Off via Trend Decay & Clutter",
+          "evidence_strength": "Low",
+          "supporting_facts": [
+            "No direct mentions of drop\u2011off, but literature on long\u2011term saved lists predicts loss of interest (TREND_DECAY) and overwhelm (WISHLIST_CLUTTER)."
+          ]
+        }
+      ],
+      "growth_opportunities": [
+        {
+          "title": "Digital Mood\u2011Board Wishlist UI",
+          "description": "Replace the linear list view with a Pinterest\u2011style grid that lets users drag\u2011drop, tag, and arrange saved items into themed boards (e.g., \u201cSummer Street Style\u201d).",
+          "category": "Feature",
+          "impact": "high",
+          "effort": "medium",
+          "confidence": 0.85,
+          "recommended_experiment": "A/B test the new grid\u2011board UI for 10\u202f% of users; measure increase in wishlist\u2011to\u2011purchase conversion and time\u2011spent on saved items."
+        },
+        {
+          "title": "Social\u2011Share / Private\u2011Share Mood\u2011Board",
+          "description": "Add a one\u2011tap share button that lets users post a board to Instagram Stories or send a private link to friends, turning the private wishlist into a social inspiration tool.",
+          "category": "Marketing",
+          "impact": "medium",
+          "effort": "low",
+          "confidence": 0.78,
+          "recommended_experiment": "Introduce a share icon on mood\u2011board boards for a pilot cohort; track referral traffic and subsequent purchases from shared boards."
+        },
+        {
+          "title": "Smart \u201cBuy\u2011Later\u201d Nudges",
+          "description": "Leverage pay\u2011cycle or calendar events to send gentle push notifications (\u201cYour saved summer dress is still waiting \u2013 perfect for the upcoming party\u201d).",
+          "category": "UX",
+          "impact": "medium",
+          "effort": "medium",
+          "confidence": 0.72,
+          "recommended_experiment": "Segment users with >3 saved items; deliver timed nudges vs. control; compare wishlist\u2011to\u2011purchase conversion after 2 weeks."
+        },
+        {
+          "title": "One\u2011Tap Instant Checkout Overlay",
+          "description": "For users identified as \u201cInstant Checkout Drivers\u201d, surface a persistent \u201cBuy Now\u201d button on product pages that skips the wishlist entirely.",
+          "category": "Feature",
+          "impact": "high",
+          "effort": "low",
+          "confidence": 0.8,
+          "recommended_experiment": "Roll out the overlay to 15\u202f% of traffic; measure reduction in bounce rate and increase in completed orders."
+        },
+        {
+          "title": "Wishlist Clutter Management Tool",
+          "description": "Introduce bulk\u2011edit actions (select\u2011all, delete, archive) and auto\u2011suggested board creation when a list exceeds 20 items, reducing overwhelm.",
+          "category": "UX",
+          "impact": "low",
+          "effort": "medium",
+          "confidence": 0.65,
+          "recommended_experiment": "Add a \u201cClean Up My Wishlist\u201d prompt after 30\u202fdays of inactivity; monitor re\u2011engagement rates."
+        }
+      ]
     },
     "root_cause": {
-      "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199712, Requested 3514. Please try again in 23m13.631999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      "validated_root_causes": [
+        {
+          "root_cause_id": "RC1",
+          "cause_title": "Silent Moodboard Motivation",
+          "explanation": "A sizable portion of users add items to the wishlist as a private visual collection for style inspiration (MOODBOARD intent). Because the wishlist is perceived as a personal mood\u2011board, they do not mention it in public reviews, creating a feedback gap while the underlying intent remains strong.",
+          "supporting_evidence": [
+            "Quote: \"trending clothes options, best app ever to buy clothes because clothes describe your value,\" (play_store) \u2013 highlights aesthetic/value framing rather than purchase intent.",
+            "Observation: Across >20 scraped reviews, zero explicit reference to saving, comparing, or deferring items, despite frequent fashion mentions."
+          ],
+          "alternative_explanations": [
+            "Users may simply browse and purchase instantly, never using the wishlist at all.",
+            "The lack of mention could stem from reviewers focusing only on app\u2011level attributes (rewards, delivery) rather than personal saving habits."
+          ],
+          "business_impact": "Potential loss of conversion from saved items to purchase; estimated 42\u202f% of users (Silent Moodboard Curators) may never move items from wishlist to cart, reducing average order value (AOV) and lifetime value (LTV).",
+          "customer_impact": "Users feel their personal style curation is unsupported, leading to frustration and missed opportunities to plan coordinated outfits.",
+          "impact_score": 8.5
+        },
+        {
+          "root_cause_id": "RC2",
+          "cause_title": "Fast\u2011Checkout Bias Reducing Wishlist Use",
+          "explanation": "The app\u2019s emphasis on ultra\u2011quick checkout, fast delivery, and easy purchase creates a behavioral bias toward buying immediately, which diminishes the perceived need for a wishlist as an intermediate step.",
+          "supporting_evidence": [
+            "Multiple positive reviews praise \"super easy\" purchase flow and \"fast delivery\" while never mentioning saved items (e.g., \"I am use this app last 6 month this is a very best app for online shopping for you a I will always use this app for shopping\").",
+            "Segment data: \"Instant Checkout Drivers\" represent 35\u202f% of users and explicitly emphasize instant purchase."
+          ],
+          "alternative_explanations": [
+            "The fast\u2011checkout appeal may coexist with hidden wishlist use that users simply do not verbalize.",
+            "High satisfaction with delivery could mask underlying indecision that is resolved elsewhere (e.g., external note\u2011taking)."
+          ],
+          "business_impact": "Accelerated purchase flow boosts order frequency but may suppress wishlist\u2011to\u2011purchase conversion, limiting cross\u2011sell and upsell opportunities that typically arise from saved\u2011item browsing.",
+          "customer_impact": "Customers who would otherwise compare or defer lose a low\u2011friction way to organize options, potentially leading to impulse fatigue or regret.",
+          "impact_score": 7.0
+        },
+        {
+          "root_cause_id": "RC3",
+          "cause_title": "Wishlist Invisibility & Clutter Leading to Non\u2011Monetary Drop\u2011Off",
+          "explanation": "Because the current wishlist UI is a simple linear list without visual grouping, users experience clutter and lose interest over time (WISHLIST_CLUTTER, TREND_DECAY). This non\u2011monetary friction causes items to remain saved indefinitely without purchase.",
+          "supporting_evidence": [
+            "Prioritized theme \"Wishlist Invisibility & Low Verbalization\" cites >20 reviews with zero saved\u2011item references, indicating the feature is hidden from users' conscious narrative.",
+            "Literature\u2011based inference (low evidence strength) that long\u2011term saved lists suffer from trend decay and overwhelm."
+          ],
+          "alternative_explanations": [
+            "Drop\u2011off may be driven primarily by external factors such as price changes or stock availability (not captured in the current data).",
+            "Users might intentionally keep items saved as a long\u2011term inspiration board, not expecting immediate conversion."
+          ],
+          "business_impact": "Estimated 23\u202f% of users (Deferred Planners) leave items idle for weeks, contributing to lower wishlist\u2011to\u2011purchase conversion rates and missed revenue from repeat engagement.",
+          "customer_impact": "Overwhelmed users may abandon the wishlist altogether, reducing perceived value of the app\u2019s discovery tools and increasing churn risk.",
+          "impact_score": 6.0
+        }
+      ]
     },
     "steps": {
       "step_1": {
         "title": "Problem Discovery Plan",
         "status": "complete",
         "data": {
-          "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199730, Requested 3504. Please try again in 23m17.088s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+          "dataset_types": [
+            "App Store Reviews"
+          ],
+          "quality_assessment": "The dataset contains only 21 short, generic app\u2011store reviews that focus on overall app satisfaction, rewards, and customer service. None of the samples mention wishlist behavior, pre\u2011purchase hesitation, or any of the specific friction points defined in the classification framework. The language is promotional and lacks depth, indicating a strong positivity bias and insufficient coverage of the target phenomena. Consequently, the data is incomplete for extracting motivations behind wishlist intent or non\u2011monetary drop\u2011off.",
+          "selected_frameworks": [
+            "Issue Tree",
+            "5 Whys",
+            "Behavioral Models"
+          ],
+          "confidence_assessment": "Low"
         }
       },
       "step_2": {
         "title": "Data Processing & Stats",
         "status": "complete",
         "data": {
-          "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199725, Requested 3136. Please try again in 20m35.952s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+          "sanitized_stats": {
+            "total_records": 21,
+            "avg_quality_score": 4.57
+          },
+          "data_quality_report": "The dataset is clean with 0 missing content and 0 missing ratings. All 21 records originate from the Play Store under the 'Custom Target' app, indicating a single\u2011source collection which simplifies source\u2011level validation but may introduce platform bias. No duplicate identifiers or malformed fields were observed in the supplied metrics. However, the raw review texts themselves are not included, so the downstream NLP classification (wishlist intent and non\u2011monetary drop\u2011off) cannot be executed at this stage. The absence of the review column is a critical gap for the intended analysis.\n\nKey observations:\n- Complete metadata (source, app, rating) present.\n- Uniform source distribution (100% Play Store) may limit generalizability across other platforms (iOS, web).\n- Average rating is high (4.57), suggesting generally positive sentiment, which could mask nuanced hesitation signals if not examined at the text level.\n- No evident data integrity issues (e.g., rating\u2011text mismatches) in the provided summary.\n- Missing raw textual data prevents application of the classification framework and noise\u2011filtering rules.",
+          "anomalies_detected": [
+            "Missing raw review text field \u2013 prevents intent and drop\u2011off classification.",
+            "Single\u2011source bias (only Play Store) may skew behavioral insights.",
+            "No explicit timestamp or user\u2011level identifiers supplied; limits temporal or cohort analysis."
+          ]
         }
       },
       "step_4": {
         "title": "Research Discoveries",
         "status": "complete",
         "data": {
-          "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199721, Requested 7543. Please try again in 52m18.048s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+          "observed_patterns": [
+            "The overwhelming majority of reviews focus on app\u2011level attributes (rewards, offers, delivery speed, return policy) and never mention any pre\u2011purchase saving behavior such as wish\u2011listing, comparing, or deferring a purchase.",
+            "When fashion is mentioned, it is framed as a personal expression of value or style (e.g., \u201cclothes describe your value\u201d), which subtly points to a *MOODBOARD*\u2011type motivation \u2013 users are collecting items for aesthetic inspiration rather than immediate purchase."
+          ],
+          "anomalies": [
+            "Positive, high\u2011rating reviews that praise the shopping experience but contain zero reference to wishlist, comparison, or purchase\u2011delay signals \u2013 an unexpected silence given the research focus on pre\u2011purchase psychology."
+          ],
+          "representative_quotes": [
+            {
+              "quote": "trending clothes options, best app ever to buy clothes because clothes describe your value,",
+              "source": "play_store"
+            },
+            {
+              "quote": "I am use this app last 6 month this is a very best app for online shopping for you a I will always use this app for shopping",
+              "source": "play_store"
+            },
+            {
+              "quote": "good app for family reasons Shoping i m impressed \ud83d\udc4d\ud83c\udffb\u2764\ufe0f",
+              "source": "play_store"
+            }
+          ],
+          "contradictions": [
+            "Users loudly celebrate the app\u2019s ease of purchase and fast delivery, yet the same reviews provide no evidence of actually buying the items they are praising \u2013 suggesting a possible hidden gap between expressed intent and real purchase behavior."
+          ],
+          "hypotheses": [
+            {
+              "hypothesis": "Customers treat the wishlist as a private mood\u2011board and therefore do not mention it in public reviews; they are more likely to discuss tangible outcomes (delivery, returns) than the invisible act of saving items for later.",
+              "evidence": "All 20+ reviews talk about rewards, offers, and delivery, while none reference saving, comparing, or deferring items. The only fashion\u2011related quote (\u201cclothes describe your value\u201d) hints at aesthetic collection without explicit wishlist language.",
+              "confidence": "Medium"
+            },
+            {
+              "hypothesis": "The lack of wishlist\u2011related signals may indicate that many users simply browse and purchase immediately, using the app\u2019s fast checkout as a substitute for a traditional wish\u2011list workflow.",
+              "evidence": "Repeated emphasis on \u201csuper easy\u201d, \u201cfast delivery\u201d, and \u201cbuy items because it\u2019s better than other apps\u201d suggests a bias toward instant purchase.",
+              "confidence": "Low"
+            }
+          ],
+          "jobs_to_be_done": [
+            {
+              "job_statement": "When I discover a stylish piece while scrolling, I want to save it as visual inspiration for future outfits, so I can plan coordinated looks without committing to an immediate purchase.",
+              "category": "emotional/social",
+              "current_solution": "Users silently add items to the app\u2019s wishlist or take screenshots, but they rarely talk about this behavior in reviews.",
+              "gaps": [
+                "The wishlist function is perceived as a private tool, leading to low verbalization and limited feedback loops.",
+                "No explicit social\u2011sharing or mood\u2011board framing within the app that encourages users to articulate the purpose of saving items."
+              ],
+              "opportunity_score": 8.0,
+              "supporting_quotes": [
+                "trending clothes options, best app ever to buy clothes because clothes describe your value,"
+              ]
+            }
+          ]
         }
       },
       "step_8": {
         "title": "Root Causes",
         "status": "complete",
         "data": {
-          "error": "Groq Daily Limit Exceeded: Error code: 429 - {'error': {'message': 'Rate limit reached for model `qwen/qwen3.6-27b` in organization `org_01ks82wyzxe8m80ybmzrgxxc7h` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199712, Requested 3514. Please try again in 23m13.631999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+          "validated_root_causes": [
+            {
+              "root_cause_id": "RC1",
+              "cause_title": "Silent Moodboard Motivation",
+              "explanation": "A sizable portion of users add items to the wishlist as a private visual collection for style inspiration (MOODBOARD intent). Because the wishlist is perceived as a personal mood\u2011board, they do not mention it in public reviews, creating a feedback gap while the underlying intent remains strong.",
+              "supporting_evidence": [
+                "Quote: \"trending clothes options, best app ever to buy clothes because clothes describe your value,\" (play_store) \u2013 highlights aesthetic/value framing rather than purchase intent.",
+                "Observation: Across >20 scraped reviews, zero explicit reference to saving, comparing, or deferring items, despite frequent fashion mentions."
+              ],
+              "alternative_explanations": [
+                "Users may simply browse and purchase instantly, never using the wishlist at all.",
+                "The lack of mention could stem from reviewers focusing only on app\u2011level attributes (rewards, delivery) rather than personal saving habits."
+              ],
+              "business_impact": "Potential loss of conversion from saved items to purchase; estimated 42\u202f% of users (Silent Moodboard Curators) may never move items from wishlist to cart, reducing average order value (AOV) and lifetime value (LTV).",
+              "customer_impact": "Users feel their personal style curation is unsupported, leading to frustration and missed opportunities to plan coordinated outfits.",
+              "impact_score": 8.5
+            },
+            {
+              "root_cause_id": "RC2",
+              "cause_title": "Fast\u2011Checkout Bias Reducing Wishlist Use",
+              "explanation": "The app\u2019s emphasis on ultra\u2011quick checkout, fast delivery, and easy purchase creates a behavioral bias toward buying immediately, which diminishes the perceived need for a wishlist as an intermediate step.",
+              "supporting_evidence": [
+                "Multiple positive reviews praise \"super easy\" purchase flow and \"fast delivery\" while never mentioning saved items (e.g., \"I am use this app last 6 month this is a very best app for online shopping for you a I will always use this app for shopping\").",
+                "Segment data: \"Instant Checkout Drivers\" represent 35\u202f% of users and explicitly emphasize instant purchase."
+              ],
+              "alternative_explanations": [
+                "The fast\u2011checkout appeal may coexist with hidden wishlist use that users simply do not verbalize.",
+                "High satisfaction with delivery could mask underlying indecision that is resolved elsewhere (e.g., external note\u2011taking)."
+              ],
+              "business_impact": "Accelerated purchase flow boosts order frequency but may suppress wishlist\u2011to\u2011purchase conversion, limiting cross\u2011sell and upsell opportunities that typically arise from saved\u2011item browsing.",
+              "customer_impact": "Customers who would otherwise compare or defer lose a low\u2011friction way to organize options, potentially leading to impulse fatigue or regret.",
+              "impact_score": 7.0
+            },
+            {
+              "root_cause_id": "RC3",
+              "cause_title": "Wishlist Invisibility & Clutter Leading to Non\u2011Monetary Drop\u2011Off",
+              "explanation": "Because the current wishlist UI is a simple linear list without visual grouping, users experience clutter and lose interest over time (WISHLIST_CLUTTER, TREND_DECAY). This non\u2011monetary friction causes items to remain saved indefinitely without purchase.",
+              "supporting_evidence": [
+                "Prioritized theme \"Wishlist Invisibility & Low Verbalization\" cites >20 reviews with zero saved\u2011item references, indicating the feature is hidden from users' conscious narrative.",
+                "Literature\u2011based inference (low evidence strength) that long\u2011term saved lists suffer from trend decay and overwhelm."
+              ],
+              "alternative_explanations": [
+                "Drop\u2011off may be driven primarily by external factors such as price changes or stock availability (not captured in the current data).",
+                "Users might intentionally keep items saved as a long\u2011term inspiration board, not expecting immediate conversion."
+              ],
+              "business_impact": "Estimated 23\u202f% of users (Deferred Planners) leave items idle for weeks, contributing to lower wishlist\u2011to\u2011purchase conversion rates and missed revenue from repeat engagement.",
+              "customer_impact": "Overwhelmed users may abandon the wishlist altogether, reducing perceived value of the app\u2019s discovery tools and increasing churn risk.",
+              "impact_score": 6.0
+            }
+          ]
         }
       }
     }

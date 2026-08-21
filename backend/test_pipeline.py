@@ -52,7 +52,7 @@ def main():
     print(f"Total hypotheses generated: {len(orchestrator.hypotheses)}")
     
     if orchestrator.themes:
-        print(f"Sample theme: {orchestrator.themes[0].name}")
+        print(f"Sample theme: {orchestrator.themes[0].title}")
     if orchestrator.personas:
         print(f"Sample persona: {orchestrator.personas[0].name}")
         
