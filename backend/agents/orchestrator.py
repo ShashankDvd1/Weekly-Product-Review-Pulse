@@ -791,6 +791,31 @@ class PipelineOrchestrator:
                 ]
             ]
             
+            # Balance dataset according to target ratios (40% YouTube, 40% Play Store, 20% App Store)
+            yt_sigs = [s for s in accepted_signals if s.source == DataSource.YOUTUBE]
+            play_sigs = [s for s in accepted_signals if s.source == DataSource.PLAY_STORE]
+            app_sigs = [s for s in accepted_signals if s.source == DataSource.APP_STORE]
+            
+            target_total = 300
+            target_yt = int(target_total * 0.40)      # 120
+            target_play = int(target_total * 0.40)    # 120
+            target_app = int(target_total * 0.20)     # 60
+            
+            import random
+            random.seed(42)
+            
+            sampled_yt = random.sample(yt_sigs, min(len(yt_sigs), target_yt))
+            sampled_play = random.sample(play_sigs, min(len(play_sigs), target_play))
+            sampled_app = random.sample(app_sigs, min(len(app_sigs), target_app))
+            
+            balanced_signals = sampled_yt + sampled_play + sampled_app
+            self._log_progress(f"⚖️ Balanced accepted dataset (Target Ratio: 40% YT, 40% Play Store, 20% App Store):")
+            self._log_progress(f"  🎥 YouTube: {len(sampled_yt)} reviews")
+            self._log_progress(f"  📱 Play Store: {len(sampled_play)} reviews")
+            self._log_progress(f"  🍎 App Store: {len(sampled_app)} reviews")
+            
+            accepted_signals = balanced_signals
+            
             self._log_progress(f"🏆 Accepted high-signal genuine reviews: {len(accepted_signals)}")
             
             if len(accepted_signals) >= TARGET_GENUINE_REVIEWS:
