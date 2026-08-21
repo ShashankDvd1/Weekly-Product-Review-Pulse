@@ -155,6 +155,11 @@ class LLMClient:
         if not raw or not isinstance(raw, str):
             return {}
         cleaned = raw.strip()
+        
+        # Strip thinking blocks from reasoning models (e.g. <think>...</think>)
+        import re
+        cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
+        
         if cleaned.startswith("```"):
             lines = cleaned.splitlines()
             if lines and lines[0].startswith("```"):
