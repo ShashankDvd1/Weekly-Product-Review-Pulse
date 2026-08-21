@@ -28,6 +28,7 @@ CRITICAL RULES:
 1. Ground every pattern, quote, or hypothesis strictly in the provided data.
 2. DO NOT propose any product solutions, features, or roadmap items.
 3. Identify contradictions where they exist (e.g. users state one preference but show a different behavior).
+4. Generate a minimum of 4 distinct and detailed causal hypotheses.
 """
         if problem_statement:
             system_prompt += f"\nFOCUS RULE: Your entire analysis and extraction MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize finding observed patterns, anomalies, representative quotes, contradictions, causal hypotheses, and Jobs-To-Be-Done that directly shed light on user behaviors, friction points, and barriers related to this specific problem statement.\n"
@@ -42,6 +43,7 @@ Return strictly a JSON object with this schema:
   ],
   "contradictions": ["Contradicting behavior or signal"],
   "hypotheses": [
+    // Generate a minimum of 4 distinct and detailed hypotheses here
     {
       "hypothesis": "Causal hypothesis",
       "evidence": "Supporting text or signal reference",

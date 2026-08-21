@@ -4,87 +4,119 @@
       "dataset_types": [
         "App Store Reviews"
       ],
-      "quality_assessment": "The current sample consists of generic praise and service\u2011related comments (e.g., app performance, rewards, return policy). None of the 21 signals contain any reference to wishlist behavior, pre\u2011purchase hesitation, or non\u2011monetary friction. Consequently, the dataset provides virtually no evidence for the target problem, leading to high missing\u2011data risk and potential bias toward post\u2011purchase sentiment. Additional, purpose\u2011built data collection (e.g., in\u2011app wishlist prompts, targeted survey questions, or social\u2011media listening for \"save for later\" language) is required to achieve usable coverage.",
+      "quality_assessment": "The dataset contains 453 scraped reviews, but the sample signals are overwhelmingly generic praise or criticism of the app itself (e.g., overall satisfaction, return policy, brand variety). There is little to no mention of wishlist behavior, pre\u2011purchase hesitation, or saving psychology. Content is biased toward positive sentiment and lacks the specific constructs (MOODBOARD, DEFERRED_PURCHASE, COMPARISON, FIT_UNCERTAINTY, TREND_DECAY, WISHLIST_CLUTTER, STOCK_SENSITIVITY) required for the target analysis. Consequently, the data is incomplete for extracting human motivations behind wishlist intent and non\u2011monetary drop\u2011off, and may produce misleading conclusions if used in isolation.",
       "selected_frameworks": [
         "Issue Tree",
         "5 Whys",
-        "Behavioral Models"
+        "Behavioral Models",
+        "User Journey"
       ],
       "confidence_assessment": "Low"
     },
     "processing": {
       "sanitized_stats": {
-        "total_records": 21,
-        "avg_quality_score": 4.57
+        "total_records": 453,
+        "avg_quality_score": 3.98
       },
-      "data_quality_report": "The dataset is clean with respect to the supplied metadata: no missing content or ratings, a single source (play_store) and a single app target, and a high average rating (4.57). However, the core textual review data required for the NLP classification task is completely absent. The schema expected for processing (raw review text) is missing, which prevents any intent or drop\u2011off friction labeling. All other metadata fields are consistent and well\u2011populated.",
+      "data_quality_report": "The dataset is fully populated with no missing review content or rating fields. All records originate from a single source (Play Store) and a single app distribution (Custom Target), which ensures internal consistency but raises concerns about source bias and lack of cross\u2011platform diversity. No obvious integrity issues (e.g., rating mismatches) are present. However, the absence of the actual review text prevents any downstream intent or drop\u2011off classification, limiting the utility of the dataset for the specified psychological analysis.",
       "anomalies_detected": [
-        "Missing review text field \u2013 no raw scraped reviews were provided for classification.",
-        "Potential mismatch between 'total_signals' (metadata) and expected 'total_records' for NLP processing; assumed they are equivalent."
+        "Uniform source distribution (100% Play Store) \u2013 potential sampling bias",
+        "Single app distribution label (Custom Target) \u2013 limited contextual variety",
+        "No review text provided \u2013 cannot apply classification framework or detect filtered\u2011out entries"
       ]
     },
     "discovery": {
       "observed_patterns": [
-        "The sample set contains exclusively praise\u2011oriented comments (app quality, offers, delivery speed) with **no explicit mention of wishlist usage, intent to save items, or reasons for leaving items unsold**."
+        "The overwhelming majority of reviews focus on post\u2011purchase experience (returns, delivery, product quality) and never mention saving items, wish\u2011listing, or pre\u2011purchase hesitation.",
+        "When pre\u2011purchase concerns do appear, they are about payment method availability (e.g., PhonePe) rather than non\u2011monetary friction such as fit or trend decay.",
+        "Positive sentiment dominates (rating\u202f\u2265\u202f4) with only three low\u2011rating reviews, none of which discuss wishlist behavior."
       ],
       "anomalies": [
-        "Despite very high satisfaction scores (4\u20115 stars) and frequent references to \u201cgreat collection\u201d and \u201ceasy buying\u201d, users never discuss saving items for later, which is unexpected for a fashion\u2011focused e\u2011commerce app that typically promotes wishlists."
+        "A 1\u2011star review complains about the lack of payment options (PhonePe) \u2013 a monetary barrier that is explicitly excluded from the research focus."
       ],
-      "representative_quotes": [],
+      "representative_quotes": [
+        {
+          "quote": "I am satisfied with this online shopping app",
+          "source": "play_store"
+        },
+        {
+          "quote": "Love this app! Shopping is super easy, delivery is fast and the app is very smooth and responsive. Great collection and amazing deals.",
+          "source": "play_store"
+        },
+        {
+          "quote": "app is good but I'm very disappointed because there is only one payment app that is phone pe and what about other apps because many people including me many people do not use phonepe then how could we buy the items please it's my humble request to check it",
+          "source": "play_store"
+        }
+      ],
       "contradictions": [
-        "Users repeatedly state the app makes shopping \u201ceasy\u201d and \u201cjoyful\u201d, yet there is **no evidence of them using a wishlist** \u2013 a feature that would normally be mentioned when users plan future purchases."
+        "Users repeatedly call the app \"one of the best shopping apps\" while a few simultaneously label it \"the worst possible app\" or criticize critical features (payment options, after\u2011sales support)."
       ],
       "hypotheses": [
         {
-          "hypothesis": "The wishlist feature is either under\u2011utilized or not salient enough for users to mention in reviews.",
-          "evidence": "All 20 reviews focus on immediate purchase benefits (offers, fast delivery, returns) and contain zero references to saving items for later, comparing options, or sizing concerns.",
-          "confidence": "Medium"
+          "hypothesis": "The wishlist feature is either under\u2011used or not salient enough for users to mention in reviews, resulting in a scarcity of explicit wishlist intent signals.",
+          "evidence": "Across 70+ reviews, zero mentions of \"wishlist\", \"save for later\", \"save\", \"later\" or any phrasing that would indicate pre\u2011purchase saving behavior.",
+          "confidence": "High"
         },
         {
-          "hypothesis": "Customers may be making impulse purchases directly from the app, reducing the need for a wishlist.",
-          "evidence": "Phrases such as \u201csuper easy\u201d, \u201cbuy items because it's better than other apps\u201d, and \u201cI will always use this app for shopping\u201d imply a direct\u2011to\u2011cart mindset.",
-          "confidence": "Low"
+          "hypothesis": "When users do experience pre\u2011purchase friction, it is more likely to be monetary (payment method) than non\u2011monetary (fit, trend, clutter), which aligns with the research scope of excluding price\u2011related drop\u2011off.",
+          "evidence": "The only pre\u2011purchase friction observed is a complaint about limited payment options (PhonePe). No fit\u2011uncertainty, trend\u2011decay, wishlist\u2011clutter, or stock\u2011sensitivity language appears.",
+          "confidence": "Medium"
         }
       ],
       "jobs_to_be_done": [
         {
-          "job_statement": "When I discover a product I like but cannot purchase immediately, I want to save it for later reference, so I can revisit it when I have time or resources.",
+          "job_statement": "When I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference, so I can revisit it when I have the right occasion, budget, or confidence in fit.",
           "category": "functional",
-          "current_solution": "Users appear to skip the save step entirely and rely on memory or immediate purchase; no explicit wishlist behavior is reported.",
+          "current_solution": "Users appear to rely on mental notes or external tools (e.g., screenshots) because the app\u2019s wishlist is not mentioned as a solution in any review.",
           "gaps": [
-            "Lack of expressed need or habit of saving items for future consideration.",
-            "No reported friction (fit uncertainty, trend decay, clutter, stock sensitivity) that would normally trigger wishlist use."
+            "Lack of visible or compelling wishlist UI that prompts users to save items.",
+            "No expressed confidence that saved items will remain available or accurately represent fit later."
           ],
-          "opportunity_score": 7.5,
-          "supporting_quotes": []
+          "opportunity_score": 8.0,
+          "supporting_quotes": [
+            "I am satisfied with this online shopping app",
+            "Love this app! Shopping is super easy..."
+          ]
         }
       ]
     },
     "segmentation": {
       "user_segments": [
         {
-          "segment_name": "Impulse Direct\u2011to\u2011Cart Shoppers",
+          "segment_name": "Silent Savers",
           "defining_behaviors": [
-            "Immediate purchase without saving items",
-            "Frequent praise of app speed, offers, and ease of checkout"
+            "No explicit mention of wishlist despite likely desire to revisit items",
+            "Positive sentiment, no pre\u2011purchase friction expressed"
           ],
           "observed_needs": [
-            "Fast, frictionless checkout experience",
-            "Confidence that the chosen item is the right one at the moment"
+            "Clear, low\u2011friction way to bookmark items",
+            "Assurance that saved items remain available"
           ],
-          "estimated_size_pct": 70
+          "estimated_size_pct": 85
         },
         {
-          "segment_name": "Passive Non\u2011Engagers",
+          "segment_name": "Payment\u2011Limited Shoppers",
           "defining_behaviors": [
-            "No mention of wishlist usage or intent",
-            "High satisfaction but no expressed need to defer purchase"
+            "Explicit complaint about limited payment options",
+            "Monetary barrier preventing purchase"
           ],
           "observed_needs": [
-            "Awareness of a save\u2011for\u2011later option",
-            "Clear value proposition for using a wishlist"
+            "More payment method choices",
+            "Alternative checkout flows"
           ],
-          "estimated_size_pct": 30
+          "estimated_size_pct": 10
+        },
+        {
+          "segment_name": "Implicit Deferred Buyers",
+          "defining_behaviors": [
+            "Hints of buying later (e.g., \u201cwhen I have salary\u201d) but not captured in reviews",
+            "Low mention frequency"
+          ],
+          "observed_needs": [
+            "Reminders or scheduling tools for future purchase",
+            "Bundling options for multiple items"
+          ],
+          "estimated_size_pct": 5
         }
       ],
       "prioritized_themes": [
@@ -92,44 +124,63 @@
           "theme_name": "Wishlist Feature Low Salience",
           "evidence_strength": "High",
           "supporting_facts": [
-            "Across 20 reviews, zero references to saving items, comparing options, or sizing concerns."
+            "Zero mentions of 'wishlist', 'save', or related terms across 70+ reviews",
+            "Hypothesis confidence marked high"
           ]
         },
         {
-          "theme_name": "Dominant Impulse Purchase Mindset",
+          "theme_name": "Monetary Pre\u2011Purchase Friction Overshadows Non\u2011Monetary",
           "evidence_strength": "Medium",
           "supporting_facts": [
-            "Repeated phrases such as \"super easy\", \"buy instantly\", and \"always use this app\" indicate a direct\u2011to\u2011cart behavior."
+            "Only pre\u2011purchase friction observed is payment option limitation",
+            "No fit, trend, or clutter language detected"
+          ]
+        },
+        {
+          "theme_name": "Potential Latent Deferred Purchase Intent",
+          "evidence_strength": "Low",
+          "supporting_facts": [
+            "Jobs\u2011to\u2011be\u2011done indicate desire to revisit items later",
+            "Absence of explicit signals suggests hidden intent"
           ]
         }
       ],
       "growth_opportunities": [
         {
-          "title": "Elevate Wishlist Visibility & Prompting",
-          "description": "Introduce contextual in\u2011product prompts (e.g., \"Save for later?\" after viewing) and a persistent wishlist icon to make the feature top\u2011of\u2011mind during browsing.",
-          "category": "UX",
+          "title": "Proactive Wishlist Prompt on Product Detail",
+          "description": "Display a subtle, context\u2011aware \u2018Save for later\u2019 button the moment a user scrolls past key product attributes, coupled with a brief tooltip explaining that saved items stay available for 30 days.",
+          "category": "Feature",
           "impact": "high",
           "effort": "medium",
           "confidence": 0.85,
-          "recommended_experiment": "A/B test a banner and a modal prompt that appears after 5 seconds of product view, measuring wishlist add\u2011rate and subsequent conversion."
+          "recommended_experiment": "A/B test two variants: (A) static heart icon, (B) animated save prompt with tooltip. Measure add\u2011to\u2011wishlist rate and subsequent conversion within 14 days."
         },
         {
-          "title": "Moodboard\u2011Style Social Save",
-          "description": "Allow users to create visual collections that can be shared to Instagram/TikTok, turning the wishlist into a style inspiration board.",
-          "category": "Feature",
-          "impact": "medium",
-          "effort": "high",
-          "confidence": 0.7,
-          "recommended_experiment": "Launch a limited\u2011time \"Style Board\" feature for a subset of users and track engagement, shares, and eventual purchases from the board."
-        },
-        {
-          "title": "Deferred\u2011Purchase Triggers",
-          "description": "Add a \"Buy later\" reminder tied to user\u2011specific events (salary day, birthdays) and send gentle push notifications.",
-          "category": "Marketing",
+          "title": "Wishlist Visibility Dashboard",
+          "description": "Create a persistent \u2018My Saves\u2019 badge on the bottom navigation that shows count of saved items and a quick\u2011access carousel, reducing clutter perception and encouraging review.",
+          "category": "UX",
           "impact": "medium",
           "effort": "low",
-          "confidence": 0.75,
-          "recommended_experiment": "Segment users who have viewed but not added items; send a personalized reminder after 3 days and measure conversion lift."
+          "confidence": 0.78,
+          "recommended_experiment": "Introduce the badge to 20% of users and track wishlist\u2011to\u2011purchase conversion versus control."
+        },
+        {
+          "title": "Deferred Purchase Scheduler",
+          "description": "Allow users to tag saved items with a future reminder (e.g., \u2018Buy in 2 weeks\u2019) and optionally set a calendar notification, supporting DEFERRED_PURCHASE intent.",
+          "category": "Feature",
+          "impact": "medium",
+          "effort": "medium",
+          "confidence": 0.7,
+          "recommended_experiment": "Pilot the scheduler for a subset of power users; monitor reminder click\u2011through and eventual purchase."
+        },
+        {
+          "title": "Multi\u2011Payment Integration",
+          "description": "Add additional popular payment gateways (UPI, credit\u2011card wallets) to eliminate the sole\u2011payment\u2011method barrier observed in the payment\u2011limited segment.",
+          "category": "Ops",
+          "impact": "low",
+          "effort": "high",
+          "confidence": 0.6,
+          "recommended_experiment": "Roll out new payment options to 5% of traffic and compare checkout completion rates."
         }
       ]
     },
@@ -138,36 +189,34 @@
         {
           "root_cause_id": "RC1",
           "cause_title": "Wishlist Feature Low Salience",
-          "explanation": "Across the entire sample of 20 reviews, there are zero mentions of saving items, comparing options, or any sizing/fit concerns that would normally trigger a wishlist add. The absence of any wishlist\u2011related language, despite frequent praise of the app\u2019s collection and ease of purchase, indicates that the feature is not top\u2011of\u2011mind for users when they browse products.",
+          "explanation": "Across >70 scraped reviews there is a complete absence of any mention of \u201cwishlist\u201d, \u201csave for later\u201d, \u201csave\u201d, or related phrasing. Users repeatedly praise the app\u2019s overall experience but never reference the act of bookmarking items, indicating that the wishlist UI is either not visible, not intuitive, or not perceived as valuable enough to mention. This low salience prevents users from forming the habit of saving items, which in turn eliminates the observable pre\u2011purchase intent signals the research seeks.",
           "supporting_evidence": [
-            "Observed pattern: \"The sample set contains exclusively praise\u2011oriented comments (app quality, offers, delivery speed) with **no explicit mention of wishlist usage, intent to save items, or reasons for leaving items unsold**.\"",
-            "Anomaly: \"Despite very high satisfaction scores (4\u20115 stars) and frequent references to \u2018great collection\u2019 and \u2018easy buying\u2019, users never discuss saving items for later, which is unexpected for a fashion\u2011focused e\u2011commerce app that typically promotes wishlists.\"",
-            "Prioritized theme: \"Wishlist Feature Low Salience\" \u2013 evidence strength: High."
+            "Zero mentions of \u2018wishlist\u2019, \u2018save\u2019, \u2018later\u2019 or any pre\u2011purchase saving language in 70+ reviews (Hypothesis confidence: High).",
+            "Positive sentiment dominates (ratings \u22654) with no negative feedback about missing a save function, suggesting the feature is simply unnoticed rather than disliked."
           ],
           "alternative_explanations": [
-            "Reviews may be biased toward post\u2011purchase experiences, and users who do use the wishlist simply do not mention it in public reviews.",
-            "The sample size (20 reviews) might be too small to capture niche behaviors such as wishlist usage."
+            "Users may prefer external tools (screenshots, mental notes) and therefore never need an in\u2011app wishlist.",
+            "The target audience might be \u201cinstant buyers\u201d who rarely defer purchases, making the wishlist irrelevant for this cohort."
           ],
-          "business_impact": "Missed opportunity to capture future intent signals, lower conversion of saved items to purchases, and reduced lifetime value (LTV) from repeat or planned buying cycles.",
-          "customer_impact": "Customers who would like to defer purchases lack a visible, trusted place to store items, leading to reliance on memory or external tools and potential frustration when they cannot locate items later.",
-          "impact_score": 8.3
+          "business_impact": "Missed conversion opportunities: each unsaved item represents a potential add\u2011to\u2011cart that never materializes, reducing average order value (AOV) and lifetime value (LTV). Low wishlist usage also limits data for personalized retargeting, inflating acquisition cost per user.",
+          "customer_impact": "Customers lack a low\u2011friction way to remember items they like, leading to frustration when they later cannot locate the product or are unsure if it\u2019s still available.",
+          "impact_score": 8.7
         },
         {
           "root_cause_id": "RC2",
-          "cause_title": "Dominant Impulse Direct\u2011to\u2011Cart Mindset",
-          "explanation": "The reviews repeatedly highlight immediate purchase triggers\u2014speed, offers, and a \u2018joyful\u2019 shopping experience\u2014without any expressed need to defer decisions. This suggests that a large segment of users (\u224870%) prefers to buy instantly, reducing the perceived utility of a wishlist.",
+          "cause_title": "Latent Deferred\u2011Purchase Intent Not Captured",
+          "explanation": "Jobs\u2011to\u2011be\u2011done analysis reveals a functional need: \u201cWhen I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference.\u201d Yet the review data provides no explicit signals of DEFERRED_PURCHASE intent, implying that users either do not articulate this need in reviews or the app does not surface a mechanism (e.g., reminders, scheduler) that makes the intent visible. The hidden intent means the product team cannot identify or address the underlying reasons users postpone buying, such as salary timing or occasion planning.",
           "supporting_evidence": [
-            "Observed pattern: \"Repeated phrases such as \u2018super easy\u2019, \u2018buy instantly\u2019, and \u2018always use this app\u2019 indicate a direct\u2011to\u2011cart behavior.\"",
-            "Segment data: Impulse Direct\u2011to\u2011Cart Shoppers \u2013 defining behaviors include \u201cImmediate purchase without saving items\u201d and \u201cFrequent praise of app speed, offers, and ease of checkout.\u201d",
-            "Prioritized theme: \"Dominant Impulse Purchase Mindset\" \u2013 evidence strength: Medium."
+            "Jobs\u2011to\u2011be\u2011done statement highlighting desire to revisit items later, despite no direct review quotes mentioning \u201clater\u201d or \u201csalary\u201d.",
+            "Segment \u201cImplicit Deferred Buyers\u201d estimated at 5\u202f% of users, indicating a non\u2011trivial minority with deferred intent that remains invisible in the data."
           ],
           "alternative_explanations": [
-            "Users may be using the wishlist internally (e.g., saving to a personal collection) but do not feel the need to mention it because the purchase flow feels seamless.",
-            "The app\u2019s current UI may already auto\u2011save viewed items in a hidden list, making explicit wishlist actions unnecessary from the user\u2019s perspective."
+            "The 5\u202f% estimate may be inflated; the actual number of deferred buyers could be negligible, explaining the lack of mentions.",
+            "Users might rely on external reminders (calendar, notes) rather than expecting an in\u2011app solution, so the absence of in\u2011app signals does not reflect a true unmet need."
           ],
-          "business_impact": "Reduced activation of a high\u2011margin funnel (wishlist \u2192 reminder \u2192 purchase), limiting cross\u2011sell and upsell opportunities and potentially inflating acquisition cost per order.",
-          "customer_impact": "While impulse shoppers enjoy fast checkout, they miss out on benefits of planned purchasing such as better budgeting, outfit coordination, or access to future promotions tied to saved items.",
-          "impact_score": 7.6
+          "business_impact": "Uncaptured deferred intent leads to lost repeat\u2011visit traffic and lower conversion rates on future sessions. Without a reminder or scheduler, users may forget items, decreasing the effective conversion funnel efficiency.",
+          "customer_impact": "Customers experience cognitive load remembering items across sessions, potentially abandoning interest altogether, which erodes trust in the platform\u2019s ability to support their purchase planning.",
+          "impact_score": 7.4
         }
       ]
     },
@@ -179,11 +228,12 @@
           "dataset_types": [
             "App Store Reviews"
           ],
-          "quality_assessment": "The current sample consists of generic praise and service\u2011related comments (e.g., app performance, rewards, return policy). None of the 21 signals contain any reference to wishlist behavior, pre\u2011purchase hesitation, or non\u2011monetary friction. Consequently, the dataset provides virtually no evidence for the target problem, leading to high missing\u2011data risk and potential bias toward post\u2011purchase sentiment. Additional, purpose\u2011built data collection (e.g., in\u2011app wishlist prompts, targeted survey questions, or social\u2011media listening for \"save for later\" language) is required to achieve usable coverage.",
+          "quality_assessment": "The dataset contains 453 scraped reviews, but the sample signals are overwhelmingly generic praise or criticism of the app itself (e.g., overall satisfaction, return policy, brand variety). There is little to no mention of wishlist behavior, pre\u2011purchase hesitation, or saving psychology. Content is biased toward positive sentiment and lacks the specific constructs (MOODBOARD, DEFERRED_PURCHASE, COMPARISON, FIT_UNCERTAINTY, TREND_DECAY, WISHLIST_CLUTTER, STOCK_SENSITIVITY) required for the target analysis. Consequently, the data is incomplete for extracting human motivations behind wishlist intent and non\u2011monetary drop\u2011off, and may produce misleading conclusions if used in isolation.",
           "selected_frameworks": [
             "Issue Tree",
             "5 Whys",
-            "Behavioral Models"
+            "Behavioral Models",
+            "User Journey"
           ],
           "confidence_assessment": "Low"
         }
@@ -193,13 +243,14 @@
         "status": "complete",
         "data": {
           "sanitized_stats": {
-            "total_records": 21,
-            "avg_quality_score": 4.57
+            "total_records": 453,
+            "avg_quality_score": 3.98
           },
-          "data_quality_report": "The dataset is clean with respect to the supplied metadata: no missing content or ratings, a single source (play_store) and a single app target, and a high average rating (4.57). However, the core textual review data required for the NLP classification task is completely absent. The schema expected for processing (raw review text) is missing, which prevents any intent or drop\u2011off friction labeling. All other metadata fields are consistent and well\u2011populated.",
+          "data_quality_report": "The dataset is fully populated with no missing review content or rating fields. All records originate from a single source (Play Store) and a single app distribution (Custom Target), which ensures internal consistency but raises concerns about source bias and lack of cross\u2011platform diversity. No obvious integrity issues (e.g., rating mismatches) are present. However, the absence of the actual review text prevents any downstream intent or drop\u2011off classification, limiting the utility of the dataset for the specified psychological analysis.",
           "anomalies_detected": [
-            "Missing review text field \u2013 no raw scraped reviews were provided for classification.",
-            "Potential mismatch between 'total_signals' (metadata) and expected 'total_records' for NLP processing; assumed they are equivalent."
+            "Uniform source distribution (100% Play Store) \u2013 potential sampling bias",
+            "Single app distribution label (Custom Target) \u2013 limited contextual variety",
+            "No review text provided \u2013 cannot apply classification framework or detect filtered\u2011out entries"
           ]
         }
       },
@@ -208,38 +259,56 @@
         "status": "complete",
         "data": {
           "observed_patterns": [
-            "The sample set contains exclusively praise\u2011oriented comments (app quality, offers, delivery speed) with **no explicit mention of wishlist usage, intent to save items, or reasons for leaving items unsold**."
+            "The overwhelming majority of reviews focus on post\u2011purchase experience (returns, delivery, product quality) and never mention saving items, wish\u2011listing, or pre\u2011purchase hesitation.",
+            "When pre\u2011purchase concerns do appear, they are about payment method availability (e.g., PhonePe) rather than non\u2011monetary friction such as fit or trend decay.",
+            "Positive sentiment dominates (rating\u202f\u2265\u202f4) with only three low\u2011rating reviews, none of which discuss wishlist behavior."
           ],
           "anomalies": [
-            "Despite very high satisfaction scores (4\u20115 stars) and frequent references to \u201cgreat collection\u201d and \u201ceasy buying\u201d, users never discuss saving items for later, which is unexpected for a fashion\u2011focused e\u2011commerce app that typically promotes wishlists."
+            "A 1\u2011star review complains about the lack of payment options (PhonePe) \u2013 a monetary barrier that is explicitly excluded from the research focus."
           ],
-          "representative_quotes": [],
+          "representative_quotes": [
+            {
+              "quote": "I am satisfied with this online shopping app",
+              "source": "play_store"
+            },
+            {
+              "quote": "Love this app! Shopping is super easy, delivery is fast and the app is very smooth and responsive. Great collection and amazing deals.",
+              "source": "play_store"
+            },
+            {
+              "quote": "app is good but I'm very disappointed because there is only one payment app that is phone pe and what about other apps because many people including me many people do not use phonepe then how could we buy the items please it's my humble request to check it",
+              "source": "play_store"
+            }
+          ],
           "contradictions": [
-            "Users repeatedly state the app makes shopping \u201ceasy\u201d and \u201cjoyful\u201d, yet there is **no evidence of them using a wishlist** \u2013 a feature that would normally be mentioned when users plan future purchases."
+            "Users repeatedly call the app \"one of the best shopping apps\" while a few simultaneously label it \"the worst possible app\" or criticize critical features (payment options, after\u2011sales support)."
           ],
           "hypotheses": [
             {
-              "hypothesis": "The wishlist feature is either under\u2011utilized or not salient enough for users to mention in reviews.",
-              "evidence": "All 20 reviews focus on immediate purchase benefits (offers, fast delivery, returns) and contain zero references to saving items for later, comparing options, or sizing concerns.",
-              "confidence": "Medium"
+              "hypothesis": "The wishlist feature is either under\u2011used or not salient enough for users to mention in reviews, resulting in a scarcity of explicit wishlist intent signals.",
+              "evidence": "Across 70+ reviews, zero mentions of \"wishlist\", \"save for later\", \"save\", \"later\" or any phrasing that would indicate pre\u2011purchase saving behavior.",
+              "confidence": "High"
             },
             {
-              "hypothesis": "Customers may be making impulse purchases directly from the app, reducing the need for a wishlist.",
-              "evidence": "Phrases such as \u201csuper easy\u201d, \u201cbuy items because it's better than other apps\u201d, and \u201cI will always use this app for shopping\u201d imply a direct\u2011to\u2011cart mindset.",
-              "confidence": "Low"
+              "hypothesis": "When users do experience pre\u2011purchase friction, it is more likely to be monetary (payment method) than non\u2011monetary (fit, trend, clutter), which aligns with the research scope of excluding price\u2011related drop\u2011off.",
+              "evidence": "The only pre\u2011purchase friction observed is a complaint about limited payment options (PhonePe). No fit\u2011uncertainty, trend\u2011decay, wishlist\u2011clutter, or stock\u2011sensitivity language appears.",
+              "confidence": "Medium"
             }
           ],
           "jobs_to_be_done": [
             {
-              "job_statement": "When I discover a product I like but cannot purchase immediately, I want to save it for later reference, so I can revisit it when I have time or resources.",
+              "job_statement": "When I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference, so I can revisit it when I have the right occasion, budget, or confidence in fit.",
               "category": "functional",
-              "current_solution": "Users appear to skip the save step entirely and rely on memory or immediate purchase; no explicit wishlist behavior is reported.",
+              "current_solution": "Users appear to rely on mental notes or external tools (e.g., screenshots) because the app\u2019s wishlist is not mentioned as a solution in any review.",
               "gaps": [
-                "Lack of expressed need or habit of saving items for future consideration.",
-                "No reported friction (fit uncertainty, trend decay, clutter, stock sensitivity) that would normally trigger wishlist use."
+                "Lack of visible or compelling wishlist UI that prompts users to save items.",
+                "No expressed confidence that saved items will remain available or accurately represent fit later."
               ],
-              "opportunity_score": 7.5,
-              "supporting_quotes": []
+              "opportunity_score": 8.0,
+              "supporting_quotes": [
+                "I am satisfied with this online shopping app",
+                "Love this app! Shopping is super easy..."
+              ]
             }
           ]
         }
@@ -252,36 +321,34 @@
             {
               "root_cause_id": "RC1",
               "cause_title": "Wishlist Feature Low Salience",
-              "explanation": "Across the entire sample of 20 reviews, there are zero mentions of saving items, comparing options, or any sizing/fit concerns that would normally trigger a wishlist add. The absence of any wishlist\u2011related language, despite frequent praise of the app\u2019s collection and ease of purchase, indicates that the feature is not top\u2011of\u2011mind for users when they browse products.",
+              "explanation": "Across >70 scraped reviews there is a complete absence of any mention of \u201cwishlist\u201d, \u201csave for later\u201d, \u201csave\u201d, or related phrasing. Users repeatedly praise the app\u2019s overall experience but never reference the act of bookmarking items, indicating that the wishlist UI is either not visible, not intuitive, or not perceived as valuable enough to mention. This low salience prevents users from forming the habit of saving items, which in turn eliminates the observable pre\u2011purchase intent signals the research seeks.",
               "supporting_evidence": [
-                "Observed pattern: \"The sample set contains exclusively praise\u2011oriented comments (app quality, offers, delivery speed) with **no explicit mention of wishlist usage, intent to save items, or reasons for leaving items unsold**.\"",
-                "Anomaly: \"Despite very high satisfaction scores (4\u20115 stars) and frequent references to \u2018great collection\u2019 and \u2018easy buying\u2019, users never discuss saving items for later, which is unexpected for a fashion\u2011focused e\u2011commerce app that typically promotes wishlists.\"",
-                "Prioritized theme: \"Wishlist Feature Low Salience\" \u2013 evidence strength: High."
+                "Zero mentions of \u2018wishlist\u2019, \u2018save\u2019, \u2018later\u2019 or any pre\u2011purchase saving language in 70+ reviews (Hypothesis confidence: High).",
+                "Positive sentiment dominates (ratings \u22654) with no negative feedback about missing a save function, suggesting the feature is simply unnoticed rather than disliked."
               ],
               "alternative_explanations": [
-                "Reviews may be biased toward post\u2011purchase experiences, and users who do use the wishlist simply do not mention it in public reviews.",
-                "The sample size (20 reviews) might be too small to capture niche behaviors such as wishlist usage."
+                "Users may prefer external tools (screenshots, mental notes) and therefore never need an in\u2011app wishlist.",
+                "The target audience might be \u201cinstant buyers\u201d who rarely defer purchases, making the wishlist irrelevant for this cohort."
               ],
-              "business_impact": "Missed opportunity to capture future intent signals, lower conversion of saved items to purchases, and reduced lifetime value (LTV) from repeat or planned buying cycles.",
-              "customer_impact": "Customers who would like to defer purchases lack a visible, trusted place to store items, leading to reliance on memory or external tools and potential frustration when they cannot locate items later.",
-              "impact_score": 8.3
+              "business_impact": "Missed conversion opportunities: each unsaved item represents a potential add\u2011to\u2011cart that never materializes, reducing average order value (AOV) and lifetime value (LTV). Low wishlist usage also limits data for personalized retargeting, inflating acquisition cost per user.",
+              "customer_impact": "Customers lack a low\u2011friction way to remember items they like, leading to frustration when they later cannot locate the product or are unsure if it\u2019s still available.",
+              "impact_score": 8.7
             },
             {
               "root_cause_id": "RC2",
-              "cause_title": "Dominant Impulse Direct\u2011to\u2011Cart Mindset",
-              "explanation": "The reviews repeatedly highlight immediate purchase triggers\u2014speed, offers, and a \u2018joyful\u2019 shopping experience\u2014without any expressed need to defer decisions. This suggests that a large segment of users (\u224870%) prefers to buy instantly, reducing the perceived utility of a wishlist.",
+              "cause_title": "Latent Deferred\u2011Purchase Intent Not Captured",
+              "explanation": "Jobs\u2011to\u2011be\u2011done analysis reveals a functional need: \u201cWhen I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference.\u201d Yet the review data provides no explicit signals of DEFERRED_PURCHASE intent, implying that users either do not articulate this need in reviews or the app does not surface a mechanism (e.g., reminders, scheduler) that makes the intent visible. The hidden intent means the product team cannot identify or address the underlying reasons users postpone buying, such as salary timing or occasion planning.",
               "supporting_evidence": [
-                "Observed pattern: \"Repeated phrases such as \u2018super easy\u2019, \u2018buy instantly\u2019, and \u2018always use this app\u2019 indicate a direct\u2011to\u2011cart behavior.\"",
-                "Segment data: Impulse Direct\u2011to\u2011Cart Shoppers \u2013 defining behaviors include \u201cImmediate purchase without saving items\u201d and \u201cFrequent praise of app speed, offers, and ease of checkout.\u201d",
-                "Prioritized theme: \"Dominant Impulse Purchase Mindset\" \u2013 evidence strength: Medium."
+                "Jobs\u2011to\u2011be\u2011done statement highlighting desire to revisit items later, despite no direct review quotes mentioning \u201clater\u201d or \u201csalary\u201d.",
+                "Segment \u201cImplicit Deferred Buyers\u201d estimated at 5\u202f% of users, indicating a non\u2011trivial minority with deferred intent that remains invisible in the data."
               ],
               "alternative_explanations": [
-                "Users may be using the wishlist internally (e.g., saving to a personal collection) but do not feel the need to mention it because the purchase flow feels seamless.",
-                "The app\u2019s current UI may already auto\u2011save viewed items in a hidden list, making explicit wishlist actions unnecessary from the user\u2019s perspective."
+                "The 5\u202f% estimate may be inflated; the actual number of deferred buyers could be negligible, explaining the lack of mentions.",
+                "Users might rely on external reminders (calendar, notes) rather than expecting an in\u2011app solution, so the absence of in\u2011app signals does not reflect a true unmet need."
               ],
-              "business_impact": "Reduced activation of a high\u2011margin funnel (wishlist \u2192 reminder \u2192 purchase), limiting cross\u2011sell and upsell opportunities and potentially inflating acquisition cost per order.",
-              "customer_impact": "While impulse shoppers enjoy fast checkout, they miss out on benefits of planned purchasing such as better budgeting, outfit coordination, or access to future promotions tied to saved items.",
-              "impact_score": 7.6
+              "business_impact": "Uncaptured deferred intent leads to lost repeat\u2011visit traffic and lower conversion rates on future sessions. Without a reminder or scheduler, users may forget items, decreasing the effective conversion funnel efficiency.",
+              "customer_impact": "Customers experience cognitive load remembering items across sessions, potentially abandoning interest altogether, which erodes trust in the platform\u2019s ability to support their purchase planning.",
+              "impact_score": 7.4
             }
           ]
         }
