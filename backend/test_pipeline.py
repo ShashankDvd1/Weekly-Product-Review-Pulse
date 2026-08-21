@@ -51,10 +51,8 @@ def main():
     print(f"Total personas generated: {len(orchestrator.personas)}")
     print(f"Total hypotheses generated: {len(orchestrator.hypotheses)}")
     
-    if orchestrator.themes:
-        print(f"Sample theme: {orchestrator.themes[0].title}")
-    if orchestrator.personas:
-        print(f"Sample persona: {orchestrator.personas[0].name}")
+    # Clean finish without printing raw strings to avoid Windows console unicode encoding crashes
+    pass
         
 if __name__ == "__main__":
     main()
