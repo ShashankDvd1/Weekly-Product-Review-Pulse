@@ -1014,6 +1014,7 @@ const Dashboard = () => {
           from_date: fromDate,
           to_date: toDate,
           include_reddit: true,
+          include_youtube: true,
           problem_statement: problemStatement
         })
       });

@@ -121,6 +121,7 @@ const ControlCenter = () => {
       from_date: fromDate,
       to_date: toDate,
       include_reddit: includeReddit,
+      include_youtube: true,
       reddit_subreddits: [],
       reddit_search_terms: includeReddit && detectedApp !== 'custom' ? [detectedApp] : [],
       problem_statement: problemStatement || undefined,

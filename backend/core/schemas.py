@@ -18,6 +18,7 @@ class DataSource(str, Enum):
     PLAY_STORE = "play_store"
     APP_STORE = "app_store"
     REDDIT = "reddit"
+    YOUTUBE = "youtube"
 
 
 class SentimentLabel(str, Enum):
@@ -306,6 +307,7 @@ class FullPipelineRequest(BaseModel):
     from_date: str = ""
     to_date: str = ""
     include_reddit: bool = True
+    include_youtube: bool = True
     export_to_sheets: bool = False
     play_store_package: Optional[str] = None
     app_store_id: Optional[str] = None

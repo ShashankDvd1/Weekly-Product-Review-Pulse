@@ -575,6 +575,7 @@ class PipelineOrchestrator:
         from_date: str = None,
         to_date: str = None,
         include_reddit: bool = True,
+        include_youtube: bool = True,
         reddit_subreddits: list[str] = None,
         reddit_search_terms: list[str] = None,
         problem_statement: str = None,
@@ -724,6 +725,33 @@ class PipelineOrchestrator:
                 except Exception as e:
                     self._log_progress(f"  ❌ Reddit error: {str(e)[:100]}")
             
+            # 4. YouTube Ingestion
+            if include_youtube:
+                try:
+                    yt_query = None
+                    if play_store_package:
+                        if "." in play_store_package:
+                            parts = play_store_package.split(".")
+                            if len(parts) > 1:
+                                yt_query = parts[1]
+                        else:
+                            yt_query = play_store_package
+                    elif apps:
+                        yt_query = apps[0]
+                        
+                    if yt_query:
+                        self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{yt_query}'...")
+                        from ingestion.youtube import collect_youtube_data
+                        from ingestion.normalizer import normalize_youtube_data
+                        
+                        yt_signals = collect_youtube_data(yt_query, max_comments=150)
+                        if yt_signals:
+                            normalized = normalize_youtube_data(yt_signals)
+                            batch_signals.extend(normalized)
+                            self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected")
+                except Exception as e:
+                    self._log_progress(f"  ❌ YouTube error: {str(e)[:100]}")
+            
             all_signals.extend(batch_signals)
             
             if problem_statement:
@@ -865,12 +893,12 @@ class PipelineOrchestrator:
         self._status = "collecting"
         self._progress = [f"[{datetime.now().strftime('%H:%M:%S')}] 🚀 Ingestion pipeline initialized. Booting NLP engines..."]
         try:
-            # Collect
             self.collect_all(
                 apps=request.apps,
                 from_date=request.from_date,
                 to_date=request.to_date,
                 include_reddit=request.include_reddit,
+                include_youtube=request.include_youtube,
                 play_store_package=request.play_store_package,
                 app_store_id=request.app_store_id,
                 reddit_subreddits=request.reddit_subreddits,

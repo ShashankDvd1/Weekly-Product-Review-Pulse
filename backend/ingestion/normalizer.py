@@ -322,3 +322,45 @@ def filter_cross_category_signals(signals: list[UnifiedSignal]) -> list[UnifiedS
     logger.info(f"Filtered {len(signals)} raw signals down to {len(filtered)} cross-category insights.")
     return filtered
 
+
+def normalize_youtube_data(
+    youtube_signals: list[dict],
+) -> list[UnifiedSignal]:
+    """
+    Normalize YouTube comments into UnifiedSignal format.
+    """
+    if not youtube_signals:
+        return []
+
+    signals = []
+    for item in youtube_signals:
+        content = str(item.get("content", ""))
+        if not content.strip():
+            continue
+
+        source_id = item.get("comment_id", "")
+        date_val = item.get("date", datetime.now(timezone.utc))
+        app_name = _detect_app_from_content(content)
+
+        signal = UnifiedSignal(
+            unified_id=_generate_unified_id("youtube", source_id, content),
+            source=DataSource.YOUTUBE,
+            source_id=source_id,
+            app_name=app_name,
+            content=content,
+            title="YouTube Comment Feedback",
+            date=date_val,
+            author_anon=str(item.get("author", "Anonymous"))[:3] + "***",
+            categories_mentioned=_detect_categories_mentioned(content),
+            behavioral_signals=_detect_behavioral_signals(content),
+            word_count=len(content.split()),
+            url=item.get("url"),
+            metadata={
+                "video_id": item.get("video_id", ""),
+            },
+        )
+        signals.append(signal)
+
+    return signals
+
+
