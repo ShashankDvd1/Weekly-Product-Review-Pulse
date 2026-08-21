@@ -698,7 +698,7 @@ class PipelineOrchestrator:
             if problem_statement:
                 self._log_progress(f"⚡ Fast Semantic Pre-filtering {len(all_signals)} raw signals against Problem Statement...")
                 from reasoning.custom_filter import semantic_prefilter
-                all_signals = semantic_prefilter(all_signals, problem_statement, max_results=350)
+                all_signals = semantic_prefilter(all_signals, problem_statement, max_results=180)
                 self._log_progress(f"✅ Kept {len(all_signals)} semantically relevant signals.")
             
             self._log_progress(f"🔄 Deduplicating {len(all_signals)} cumulative signals...")

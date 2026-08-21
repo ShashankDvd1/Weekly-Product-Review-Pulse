@@ -116,7 +116,8 @@ class LLMClient:
                     err_lower = err_str.lower()
                     if "tokens per day" in err_lower or "requests per day" in err_lower or "tpd" in err_lower or "rpd" in err_lower:
                         logger.error(f"Groq Daily Limit Exceeded (TPD/RPD): {err_str}")
-                        self._force_fast_model = True
+                        if model == LLM_MODEL_REASONING:
+                            self._force_fast_model = True
                         raise RuntimeError(f"Groq Daily Limit Exceeded: {err_str}")
 
                     import re
@@ -132,7 +133,8 @@ class LLMClient:
                         
                     if wait_time > 300:
                         logger.error(f"Groq rate limit wait time too long ({wait_time}s): {err_str}")
-                        self._force_fast_model = True
+                        if model == LLM_MODEL_REASONING:
+                            self._force_fast_model = True
                         raise RuntimeError(f"Groq Daily Token Limit Exceeded (Wait time > 5m: {wait_time}s): {err_str}")
                         
                     logger.warning(f"Groq Rate Limit (429) hit. Waiting {wait_time}s before retry (attempt {attempt + 1}/{retries})...")
