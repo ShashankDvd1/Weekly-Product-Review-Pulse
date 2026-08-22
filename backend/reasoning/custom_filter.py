@@ -20,6 +20,7 @@ def semantic_prefilter(signals: List[UnifiedSignal], problem_statement: str, max
     """
     Blazing fast pre-filter using local vector embeddings. 
     Drops completely irrelevant reviews before they hit the LLM.
+    Ensures minority sources (e.g. App Store, YouTube) are not drowned out by dominant sources (e.g. Play Store).
     """
     if not signals or not problem_statement:
         return signals
@@ -44,13 +45,32 @@ def semantic_prefilter(signals: List[UnifiedSignal], problem_statement: str, max
     # Since generate_embeddings uses normalize_embeddings=True, dot product is cosine similarity
     similarities = np.dot(sig_embs, prob_emb)
     
-    scored_signals = list(zip(signals, similarities))
-    scored_signals.sort(key=lambda x: x[1], reverse=True)
-    
-    # Keep top results sorted by similarity to ensure we don't drop everything
-    filtered = [s for s, sim in scored_signals][:max_results]
-    
-    logger.info(f"Semantic Pre-filter reduced {len(signals)} -> {len(filtered)} signals (kept top closest matches).")
+    # Temporarily attach similarity score to each signal
+    for sig, sim in zip(signals, similarities):
+        sig._temp_sim = sim
+        
+    # Group signals by source
+    by_source = {}
+    for sig in signals:
+        by_source.setdefault(sig.source, []).append(sig)
+        
+    filtered = []
+    num_sources = len(by_source)
+    if num_sources > 0:
+        # Keep at least a balanced portion of the max_results per source (with a minimum of 100 to avoid losing too much signal)
+        limit_per_source = max(max_results // num_sources, 120)
+        for source, src_signals in by_source.items():
+            src_signals.sort(key=lambda x: getattr(x, '_temp_sim', 0.0), reverse=True)
+            filtered.extend(src_signals[:limit_per_source])
+            
+        # Clean up temporary similarity attribute
+        for sig in signals:
+            if hasattr(sig, '_temp_sim'):
+                delattr(sig, '_temp_sim')
+    else:
+        filtered = signals
+        
+    logger.info(f"Semantic Pre-filter reduced {len(signals)} -> {len(filtered)} signals (balanced across {num_sources} sources).")
     return filtered
 
 def assess_reviews_with_custom_prompt(signals: List[UnifiedSignal], custom_prompt: str) -> List[UnifiedSignal]:

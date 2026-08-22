@@ -120,19 +120,32 @@ def compute_sentiment_summary(signals: list[UnifiedSignal]) -> dict:
     """Compute aggregate sentiment statistics."""
     scores = [s.sentiment_score for s in signals if s.sentiment_score is not None]
     if not scores:
-        return {"avg": 0.0, "positive_pct": 0, "negative_pct": 0, "neutral_pct": 0, "count": 0}
+        return {
+            "avg": 0.0,
+            "positive_pct": 0,
+            "negative_pct": 0,
+            "neutral_pct": 0,
+            "positive": 0.0,
+            "negative": 0.0,
+            "neutral": 0.0,
+            "count": 0
+        }
 
     avg = sum(scores) / len(scores)
     positive = sum(1 for s in scores if s > 0.3)
     negative = sum(1 for s in scores if s < -0.3)
     neutral = len(scores) - positive - negative
 
+    total = len(scores)
     return {
         "avg": round(avg, 2),
-        "positive_pct": round(positive / len(scores) * 100, 1),
-        "negative_pct": round(negative / len(scores) * 100, 1),
-        "neutral_pct": round(neutral / len(scores) * 100, 1),
-        "count": len(scores),
+        "positive_pct": round(positive / total * 100, 1),
+        "negative_pct": round(negative / total * 100, 1),
+        "neutral_pct": round(neutral / total * 100, 1),
+        "positive": round(positive / total, 3),
+        "negative": round(negative / total, 3),
+        "neutral": round(neutral / total, 3),
+        "count": total,
     }
 
 
