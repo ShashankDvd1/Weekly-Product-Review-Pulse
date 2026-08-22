@@ -10,7 +10,7 @@ import time
 import json
 import logging
 from groq import Groq
-import tiktoken
+
 
 from core.config import (
     GROQ_API_KEY,
@@ -26,12 +26,16 @@ from core.config import (
 logger = logging.getLogger(__name__)
 
 # Tokenizer for rough token counting
-_encoding = tiktoken.get_encoding("cl100k_base")
-
-
-def count_tokens(text: str) -> int:
-    """Count approximate tokens in a text string."""
-    return len(_encoding.encode(text))
+try:
+    import tiktoken
+    _encoding = tiktoken.get_encoding("cl100k_base")
+    def count_tokens(text: str) -> int:
+        """Count approximate tokens in a text string."""
+        return len(_encoding.encode(text))
+except ImportError:
+    def count_tokens(text: str) -> int:
+        """Fallback token counter if tiktoken is not available (approx. 4 chars per token)."""
+        return len(text) // 4
 
 
 class LLMClient:
