@@ -52,6 +52,13 @@ class LLMClient:
         self._force_fast_model = False
         self._token_window_start = time.time()
         self._tokens_used_in_window = 0
+        self.cumulative_tokens_used = 0
+        self.last_api_limits = {
+            "token_limit": GROQ_MAX_TPM,
+            "tokens_remaining": GROQ_MAX_TPM,
+            "request_limit": GROQ_MAX_RPM,
+            "requests_remaining": GROQ_MAX_RPM
+        }
 
     # ── internal ────────────────────────────────
     def _enforce_token_limit(self, estimated_tokens: int):
@@ -100,13 +107,28 @@ class LLMClient:
                     call_kwargs["response_format"] = {"type": "json_object"}
                 if max_tokens:
                     call_kwargs["max_tokens"] = max_tokens
-                response = self._client.chat.completions.create(**call_kwargs)
+                    
+                # Call with raw response to inspect headers
+                raw_response = self._client.chat.completions.with_raw_response.create(**call_kwargs)
+                response = raw_response.parse()
+                headers = raw_response.headers
                 
                 # Accurately track tokens used
+                tokens_used = estimated_total
                 if hasattr(response, 'usage') and response.usage:
-                    self._tokens_used_in_window += response.usage.total_tokens
-                else:
-                    self._tokens_used_in_window += estimated_total
+                    tokens_used = response.usage.total_tokens
+                
+                self._tokens_used_in_window += tokens_used
+                self.cumulative_tokens_used += tokens_used
+
+                # Extract limits from headers
+                try:
+                    self.last_api_limits["token_limit"] = int(headers.get("x-ratelimit-limit-tokens", GROQ_MAX_TPM))
+                    self.last_api_limits["tokens_remaining"] = int(headers.get("x-ratelimit-remaining-tokens", GROQ_MAX_TPM))
+                    self.last_api_limits["request_limit"] = int(headers.get("x-ratelimit-limit-requests", GROQ_MAX_RPM))
+                    self.last_api_limits["requests_remaining"] = int(headers.get("x-ratelimit-remaining-requests", GROQ_MAX_RPM))
+                except Exception as ex:
+                    logger.debug(f"Failed to parse rate limit headers: {ex}")
 
                 return response.choices[0].message.content
             except Exception as e:

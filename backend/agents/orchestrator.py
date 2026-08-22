@@ -754,20 +754,24 @@ class PipelineOrchestrator:
             
             all_signals.extend(batch_signals)
             
-            if problem_statement:
-                self._log_progress(f"⚡ Fast Semantic Pre-filtering {len(all_signals)} raw signals against Problem Statement...")
-                from reasoning.custom_filter import semantic_prefilter
-                all_signals = semantic_prefilter(all_signals, problem_statement, max_results=600)
-                self._log_progress(f"✅ Kept {len(all_signals)} semantically relevant signals.")
-            
-            self._log_progress(f"🔄 Deduplicating {len(all_signals)} cumulative signals...")
+            # 1. Deduplicate first
+            self._log_progress(f"🔄 Deduplicating {len(all_signals)} raw cumulative signals...")
             from processing.deduplication import semantic_deduplicate
             unique_signals = semantic_deduplicate(all_signals)
-            self._log_progress(f"✅ Current unique dataset: {len(unique_signals)} signals")
+            self._log_progress(f"✅ Unique dataset after deduplication: {len(unique_signals)} signals")
             
-            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(unique_signals)} reviews...")
+            # 2. Then filter out using semantic pre-filtering
+            if problem_statement:
+                self._log_progress(f"⚡ Fast Semantic Pre-filtering {len(unique_signals)} unique signals against Problem Statement...")
+                from reasoning.custom_filter import semantic_prefilter
+                prefiltered_signals = semantic_prefilter(unique_signals, problem_statement, max_results=600)
+                self._log_progress(f"✅ Kept {len(prefiltered_signals)} semantically relevant signals.")
+            else:
+                prefiltered_signals = unique_signals
+            
+            self._log_progress(f"🧠 Running Intelligent Quality Filter on {len(prefiltered_signals)} reviews...")
             from reasoning.quality_filter import assess_review_quality_batch
-            assessed_signals = assess_review_quality_batch(unique_signals)
+            assessed_signals = assess_review_quality_batch(prefiltered_signals)
             
             if problem_statement:
                 # Bypass the expensive LLM Custom Filter to save 100% of ingestion tokens on Free Tier.
@@ -953,9 +957,14 @@ class PipelineOrchestrator:
             compute_source_distribution, compute_sentiment_summary,
             compute_category_mention_counts, compute_behavioral_signal_counts,
         )
+        client = get_llm_client()
         return {
             "status": self._status,
             "progress": self._progress,
+            "token_usage": {
+                "cumulative_tokens_used": getattr(client, "cumulative_tokens_used", 0),
+                "last_api_limits": getattr(client, "last_api_limits", {})
+            },
             "data_coverage": {
                 "total_signals": len(self.signals),
                 "source_distribution": compute_source_distribution(self.signals),
@@ -995,6 +1004,7 @@ class PipelineOrchestrator:
         min_date = min(dates).strftime("%Y-%m-%d") if dates else None
         max_date = max(dates).strftime("%Y-%m-%d") if dates else None
 
+        client = get_llm_client()
         return {
             "total_signals": len(self.signals),
             "signals_by_source": compute_source_distribution(self.signals),
@@ -1013,6 +1023,10 @@ class PipelineOrchestrator:
             ],
             "personas_count": len(self.personas),
             "opportunities_count": len(self.opportunities),
+            "token_usage": {
+                "cumulative_tokens_used": getattr(client, "cumulative_tokens_used", 0),
+                "last_api_limits": getattr(client, "last_api_limits", {})
+            },
             "date_range": {"from_date": min_date, "to_date": max_date},
             "status": self._status,
             "last_updated": datetime.now().isoformat(),
