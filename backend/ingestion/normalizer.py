@@ -325,6 +325,7 @@ def filter_cross_category_signals(signals: list[UnifiedSignal]) -> list[UnifiedS
 
 def normalize_youtube_data(
     youtube_signals: list[dict],
+    default_app_name: Optional[str] = None,
 ) -> list[UnifiedSignal]:
     """
     Normalize YouTube comments into UnifiedSignal format.
@@ -341,6 +342,8 @@ def normalize_youtube_data(
         source_id = item.get("comment_id", "")
         date_val = item.get("date", datetime.now(timezone.utc))
         app_name = _detect_app_from_content(content)
+        if app_name == "unknown" and default_app_name:
+            app_name = default_app_name
 
         signal = UnifiedSignal(
             unified_id=_generate_unified_id("youtube", source_id, content),

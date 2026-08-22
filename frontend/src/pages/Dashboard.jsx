@@ -786,11 +786,15 @@ const Dashboard = () => {
             if (stratData.board_presentation) setBoardPresentation(stratData.board_presentation);
           }
 
-          if (statusData.status === 'complete' || statusData.status === 'idle') {
+          if (statusData.status === 'complete' || statusData.status === 'error') {
             setPipelineRunning(false);
             clearInterval(intervalId);
             await fetchDashboardAndStrategy();
-            alert("Intelligence Ingestion & Strategy Discovery (Phase 1) Complete!");
+            if (statusData.status === 'error') {
+              alert("Pipeline execution failed. Check backend logs.");
+            } else if (statusData.status === 'complete') {
+              alert("Intelligence Ingestion & Strategy Discovery (Phase 1) Complete!");
+            }
           }
         } catch (err) {
           console.error("Error polling pipeline status:", err);

@@ -728,27 +728,59 @@ class PipelineOrchestrator:
             # 4. YouTube Ingestion
             if include_youtube:
                 try:
-                    yt_query = None
+                    import re
+                    from ingestion.youtube import collect_youtube_data
+                    from ingestion.normalizer import normalize_youtube_data
+
                     if play_store_package:
+                        friendly = None
                         if "." in play_store_package:
-                            parts = play_store_package.split(".")
-                            if len(parts) > 1:
-                                yt_query = parts[1]
+                            try:
+                                from google_play_scraper import app as play_app
+                                details = play_app(play_store_package)
+                                title = details.get("title", "")
+                                if title:
+                                    # Clean non-ASCII and split by common separators
+                                    title_clean = title.encode('ascii', 'ignore').decode('ascii')
+                                    friendly = re.split(r'[:\-\(|~–—]', title_clean)[0].strip()
+                                    # Remove extra spaces
+                                    friendly = " ".join(friendly.split())
+                            except Exception as e:
+                                logger.error(f"Failed to fetch app title for YouTube query: {e}")
+                            
+                            if not friendly:
+                                parts = play_store_package.split(".")
+                                if len(parts) > 1:
+                                    p_part = parts[1]
+                                    if p_part == "grofers":
+                                        friendly = "Blinkit"
+                                    elif p_part == "zeptoconsumerapp":
+                                        friendly = "Zepto"
+                                    elif p_part == "fsn":
+                                        friendly = "Nykaa Fashion"
+                                    else:
+                                        friendly = p_part
                         else:
-                            yt_query = play_store_package
+                            friendly = play_store_package
+                        
+                        if friendly:
+                            self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{friendly}'...")
+                            yt_signals = collect_youtube_data(friendly, max_comments=150)
+                            if yt_signals:
+                                normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
+                                batch_signals.extend(normalized)
+                                self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected for {friendly}")
+
                     elif apps:
-                        yt_query = apps[0]
-                        
-                    if yt_query:
-                        self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{yt_query}'...")
-                        from ingestion.youtube import collect_youtube_data
-                        from ingestion.normalizer import normalize_youtube_data
-                        
-                        yt_signals = collect_youtube_data(yt_query, max_comments=150)
-                        if yt_signals:
-                            normalized = normalize_youtube_data(yt_signals)
-                            batch_signals.extend(normalized)
-                            self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected")
+                        for app_key in apps:
+                            app_config = QUICK_COMMERCE_APPS.get(app_key)
+                            friendly = app_config["name"] if app_config else app_key
+                            self._log_progress(f"🎥 Collecting YouTube comments for catalog app: '{friendly}'...")
+                            yt_signals = collect_youtube_data(friendly, max_comments=150)
+                            if yt_signals:
+                                normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
+                                batch_signals.extend(normalized)
+                                self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected for {friendly}")
                 except Exception as e:
                     self._log_progress(f"  ❌ YouTube error: {str(e)[:100]}")
             
