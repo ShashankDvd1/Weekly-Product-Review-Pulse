@@ -253,7 +253,8 @@ class PipelineOrchestrator:
                     avoided_categories=[],
                     apps_used=["zepto", "blinkit", "swiggy_instamart"],
                     signal_count=int(float(p_raw.get("estimated_size_pct", 30))),
-                    representative_quotes=[]
+                    representative_quotes=[],
+                    core_friction=p_raw.get("core_friction", p_raw.get("observed_needs", ["Friction during category exploration"])[0] if p_raw.get("observed_needs") else "Habitual repetition barrier")
                 ))
             except Exception as e:
                 logger.error(f"Failed to map Persona: {e}")
@@ -262,6 +263,7 @@ class PipelineOrchestrator:
         self.opportunities = []
         for i, o_raw in enumerate(segmentation_res.get("growth_opportunities", [])):
             try:
+                first_seg_name = segmentation_res.get("user_segments", [{}])[0].get("segment_name", "Core Segment") if segmentation_res.get("user_segments") else "Core Segment"
                 self.opportunities.append(GrowthOpportunity(
                     opportunity_id=f"O{i+1}",
                     title=o_raw.get("title", ""),
@@ -272,7 +274,9 @@ class PipelineOrchestrator:
                     confidence=float(o_raw.get("confidence", 0.8)),
                     supporting_themes=[],
                     supporting_jtbd=[],
-                    recommended_experiment=o_raw.get("recommended_experiment", "")
+                    target_persona=o_raw.get("target_persona", first_seg_name),
+                    recommended_experiment=o_raw.get("recommended_experiment", ""),
+                    core_value_prop=o_raw.get("core_value_prop", o_raw.get("recommended_experiment", o_raw.get("description", "")))
                 ))
             except Exception as e:
                 logger.error(f"Failed to map Opportunity: {e}")
@@ -290,7 +294,9 @@ class PipelineOrchestrator:
                     confidence=float(b_raw.get("impact_score", 8.0)) / 10.0,
                     confidence_level=ConfidenceLevel.HIGH,
                     recommended_intervention=b_raw.get("cause_title", ""),
-                    apps_affected=["zepto", "blinkit", "swiggy_instamart"]
+                    apps_affected=["zepto", "blinkit", "swiggy_instamart"],
+                    name=b_raw.get("cause_title", b_raw.get("explanation", "")[:50] + "..."),
+                    mitigation_strategy=b_raw.get("business_impact", b_raw.get("explanation", ""))
                 ))
             except Exception as e:
                 logger.error(f"Failed to map CategoryBarrier: {e}")
@@ -1024,10 +1030,9 @@ class PipelineOrchestrator:
         for s in self.signals:
             if s.date:
                 if isinstance(s.date, datetime):
-                    dates.append(s.date)
+                    dates.append(s.date.replace(tzinfo=None))
                 elif isinstance(s.date, str):
                     try:
-                        # strip Z or timezone details if necessary
                         clean_date = s.date.split("T")[0]
                         dates.append(datetime.strptime(clean_date, "%Y-%m-%d"))
                     except Exception:

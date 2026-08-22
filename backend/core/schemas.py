@@ -166,6 +166,7 @@ class Persona(BaseModel):
     signal_count: int = 0
     representative_quotes: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0, default=0.5)
+    core_friction: str = ""
 
 
 class CategoryBarrier(BaseModel):
@@ -180,6 +181,8 @@ class CategoryBarrier(BaseModel):
     supporting_evidence: list[EvidenceItem] = Field(default_factory=list)
     recommended_intervention: str = ""
     apps_affected: list[str] = Field(default_factory=list)
+    name: str = ""
+    mitigation_strategy: str = ""
 
 
 class JTBD(BaseModel):
@@ -209,6 +212,7 @@ class GrowthOpportunity(BaseModel):
     target_persona: Optional[str] = None
     recommended_experiment: str = ""
     apps_affected: list[str] = Field(default_factory=list)
+    core_value_prop: str = ""
 
 
 # ─────────────────────────────────────────────
