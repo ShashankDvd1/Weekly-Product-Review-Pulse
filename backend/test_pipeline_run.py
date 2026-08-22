@@ -25,9 +25,13 @@ def test_run():
     try:
         results = orchestrator.run_full_pipeline(req)
         print("\n=== PIPELINE RUN SUCCESS ===")
-        print(f"Total Signals: {results.get('total_signals')}")
+        coverage = results.get('data_coverage', {})
+        print(f"Total Signals: {coverage.get('total_signals')}")
+        print(f"Source Distribution: {coverage.get('source_distribution')}")
+        print(f"Sentiment Summary: {coverage.get('sentiment_summary')}")
         print(f"Detected Themes: {len(results.get('themes', []))}")
         print(f"Detected Barriers: {len(results.get('barriers', []))}")
+        print(f"Token Usage Summary: {results.get('token_usage')}")
         print("============================\n")
     except Exception as e:
         print("\n=== PIPELINE RUN FAILED ===")
