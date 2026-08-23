@@ -17,8 +17,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # ─────────────────────────────────────────────
 # LLM Configuration
 # ─────────────────────────────────────────────
-LLM_MODEL_FAST = "llama-3.1-8b-instant"                 # Fast, cheap: sentiment, classification
-LLM_MODEL_REASONING = "llama-3.3-70b-versatile"     # Deep reasoning: behavior, personas, JTBD
+LLM_MODEL_FAST = "groq/compound-mini"                 # Fast, cheap: sentiment, classification
+LLM_MODEL_REASONING = "groq/compound"     # Deep reasoning: behavior, personas, JTBD
 LLM_TEMPERATURE_ANALYTICAL = 0.2                # Low creativity for analysis
 LLM_TEMPERATURE_CREATIVE = 0.4                  # Moderate creativity for personas/JTBD
 

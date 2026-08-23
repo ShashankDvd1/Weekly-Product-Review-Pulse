@@ -1,8 +1,12 @@
 import sys
 import os
+import logging
 
 # Ensure backend directory is in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Configure logging so console logs from the orchestrator are not silenced
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(name)s] %(levelname)s: %(message)s')
 
 from core.schemas import FullPipelineRequest
 from agents.orchestrator import PipelineOrchestrator
@@ -45,6 +49,15 @@ def main():
     print("Running run_full_pipeline to verify full cycle...")
     results = orchestrator.run_full_pipeline(req)
     
+    if isinstance(results, dict) and results.get("status") == "error":
+        print("\n=== PIPELINE RUN FAILED ===")
+        print(f"Reason: {results.get('message')}")
+        print("\nPipeline Progress Logs:")
+        for log_line in orchestrator.progress:
+            print(log_line)
+        print("===========================\n")
+        sys.exit(1)
+        
     print(f"\nSUCCESS! Pipeline completed.")
     print(f"Total accepted signals: {len(orchestrator.signals)}")
     print(f"Total themes generated: {len(orchestrator.themes)}")

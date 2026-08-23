@@ -1,4 +1,5 @@
 import logging
+import sys
 from datetime import datetime, timedelta
 from core.schemas import FullPipelineRequest
 from agents.orchestrator import PipelineOrchestrator
@@ -24,6 +25,9 @@ def test_run():
     print(f"Running pipeline for Nykaa Fashion (com.fsn.nds) from {thirty_days_ago} to {today}...")
     try:
         results = orchestrator.run_full_pipeline(req)
+        if isinstance(results, dict) and results.get("status") == "error":
+            raise RuntimeError(results.get("message", "Unknown error in pipeline"))
+            
         print("\n=== PIPELINE RUN SUCCESS ===")
         coverage = results.get('data_coverage', {})
         print(f"Total Signals: {coverage.get('total_signals')}")
@@ -36,7 +40,11 @@ def test_run():
     except Exception as e:
         print("\n=== PIPELINE RUN FAILED ===")
         logging.exception("Error during execution")
+        print("\nPipeline Progress Logs:")
+        for log_line in orchestrator.progress:
+            print(log_line)
         print("===========================\n")
+        sys.exit(1)
 
 if __name__ == "__main__":
     test_run()
