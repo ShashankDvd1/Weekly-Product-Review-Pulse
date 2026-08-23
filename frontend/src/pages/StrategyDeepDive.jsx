@@ -115,6 +115,7 @@ const StrategyDeepDive = () => {
   const [logs, setLogs] = useState([]);
   const [completedSteps, setCompletedSteps] = useState(0);
   const [totalSteps, setTotalSteps] = useState(17);
+  const [status, setStatus] = useState('idle');
 
   const handleExportDoc = async () => {
     try {
@@ -186,6 +187,7 @@ const StrategyDeepDive = () => {
         const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
         const result = await res.json();
         
+        if (result.status) setStatus(result.status);
         if (result.logs) setLogs(result.logs);
         if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
         if (result.total_steps !== undefined) setTotalSteps(result.total_steps);
@@ -203,6 +205,7 @@ const StrategyDeepDive = () => {
       } catch (err) {
         clearInterval(interval);
         setLoading(false);
+        setStatus('failed');
         console.error('Polling failed:', err);
       }
     }, 2000);
@@ -214,6 +217,7 @@ const StrategyDeepDive = () => {
         const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
         const result = await res.json();
         
+        if (result.status) setStatus(result.status);
         if (result.logs) setLogs(result.logs);
         if (result.completed_steps !== undefined) setCompletedSteps(result.completed_steps);
         if (result.total_steps !== undefined) setTotalSteps(result.total_steps);
@@ -237,11 +241,13 @@ const StrategyDeepDive = () => {
   const handleRun = async () => {
     setLoading(true);
     setTriggered(true);
+    setStatus('running');
     setLogs(["[SYSTEM] Requesting Strategy Deep Dive run in background..."]);
     try {
       const res = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
       const result = await res.json();
       
+      if (result.status) setStatus(result.status);
       if (result.logs) setLogs(result.logs);
       
       if (result.status === 'completed') {
@@ -254,6 +260,7 @@ const StrategyDeepDive = () => {
     } catch (err) {
       console.error('Strategy deep dive failed:', err);
       setLoading(false);
+      setStatus('failed');
     }
   };
 
@@ -345,30 +352,40 @@ const StrategyDeepDive = () => {
         </div>
       )}
 
-      {triggered && (loading || (data && data.steps)) && (
+      {triggered && (loading || status === 'failed' || (data && data.steps)) && (
         <>
           {/* Progress Bar */}
           <div style={{ marginBottom: '2rem', padding: '0 0.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
               <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Analysis Progress</span>
-              <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>
-                {completedSteps}/{totalSteps} steps complete
+              <span style={{ 
+                color: status === 'failed' ? 'var(--error)' : 'var(--accent-primary)', 
+                fontWeight: 'bold', 
+                fontSize: '0.85rem' 
+              }}>
+                {status === 'failed' ? 'Failed' : `${completedSteps}/${totalSteps} steps complete`}
               </span>
             </div>
             <div style={{ height: '6px', background: 'var(--bg-secondary)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', borderRadius: '3px', transition: 'width 0.5s ease' }} />
+              <div style={{ 
+                height: '100%', 
+                width: `${progress}%`, 
+                background: status === 'failed' ? 'var(--error)' : 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))', 
+                borderRadius: '3px', 
+                transition: 'width 0.5s ease' 
+              }} />
             </div>
           </div>
 
           {/* Console Log UI */}
-          {loading && (
+          {(loading || status === 'failed' || logs.length > 0) && (
             <div style={{
               background: '#121214',
-              color: '#4ade80',
+              color: status === 'failed' ? '#f87171' : '#4ade80',
               fontFamily: 'monospace',
               padding: '1.25rem',
               borderRadius: '8px',
-              border: '1px solid var(--border-glass)',
+              border: `1px solid ${status === 'failed' ? 'rgba(239, 68, 68, 0.4)' : 'var(--border-glass)'}`,
               maxHeight: '280px',
               overflowY: 'auto',
               textAlign: 'left',
@@ -379,10 +396,27 @@ const StrategyDeepDive = () => {
               flexDirection: 'column',
               gap: '0.35rem'
             }}>
-              <div style={{ color: 'var(--text-muted)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
-                <span>🖥️ ANALYSIS ENGINE CONSOLE OUTPUT</span>
+              <div style={{ 
+                color: 'var(--text-muted)', 
+                borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                paddingBottom: '0.5rem', 
+                marginBottom: '0.5rem', 
+                display: 'flex', 
+                justifyContent: 'space-between' 
+              }}>
+                <span style={{ color: status === 'failed' ? 'var(--error)' : 'inherit' }}>
+                  {status === 'failed' ? '❌ STRATEGY ENGINE DEEP DIVE FAILED' : '🖥️ STRATEGY ENGINE CONSOLE OUTPUT'}
+                </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Processing...
+                  {loading ? (
+                    <>
+                      <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Processing...
+                    </>
+                  ) : status === 'failed' ? (
+                    <span style={{ color: 'var(--error)', fontWeight: 'bold' }}>FAILED</span>
+                  ) : (
+                    <span style={{ color: 'var(--success)', fontWeight: 'bold' }}>COMPLETED</span>
+                  )}
                 </span>
               </div>
               {logs.map((log, index) => (
@@ -390,6 +424,18 @@ const StrategyDeepDive = () => {
                   {log}
                 </div>
               ))}
+            </div>
+          )}
+
+          {status === 'failed' && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleRun} 
+                style={{ padding: '0.75rem 2rem', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--error)' }}
+              >
+                <Brain size={20} /> Retry Deep Dive
+              </button>
             </div>
           )}
         </>

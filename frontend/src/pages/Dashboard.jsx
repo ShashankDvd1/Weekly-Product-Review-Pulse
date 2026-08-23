@@ -862,14 +862,15 @@ const Dashboard = () => {
 
   async function fetchDashboardAndStrategy() {
     try {
-      // 1. Check background ingestion
       const statusRes = await fetch(`${getBackendUrl()}/api/v2/pipeline/status`);
       if (statusRes.ok) {
         const statusData = await statusRes.json();
+        setPipelineStatus(statusData.status);
+        setPipelineLogs(statusData.progress || []);
         if (statusData.status === 'collecting' || statusData.status === 'analyzing') {
           setPipelineRunning(true);
-          setPipelineStatus(statusData.status);
-          setPipelineLogs(statusData.progress || []);
+        } else {
+          setPipelineRunning(false);
         }
       }
 
@@ -1360,18 +1361,41 @@ const Dashboard = () => {
           </div>
 
           {/* ── Phase 1 / Active Logs Panel ── */}
-          {pipelineRunning && (
-            <div className="glass-panel" style={{ padding: '1.25rem', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '10px', textAlign: 'left' }}>
+          {((pipelineRunning || pipelineStatus === 'complete' || pipelineStatus === 'error') && pipelineLogs.length > 0) && (
+            <div className="glass-panel" style={{ 
+              padding: '1.25rem', 
+              border: `1px solid ${pipelineStatus === 'error' ? 'rgba(239, 68, 68, 0.4)' : pipelineStatus === 'complete' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(59, 130, 246, 0.3)'}`, 
+              borderRadius: '10px', 
+              textAlign: 'left' 
+            }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h4 style={{ color: 'var(--accent-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Ingestion Pipeline Running...
+                <h4 style={{ 
+                  color: pipelineStatus === 'error' ? 'var(--error)' : pipelineStatus === 'complete' ? 'var(--success)' : 'var(--accent-primary)', 
+                  margin: 0, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px' 
+                }}>
+                  {pipelineRunning && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+                  {pipelineStatus === 'error' && '❌ Ingestion Pipeline Failed'}
+                  {pipelineStatus === 'complete' && '✅ Ingestion Pipeline Complete'}
+                  {pipelineStatus !== 'error' && pipelineStatus !== 'complete' && '🚀 Ingestion Pipeline Running...'}
                 </h4>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Status: {pipelineStatus}</span>
               </div>
               
               <div style={{
-                background: '#090e18', color: '#10b981', fontFamily: 'monospace', padding: '1rem', borderRadius: '6px',
-                maxHeight: '200px', overflowY: 'auto', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.25rem',
+                background: '#090e18', 
+                color: pipelineStatus === 'error' ? '#f87171' : '#10b981', 
+                fontFamily: 'monospace', 
+                padding: '1rem', 
+                borderRadius: '6px',
+                maxHeight: '200px', 
+                overflowY: 'auto', 
+                fontSize: '0.8rem', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '0.25rem',
                 border: '1px solid rgba(255,255,255,0.03)'
               }}>
                 {pipelineLogs.map((log, idx) => <div key={idx}>{log}</div>)}
