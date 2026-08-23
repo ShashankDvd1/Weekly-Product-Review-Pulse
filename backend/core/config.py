@@ -130,7 +130,7 @@ CATEGORY_BARRIER_TYPES = [
 # ─────────────────────────────────────────────
 # Data Pipeline
 # ─────────────────────────────────────────────
-MAX_REVIEWS_PER_APP = 5000
+MAX_REVIEWS_PER_APP = 200
 DEDUP_SIMILARITY_THRESHOLD = 0.85
 MIN_CLUSTER_SIZE = 5
 

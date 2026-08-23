@@ -580,7 +580,7 @@ class PipelineOrchestrator:
         app_store_id: str = None,
         from_date: str = None,
         to_date: str = None,
-        include_reddit: bool = True,
+        include_reddit: bool = False,
         include_youtube: bool = True,
         reddit_subreddits: list[str] = None,
         reddit_search_terms: list[str] = None,
@@ -663,7 +663,7 @@ class PipelineOrchestrator:
                 if play_store_package:
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=300)
+                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=60)
                         if not df_play.empty:
                             normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
                             batch_signals.extend(normalized)
@@ -674,7 +674,7 @@ class PipelineOrchestrator:
                 if app_store_id:
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=4)
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=1)
                         if not df_app.empty:
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
@@ -696,7 +696,7 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=300)
+                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=60)
                         if not df_play.empty:
                             normalized = normalize_play_store_reviews(df_play, app_name, package)
                             batch_signals.extend(normalized)
@@ -706,7 +706,7 @@ class PipelineOrchestrator:
 
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=4)
+                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=1)
                         if not df_app.empty:
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
                             batch_signals.extend(normalized)
@@ -771,7 +771,7 @@ class PipelineOrchestrator:
                         
                         if friendly:
                             self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{friendly}'...")
-                            yt_signals = collect_youtube_data(friendly, max_comments=150)
+                            yt_signals = collect_youtube_data(friendly, max_comments=30)
                             if yt_signals:
                                 normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
                                 batch_signals.extend(normalized)
@@ -782,7 +782,7 @@ class PipelineOrchestrator:
                             app_config = QUICK_COMMERCE_APPS.get(app_key)
                             friendly = app_config["name"] if app_config else app_key
                             self._log_progress(f"🎥 Collecting YouTube comments for catalog app: '{friendly}'...")
-                            yt_signals = collect_youtube_data(friendly, max_comments=150)
+                            yt_signals = collect_youtube_data(friendly, max_comments=30)
                             if yt_signals:
                                 normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
                                 batch_signals.extend(normalized)

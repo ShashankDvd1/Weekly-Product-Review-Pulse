@@ -12,7 +12,7 @@ class ResearchDiscoveryAgent(BaseAgent):
         """
         # Compress signals to fit context limits (prioritize high-signal/low-score or diverse ones)
         sample_signals = []
-        for s in signals[:60]:
+        for s in signals[:30]:
             sample_signals.append({
                 "source": s.source.value,
                 "app": s.app_name,
