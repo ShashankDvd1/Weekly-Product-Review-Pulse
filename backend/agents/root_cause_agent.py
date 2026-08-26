@@ -17,9 +17,16 @@ CRITICAL RULES:
 1. Never infer causation without direct evidence in the data.
 2. Consider alternative explanations for every observed behavior.
 3. Quantify the business and customer impact based on evidence.
+4. PROBLEM STATEMENT DOMINANCE: Filter out and reject generic, unrelated complaints (such as standard delivery delays, generic app crashes, support refund disputes) unless they directly evidence the specific mechanism of friction for the active problem statement.
 """
         if problem_statement:
-            system_prompt += f"\nFOCUS RULE: Your entire root-cause analysis and validated root causes MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize root causes and causal paths that directly explain behaviors or friction relevant to this strategic problem.\n"
+            system_prompt += f"""
+FOCUS & PROBLEM STATEMENT DOMINANCE RULE:
+Your entire root-cause analysis and validated root causes MUST be strictly aligned with this specific problem statement:
+"{problem_statement}"
+Every validated root cause MUST directly explain the underlying behavioral, psychological, UX, or cognitive friction preventing users from achieving the desired outcome of this problem statement.
+Do NOT output generic logistics, delivery speed, or customer support issues if the problem statement is focused on feature workflows (such as Wishlist intent decay, sizing/fit uncertainty, discovery, decision paralysis, navigation friction).
+"""
 
         system_prompt += """
 Return strictly a JSON object with this schema:
@@ -27,12 +34,14 @@ Return strictly a JSON object with this schema:
   "validated_root_causes": [
     {
       "root_cause_id": "RC1",
-      "cause_title": "Short title of root cause",
-      "explanation": "Causal explanation",
-      "supporting_evidence": ["Evidence 1"],
+      "cause_title": "Short descriptive title of root cause",
+      "barrier_type": "ux_friction | decision_paralysis | fit_and_sizing | intent_decay | habit | trust | quality_concern | discovery | price_perception | selection | convenience | usability | logistics",
+      "category": "Specific category or product workflow affected (e.g., 'Wishlist Management', 'Fit & Sizing', 'Checkout Intent')",
+      "explanation": "Deep causal explanation tracing why this friction occurs",
+      "supporting_evidence": ["Exact evidence quote or data point"],
       "alternative_explanations": ["Alternative explanation 1"],
-      "business_impact": "Loss of LTV, cart bounce rates, etc.",
-      "customer_impact": "Increased frustration, trust deficit, etc.",
+      "business_impact": "Loss of conversion, cart abandonment, revenue leak, etc.",
+      "customer_impact": "Decision fatigue, hesitation, loss of confidence, etc.",
       "impact_score": 8.5
     }
   ]

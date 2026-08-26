@@ -270,14 +270,12 @@ def detect_category_barriers(
     chunks = _prepare_signals_for_llm(signals)
     all_barriers = []
 
-    categories_str = ", ".join(target_categories) if target_categories else (
-        "Beauty, Electronics, Home & Kitchen, Baby Care, Pet Care, Stationery, Toys"
-    )
+    categories_str = ", ".join(target_categories) if target_categories else "all product categories and features"
 
     from concurrent.futures import ThreadPoolExecutor
 
     def analyze_barrier_chunk(chunk):
-        problem_context = f"The specific problem to focus on is: {problem_statement}" if problem_statement else f"The question: Why do users keep buying from familiar categories (Grocery, Snacks, Dairy) but avoid exploring: {categories_str}?"
+        problem_context = f"The specific problem to focus on is: {problem_statement}" if problem_statement else f"Analyze barriers preventing users from completing tasks or exploring features across: {categories_str}."
         
         prompt = f"""Analyze these consumer signals to identify experience barriers and friction points based on the target problem.
 

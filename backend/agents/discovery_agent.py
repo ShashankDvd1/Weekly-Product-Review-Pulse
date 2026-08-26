@@ -10,14 +10,17 @@ class ResearchDiscoveryAgent(BaseAgent):
         """
         Extract patterns, anomalies, and customer quotes from the dataset without proposing solutions.
         """
-        # Compress signals to fit context limits (prioritize high-signal/low-score or diverse ones)
+        # Select up to 60 high-relevance signals with concise content
         sample_signals = []
-        for s in signals[:30]:
+        for s in signals[:60]:
+            clean_content = (s.content or "").strip()
+            if len(clean_content) > 200:
+                clean_content = clean_content[:200] + "..."
             sample_signals.append({
                 "source": s.source.value,
                 "app": s.app_name,
                 "rating": s.rating,
-                "content": s.content
+                "content": clean_content
             })
             
         system_prompt = """
@@ -29,9 +32,16 @@ CRITICAL RULES:
 2. DO NOT propose any product solutions, features, or roadmap items.
 3. Identify contradictions where they exist (e.g. users state one preference but show a different behavior).
 4. Generate a minimum of 4 distinct and detailed causal hypotheses.
+5. PROBLEM STATEMENT DOMINANCE: Discard generic platform complaints (e.g. baseline delivery delays, generic app crashes, support refund disputes) that do not directly illuminate the target problem statement.
 """
         if problem_statement:
-            system_prompt += f"\nFOCUS RULE: Your entire analysis and extraction MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize finding observed patterns, anomalies, representative quotes, contradictions, causal hypotheses, and Jobs-To-Be-Done that directly shed light on user behaviors, friction points, and barriers related to this specific problem statement.\n"
+            system_prompt += f"""
+FOCUS & PROBLEM STATEMENT DOMINANCE RULE:
+Your entire analysis and extraction MUST be strictly aligned with this research problem statement:
+"{problem_statement}"
+Prioritize finding observed patterns, anomalies, representative quotes, contradictions, causal hypotheses, and Jobs-To-Be-Done that directly shed light on user behaviors, friction points, and psychological/UX barriers related to this specific problem statement.
+Ignore generic complaints that are unrelated to this problem statement.
+"""
 
         system_prompt += """
 Return strictly a JSON object with this schema:

@@ -13,7 +13,12 @@ import {
   Zap,
   Lightbulb, 
   Beaker,
-  Users
+  Users,
+  HelpCircle,
+  Scissors,
+  Layers,
+  Truck,
+  Bookmark
 } from 'lucide-react';
 import { getBackendUrl } from '../config';
 
@@ -25,7 +30,13 @@ const barrierIcons = {
   quality_concern: <AlertCircle size={24} />,
   selection: <Target size={24} />,
   convenience: <TrendingDown size={24} />,
-  discovery: <MapPin size={24} />
+  discovery: <MapPin size={24} />,
+  ux_friction: <Zap size={24} />,
+  decision_paralysis: <HelpCircle size={24} />,
+  intent_decay: <Bookmark size={24} />,
+  fit_and_sizing: <Scissors size={24} />,
+  usability: <Layers size={24} />,
+  logistics: <Truck size={24} />
 };
 
 const InsightsHub = () => {

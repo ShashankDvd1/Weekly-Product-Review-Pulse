@@ -117,14 +117,20 @@ QUICK_COMMERCE_APPS = {
 # Category Exploration Analysis
 # ─────────────────────────────────────────────
 CATEGORY_BARRIER_TYPES = [
-    "awareness",        # User doesn't know the category exists
-    "trust",            # User doesn't trust the platform for this category
-    "habit",            # User has a fixed routine / trigger
-    "price_perception", # User assumes it's overpriced
-    "quality_concern",  # User fears poor quality
-    "selection",        # User thinks selection is limited
-    "convenience",      # Easier to buy elsewhere
-    "discovery",        # Hard to find/browse the category in app
+    "awareness",        # User doesn't know the feature/category exists
+    "trust",            # User has trust or verification concerns
+    "habit",            # User has a fixed routine / repeat habit
+    "price_perception", # User assumes it's overpriced or uncompetitive
+    "quality_concern",  # User fears poor quality or mismatch
+    "selection",        # User thinks options are limited
+    "convenience",      # Easier to do elsewhere
+    "discovery",        # Hard to find/browse
+    "ux_friction",      # UI/UX interaction friction
+    "decision_paralysis", # Too many choices / lack of clear signals
+    "intent_decay",     # Wishlisted items forgotten or delayed
+    "fit_and_sizing",   # Sizing or fit uncertainty
+    "usability",        # Navigation or tool usability
+    "logistics",        # Delivery or fulfillment roadblocks
 ]
 
 # ─────────────────────────────────────────────

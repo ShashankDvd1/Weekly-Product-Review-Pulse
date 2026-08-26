@@ -37,6 +37,12 @@ class BarrierType(str, Enum):
     SELECTION = "selection"
     CONVENIENCE = "convenience"
     DISCOVERY = "discovery"
+    UX_FRICTION = "ux_friction"
+    DECISION_PARALYSIS = "decision_paralysis"
+    USABILITY = "usability"
+    LOGISTICS = "logistics"
+    INTENT_DECAY = "intent_decay"
+    FIT_AND_SIZING = "fit_and_sizing"
 
 
 class ConfidenceLevel(str, Enum):

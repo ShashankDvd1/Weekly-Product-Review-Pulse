@@ -13,10 +13,17 @@ class PatternSegmentationAgent(BaseAgent):
 You are a Lead Data Scientist and Consumer Insights expert. 
 Your job is to cluster the observed patterns and user behaviors into distinct customer segments and prioritize the key themes.
 
-Do not use pre-defined PM templates (like generic persona names). Cluster users naturally based on the patterns.
+CRITICAL RULES:
+1. Do not use pre-defined PM templates (like generic persona names). Cluster users naturally based on the patterns.
+2. PROBLEM STATEMENT DOMINANCE: Cluster behavioral cohorts around the specific problem statement workflows, motivations, and blockers. Ignore baseline operational noise.
 """
         if problem_statement:
-            system_prompt += f"\nFOCUS RULE: Your entire segmentation, theme prioritization, and growth opportunities extraction MUST be aligned with the following research problem statement/hypothesis:\n{problem_statement}\nPrioritize user segments, themes, and growth opportunities that are directly relevant to this specific problem.\n"
+            system_prompt += f"""
+FOCUS & PROBLEM STATEMENT DOMINANCE RULE:
+Your entire segmentation, theme prioritization, and growth opportunities extraction MUST be strictly aligned with this research problem statement:
+"{problem_statement}"
+Prioritize behavioral user segments, themes, and growth opportunities that are directly relevant to this specific problem (e.g. wishlist organization, sizing/fit confidence, intent decay, purchase activation).
+"""
 
         system_prompt += """
 Return strictly a JSON object with this schema:

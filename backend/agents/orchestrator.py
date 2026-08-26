@@ -287,10 +287,38 @@ class PipelineOrchestrator:
         self.barriers = []
         for i, b_raw in enumerate(root_cause_res.get("validated_root_causes", [])):
             try:
+                b_type_raw = str(b_raw.get("barrier_type", "")).lower().strip().replace(" ", "_").replace("-", "_")
+                try:
+                    b_type = BarrierType(b_type_raw)
+                except ValueError:
+                    combined_text = (b_raw.get("cause_title", "") + " " + b_raw.get("explanation", "")).lower()
+                    if any(k in combined_text for k in ["decision", "paralysis", "hesitation", "too many choices", "defer", "deferral"]):
+                        b_type = BarrierType.DECISION_PARALYSIS
+                    elif any(k in combined_text for k in ["wishlist", "ux", "ui", "filter", "organize", "search", "friction", "cluttered", "lost"]):
+                        b_type = BarrierType.UX_FRICTION
+                    elif any(k in combined_text for k in ["size", "fit", "sizing", "guide", "chart", "height"]):
+                        b_type = BarrierType.FIT_AND_SIZING
+                    elif any(k in combined_text for k in ["forgot", "intent", "decay", "saved long ago", "style", "pair"]):
+                        b_type = BarrierType.INTENT_DECAY
+                    elif any(k in combined_text for k in ["habit", "routine"]):
+                        b_type = BarrierType.HABIT
+                    elif any(k in combined_text for k in ["quality", "material", "fabric", "color mismatch"]):
+                        b_type = BarrierType.QUALITY_CONCERN
+                    elif any(k in combined_text for k in ["delivery", "shipping", "pincode", "logistic"]):
+                        b_type = BarrierType.LOGISTICS
+                    elif any(k in combined_text for k in ["price", "cost", "charge"]):
+                        b_type = BarrierType.PRICE_PERCEPTION
+                    elif any(k in combined_text for k in ["discovery", "find", "explore"]):
+                        b_type = BarrierType.DISCOVERY
+                    elif any(k in combined_text for k in ["fake", "counterfeit", "authenticity", "trust"]):
+                        b_type = BarrierType.TRUST
+                    else:
+                        b_type = BarrierType.UX_FRICTION
+
                 self.barriers.append(CategoryBarrier(
                     barrier_id=f"B{i+1}",
-                    category=b_raw.get("category", "General Product Category"),
-                    barrier_type=BarrierType.TRUST,
+                    category=b_raw.get("category", b_raw.get("cause_title", "Product Experience")),
+                    barrier_type=b_type,
                     description=b_raw.get("explanation", ""),
                     signal_count=len(b_raw.get("supporting_evidence", [])),
                     confidence=float(b_raw.get("impact_score", 8.0)) / 10.0,
@@ -915,12 +943,17 @@ class PipelineOrchestrator:
             target_play = int(target_total * 0.40)    # 120
             target_app = int(target_total * 0.20)     # 60
             
-            import random
-            random.seed(42)
-            
-            sampled_yt = random.sample(yt_sigs, min(len(yt_sigs), target_yt))
-            sampled_play = random.sample(play_sigs, min(len(play_sigs), target_play))
-            sampled_app = random.sample(app_sigs, min(len(app_sigs), target_app))
+            # If problem_statement is provided, preserve top semantic ranking rather than random shuffle
+            if problem_statement:
+                sampled_yt = yt_sigs[:min(len(yt_sigs), target_yt)]
+                sampled_play = play_sigs[:min(len(play_sigs), target_play)]
+                sampled_app = app_sigs[:min(len(app_sigs), target_app)]
+            else:
+                import random
+                random.seed(42)
+                sampled_yt = random.sample(yt_sigs, min(len(yt_sigs), target_yt))
+                sampled_play = random.sample(play_sigs, min(len(play_sigs), target_play))
+                sampled_app = random.sample(app_sigs, min(len(app_sigs), target_app))
             
             balanced_signals = sampled_yt + sampled_play + sampled_app
             self._log_progress(f"⚖️ Balanced accepted dataset (Target Ratio: 40% YT, 40% Play Store, 20% App Store):")
