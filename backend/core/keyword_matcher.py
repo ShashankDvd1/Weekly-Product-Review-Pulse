@@ -1,99 +1,68 @@
 """
-Pulse Intelligence — Relative Keyword Extraction & Semantic Matcher
-Extracts search terms from user input and expands them with relative semantic families
-(synonyms, related workflows, and stems) so that reviews discussing related concepts are preserved.
+Pulse Intelligence — Dynamic Keyword Extraction & Review Matcher
+Directly extracts all search terms, phrases, categories, and stems from user input dynamically.
+Zero hardcoded domain rules — fully driven by user inputs and prompt configuration.
 """
 
 import re
 from typing import List, Optional, Union, Set
 
-# Semantic family expansions: If a keyword belongs to a family, all related terms are included
-SEMANTIC_FAMILIES = {
-    "fit_and_sizing": {
-        "fit", "size", "sizing", "chart", "guide", "measurement", "tight", "loose", 
-        "small", "large", "medium", "xl", "xxl", "length", "waist", "shoulder", 
-        "fitting", "true to size", "model", "height", "trial", "alter", "cut"
-    },
-    "wishlist_and_cart": {
-        "wishlist", "wish", "save", "saved", "bag", "cart", "favourite", "favorite", 
-        "heart", "later", "item", "list", "stock", "sold out", "notify", "forgot", 
-        "stale", "add to cart", "move to bag", "saved items"
-    },
-    "quality_and_fabric": {
-        "fabric", "cloth", "material", "quality", "cotton", "silk", "polyester", 
-        "color", "colour", "mismatch", "photo", "picture", "finish", "cheap", 
-        "original", "fake", "counterfeit", "texture", "feel", "wash", "shrink", 
-        "bleed", "stitch", "transparent", "see through"
-    },
-    "intent_and_decision": {
-        "hesitat", "confus", "decid", "decision", "doubt", "paralys", "paralysis", 
-        "choice", "delay", "defer", "buy", "purchas", "order", "worth", "abandon", 
-        "checkout", "drop off", "think twice", "second thought", "cancel", "unsure"
-    },
-    "ux_and_navigation": {
-        "filter", "sort", "search", "find", "browse", "ui", "ux", "scroll", 
-        "category", "categor", "clutter", "section", "drawer", "tab", "organize", 
-        "lost", "slow", "bug", "crash", "stuck", "interface", "navigation"
-    },
-    "pricing_and_offers": {
-        "price", "cost", "discount", "coupon", "offer", "deal", "charge", 
-        "expensive", "cheap", "worth", "cashback", "sale", "overpriced", "fee"
-    },
-    "delivery_and_returns": {
-        "return", "exchange", "refund", "pickup", "replace", "policy", "courier"
-    }
-}
-
 def extract_keyword_terms(keywords_input: Optional[Union[str, List[str]]]) -> List[str]:
     """
-    Extracts individual words and quoted phrases from structured user input,
-    and automatically enriches the term list with relative semantic synonyms.
+    Directly extracts and parses all search terms, phrases, and word stems from user input.
+    Handles structured input including:
+      - Category colons (e.g. 'Fit & Sizing: fit, size, chart')
+      - Numbered bullet lists (e.g. '1. Fit & sizing: "size guide", fit issue')
+      - Quoted multi-word phrases (e.g. "true to size", "color mismatch")
+      - Comma / newline / semicolon separated lists
     """
     if not keywords_input:
         return []
         
-    raw = keywords_input if isinstance(keywords_input, str) else ", ".join(keywords_input)
-    
-    # Step 1: Extract quoted phrases (e.g. "size guide", "fit issue")
-    quoted_phrases = re.findall(r'"([^"]+)"', raw)
-    
-    # Step 2: Clean remaining text
-    remaining = re.sub(r'"[^"]*"', ' ', raw)
-    remaining = re.sub(r'\d+\.\s*', ' ', remaining)
-    remaining = re.sub(r'[&|/\\()\[\]{}]', ' ', remaining)
-    
-    raw_tokens = re.split(r'[,\n;]+', remaining)
-    
-    extracted_terms: Set[str] = set()
-    for phrase in quoted_phrases:
-        clean = phrase.strip().lower()
-        if len(clean) >= 2:
-            extracted_terms.add(clean)
-            
+    raw_text = keywords_input if isinstance(keywords_input, str) else ", ".join(keywords_input)
+    if not raw_text.strip():
+        return []
+
+    terms: Set[str] = set()
+
+    # 1. Extract explicitly quoted phrases
+    quoted_matches = re.findall(r'["\']([^"\']+)["\']', raw_text)
+    for q in quoted_matches:
+        clean_q = q.strip().lower()
+        if len(clean_q) >= 2:
+            terms.add(clean_q)
+
+    # 2. Clean out quotes and split by common delimiters (commas, newlines, colons, semicolons, pipes, slashes)
+    text_unquoted = re.sub(r'["\']', ' ', raw_text)
+    raw_tokens = re.split(r'[,;:\n\r\|/]+', text_unquoted)
+
     for token in raw_tokens:
-        clean = token.strip().lower()
-        if len(clean) >= 3 and clean not in {
-            'uncertainty', 'friction', 'management', 'decay', 'non-monetary', 'roadblocks'
-        }:
-            if len(clean.split()) > 4:
-                words = [w for w in clean.split() if len(w) >= 3]
-                extracted_terms.update(words)
-            else:
-                extracted_terms.add(clean)
+        # Strip bullet numbers (e.g. '1. ', '2) ') and punctuation
+        clean_token = re.sub(r'^\s*\d+[\.\)]\s*', '', token).strip().lower()
+        clean_token = clean_token.strip('.-_ !?*()[]{}&')
+        if not clean_token or len(clean_token) < 2:
+            continue
 
-    # Step 3: Expand with relative semantic families
-    expanded_terms: Set[str] = set(extracted_terms)
-    for term in list(extracted_terms):
-        for family_name, family_words in SEMANTIC_FAMILIES.items():
-            # If the extracted term intersects or is a substring of any family word
-            if any(term in fw or fw in term for fw in family_words):
-                expanded_terms.update(family_words)
+        # Add the full phrase token (e.g. 'true to size', 'color mismatch', 'add to cart')
+        terms.add(clean_token)
 
-    return list(expanded_terms)
+        # Also extract individual words from multi-word tokens
+        words = re.findall(r'[a-zA-Z0-9_-]+', clean_token)
+        for w in words:
+            if len(w) >= 2 and w not in {'and', 'the', 'for', 'with', 'from', 'also', 'etc'}:
+                terms.add(w)
+                # Generate stem for inflected words (e.g. hesitation -> hesitat, sizing -> size/siz, fitting -> fit)
+                if len(w) > 5 and w.endswith(('ing', 'ion', 'ity', 'ed', 'es')):
+                    stem = re.sub(r'(ing|ion|ity|ed|es)$', '', w)
+                    if len(stem) >= 3:
+                        terms.add(stem)
+
+    return sorted(list(terms))
+
 
 def matches_keywords(text: str, keywords: Optional[List[str]]) -> bool:
     """
-    Returns True if the text contains ANY of the relative keyword terms or stems,
+    Returns True if the text contains ANY of the dynamically extracted keyword terms or stems,
     or True if no keywords are specified.
     """
     if not keywords:
@@ -103,10 +72,10 @@ def matches_keywords(text: str, keywords: Optional[List[str]]) -> bool:
         
     text_lower = text.lower()
     
-    # Fast check: direct substring or stem match
     for kw in keywords:
         if kw in text_lower:
             return True
             
     return False
+
 
