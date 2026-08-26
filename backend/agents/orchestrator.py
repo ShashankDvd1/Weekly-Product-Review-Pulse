@@ -677,7 +677,7 @@ class PipelineOrchestrator:
                 if app_store_id:
                     try:
                         self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=1)
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=5)
                         if not df_app.empty:
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
@@ -794,20 +794,70 @@ class PipelineOrchestrator:
                     self._log_progress(f"  ❌ YouTube error: {str(e)[:100]}")
             
             if keywords:
-                if isinstance(keywords, str):
-                    keyword_list = [k.strip().lower() for k in keywords.split(",") if k.strip()]
-                elif isinstance(keywords, list):
-                    keyword_list = [k.strip().lower() for k in keywords if k.strip()]
-                else:
-                    keyword_list = []
+                import re as _re
+                
+                # ── Smart keyword extraction ──
+                # The user may paste structured input with numbering, quoted phrases, 
+                # and category headers. We need to extract individual search terms.
+                raw_kw_input = keywords if isinstance(keywords, str) else ", ".join(keywords)
+                
+                # Step 1: Extract quoted phrases first (e.g. "size guide", "fit issue")
+                quoted_phrases = _re.findall(r'"([^"]+)"', raw_kw_input)
+                
+                # Step 2: Remove quoted phrases, numbering, and category headers from the remaining text
+                remaining = _re.sub(r'"[^"]*"', ' ', raw_kw_input)           # remove quoted blocks
+                remaining = _re.sub(r'\d+\.\s*', ' ', remaining)              # remove "1. ", "2. " etc.
+                remaining = _re.sub(r'[&|/\\()\[\]{}]', ' ', remaining)       # remove special chars
+                
+                # Step 3: Split remaining text by commas, newlines, and common delimiters
+                raw_tokens = _re.split(r'[,\n;]+', remaining)
+                
+                # Step 4: Clean and collect all terms (min 2 chars to avoid noise)
+                all_terms = []
+                for phrase in quoted_phrases:
+                    clean = phrase.strip().lower()
+                    if len(clean) >= 2:
+                        all_terms.append(clean)
+                
+                for token in raw_tokens:
+                    clean = token.strip().lower()
+                    # Skip generic category labels and very short tokens
+                    if len(clean) >= 3 and clean not in {
+                        'fit', 'sizing', 'quality', 'uncertainty', 'friction',
+                        'management', 'hesitation', 'intent', 'decay', 'logistics',
+                        'non-monetary', 'roadblocks', 'post-wishlist', 'ui', 'ux'
+                    }:
+                        # Split multi-word tokens into sub-phrases if they are long category titles
+                        if len(clean.split()) > 4:
+                            # These are likely category headers, extract individual meaningful words
+                            words = [w for w in clean.split() if len(w) >= 4]
+                            all_terms.extend(words)
+                        else:
+                            all_terms.append(clean)
+                
+                # Deduplicate while preserving order
+                seen = set()
+                keyword_list = []
+                for t in all_terms:
+                    if t not in seen:
+                        seen.add(t)
+                        keyword_list.append(t)
                 
                 if keyword_list:
-                    self._log_progress(f"🔍 Filtering {len(batch_signals)} collected signals for keywords: {keyword_list}...")
+                    # Determine match threshold: require ANY 1 term match for broad relevance
+                    # This is intentionally relaxed — the downstream semantic pre-filter and
+                    # quality filter will apply stricter relevance scoring.
+                    min_matches = 1
+                    
+                    self._log_progress(f"🔍 Filtering {len(batch_signals)} collected signals using {len(keyword_list)} extracted terms (match≥{min_matches})...")
+                    self._log_progress(f"   📋 Sample terms: {keyword_list[:15]}{'...' if len(keyword_list) > 15 else ''}")
                     filtered_batch = []
                     for sig in batch_signals:
                         content_lower = sig.content.lower()
                         title_lower = (sig.title or "").lower()
-                        if any(kw in content_lower or kw in title_lower for kw in keyword_list):
+                        combined = content_lower + " " + title_lower
+                        match_count = sum(1 for kw in keyword_list if kw in combined)
+                        if match_count >= min_matches:
                             filtered_batch.append(sig)
                     batch_signals = filtered_batch
                     self._log_progress(f"✅ Filtered down to {len(batch_signals)} signals matching keywords.")
