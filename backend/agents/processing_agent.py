@@ -1,3 +1,4 @@
+import json
 from agents.base import BaseAgent
 from core.schemas import UnifiedSignal
 
@@ -53,17 +54,10 @@ Return strictly a JSON object with this schema:
         
         user_prompt = f"""
 Data Quality Metrics:
-{json_dumps(quality_report)}
+{json.dumps(quality_report, indent=2)}
 """
         if problem_statement:
             user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
 
-        user_prompt += "\nProduce the Data Processing report.\n"
-        
-        # Simple helper since json isn't imported
-        import json
+        user_prompt += "\nGenerate the Data Processing & Quality Report.\n"
         return self.generate_json(system_prompt, user_prompt)
-
-def json_dumps(obj):
-    import json
-    return json.dumps(obj, indent=2)

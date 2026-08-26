@@ -17,10 +17,10 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # ─────────────────────────────────────────────
 # LLM Configuration
 # ─────────────────────────────────────────────
-LLM_MODEL_FAST = "groq/compound-mini"                 # Fast, cheap: sentiment, classification
-LLM_MODEL_REASONING = "groq/compound"     # Deep reasoning: behavior, personas, JTBD
-LLM_TEMPERATURE_ANALYTICAL = 0.2                # Low creativity for analysis
-LLM_TEMPERATURE_CREATIVE = 0.4                  # Moderate creativity for personas/JTBD
+LLM_MODEL_FAST = "qwen/qwen3.8-27b"                  # High throughput, no TPD rate limits, clean JSON
+LLM_MODEL_REASONING = "qwen/qwen3.8-27b"             # Deep reasoning, large token limit
+LLM_TEMPERATURE_ANALYTICAL = 0.2                     # Low creativity for analysis
+LLM_TEMPERATURE_CREATIVE = 0.4                       # Moderate creativity for personas/JTBD
 
 # Groq free tier rate limits
 GROQ_MAX_TPM = 40000   # Tokens per minute
