@@ -752,9 +752,8 @@ const Dashboard = () => {
   const [parsing, setParsing] = useState(false);
   const [parsedConfig, setParsedConfig] = useState(null);
 
-  const [problemStatement, setProblemStatement] = useState(
-    "You are a Product Manager on the Growth Team at your chosen company. Quick commerce platforms have successfully become a part of users' weekly routines. Many users place recurring orders for Groceries, snacks & beverages and household essentials. Over time, however, shopping behavior becomes highly repetitive. Users often purchase the same set of products repeatedly and rarely explore new categories available on the platform. One of the company's strategic goals is to: Increase the percentage of Monthly Active Customers who purchase products from at least one new category every month."
-  );
+  const [problemStatement, setProblemStatement] = useState("");
+  const [keywords, setKeywords] = useState("");
 
   const toggleStep = (stepId) => {
     setOpenSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
@@ -946,7 +945,8 @@ const Dashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...parsedConfig,
-          problem_statement: problemStatement
+          problem_statement: problemStatement,
+          keywords: keywords
         })
       });
       if (!res.ok) throw new Error("Pipeline run encountered a server error");
@@ -1020,7 +1020,8 @@ const Dashboard = () => {
           to_date: toDate,
           include_reddit: true,
           include_youtube: true,
-          problem_statement: problemStatement
+          problem_statement: problemStatement,
+          keywords: keywords
         })
       });
       if (!response.ok) throw new Error('Pipeline failed to initiate');
@@ -1333,6 +1334,21 @@ const Dashboard = () => {
                     </div>
                   </>
                 )}
+              </div>
+
+              {/* Keyword Filter Input */}
+              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-glass)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', fontWeight: 'bold' }}>REVIEW FILTER KEYWORDS</span>
+                <input 
+                  type="text" 
+                  value={keywords} 
+                  onChange={(e) => setKeywords(e.target.value)}
+                  placeholder="Enter keywords (comma-separated, e.g. delay, checkout)"
+                  style={{ width: '100%', background: 'var(--bg-secondary)', color: '#fff', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.35rem 0.5rem', fontSize: '0.85rem' }}
+                />
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Only process reviews containing these terms (optional)
+                </div>
               </div>
             </div>
 

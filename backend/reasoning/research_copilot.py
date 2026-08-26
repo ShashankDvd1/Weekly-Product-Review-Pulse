@@ -22,7 +22,7 @@ from core.schemas import (
 logger = logging.getLogger(__name__)
 
 
-RESEARCH_SYSTEM_PROMPT = """You are a Senior User Researcher at a Quick Commerce company.
+RESEARCH_SYSTEM_PROMPT = """You are a Senior User Researcher.
 
 You design rigorous research studies to validate product hypotheses. Your interview questions are:
 - Open-ended (not leading)
@@ -97,7 +97,7 @@ def generate_hypotheses(
         for t in themes[:8]
     ])
 
-    prompt = f"""Based on the following analysis of quick commerce user behavior, generate 8-10 testable product hypotheses.
+    prompt = f"""Based on the following analysis of user behavior, generate 8-10 testable product hypotheses.
 
 ## CATEGORY BARRIERS
 {barriers_str}

@@ -23,7 +23,7 @@ from output.evidence_builder import (
 logger = logging.getLogger(__name__)
 
 
-REPORT_SYSTEM_PROMPT = """You are a Chief Product Officer writing an executive brief for the CEO of a Quick Commerce company.
+REPORT_SYSTEM_PROMPT = """You are a Chief Product Officer writing an executive brief for the CEO.
 
 Your writing is:
 - Data-driven (every claim has a number behind it)
@@ -81,7 +81,7 @@ def generate_executive_summary(
 ## CATEGORY MENTIONS
 {category_counts}"""
 
-    prompt = f"""Write an executive summary for a Quick Commerce Category Discovery Analysis.
+    prompt = f"""Write an executive summary for the product and user behavior analysis.
 
 {context}
 

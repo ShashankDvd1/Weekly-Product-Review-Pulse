@@ -1,81 +1,96 @@
 {
   "strategy_deep_dive": {
     "planning": {
-      "dataset_types": [
-        "App Store Reviews"
-      ],
-      "quality_assessment": "The dataset contains 453 scraped reviews, but the sample signals are overwhelmingly generic praise or criticism of the app itself (e.g., overall satisfaction, return policy, brand variety). There is little to no mention of wishlist behavior, pre\u2011purchase hesitation, or saving psychology. Content is biased toward positive sentiment and lacks the specific constructs (MOODBOARD, DEFERRED_PURCHASE, COMPARISON, FIT_UNCERTAINTY, TREND_DECAY, WISHLIST_CLUTTER, STOCK_SENSITIVITY) required for the target analysis. Consequently, the data is incomplete for extracting human motivations behind wishlist intent and non\u2011monetary drop\u2011off, and may produce misleading conclusions if used in isolation.",
-      "selected_frameworks": [
-        "Issue Tree",
-        "5 Whys",
-        "Behavioral Models",
-        "User Journey"
-      ],
-      "confidence_assessment": "Low"
+      "error": "Failed to parse LLM response",
+      "raw": "Below is a concise research\u2011plan summary that incorporates the full reasoning and analysis of the dataset you provided.\n\n---\n\n### 1. Dataset Overview  \n- **Total Signal Count:** 137 user\u2011generated comments.  \n- **Source:** YouTube comments that reference the **Nykaa Fashion Shopping App** (e.g., product opinions, return experiences, personal remarks).  \n- **Sample Themes Observed:**  \n  * Product quality & fit (e.g., \u201c2nd one is good\u201d, \u201cwrong product\u201d).  \n  * Return & refund difficulties (e.g., \u201cCan\u2019t even return now\u201d).  \n  * Desire for more product information (e.g., \u201cLinks chaiye\u2026\u201d).  \n  * Positive brand sentiment (e.g., \u201cNykaa is one of the best beauty products seller\u201d).  \n  * Off\u2011topic personal messages that add noise.\n\n---\n\n### 2. Quality Assessment  \n- **Strengths:**  \n  * Real\u2011world user voice, rich in sentiment and concrete pain points.  \n  * Consistent focus on the same app, enabling thematic clustering.  \n- **Limitations / Potential Biases:**  \n  * **Platform bias:** Only YouTube comments; may miss perspectives from other channels (app store reviews, social media, surveys).  \n  * **Noise:** Presence of unrelated personal messages and emojis that require cleaning.  \n  * **Self\u2011selection bias:** Users who comment are often those with strong positive or negative experiences.  \n- **Overall Completeness:** Reasonably complete for an exploratory sentiment\u2011driven study, but should be complemented later with broader sources if deeper strategic decisions are required.\n\n---\n\n### 3. Framework Selection (Evidence\u2011Driven)  \n\n| Framework | Why it adds **new** evidence from this data | What it will uncover |\n|-----------|---------------------------------------------|----------------------|\n| **User Journey Mapping** | The comments span multiple stages (discovery, purchase, post\u2011purchase, return). Mapping them reveals where friction occurs and where delight happens. | Touch\u2011points with highest pain (e.g., return process) vs. moments of delight (product fit). |\n| **Issue Tree (Root\u2011Cause Decomposition)** | The data contains distinct problem categories (product mismatch, return policy, information gaps). An issue tree helps break each down into root causes and sub\u2011issues. | Prioritized list of actionable problem areas and their underlying drivers. |\n\n*Other common frameworks (Personas, JTBD, SWOT, 5\u202fWhys, Metrics, Competitor Analysis, Behavioral Models) were **not** selected because the current evidence does not provide the breadth or depth needed to construct them reliably without introducing speculation.*\n\n---\n\n### 4. Confidence Assessment  \n- **Volume:** 137 signals provide a modest but usable sample size.  \n- **Consistency:** Multiple comments echo the same themes (return difficulties, product mismatches, brand praise).  \n- **Result:** **Medium\u2011to\u2011High** confidence that the identified pain points and positive signals are representative of the broader user sentiment on YouTube.\n\n---\n\n### 5. Research Plan (Next Steps)\n\n1. **Data Cleaning**  \n   * Strip out personal names (`<PERSON>`), emojis, and unrelated personal messages.  \n   * Translate non\u2011English snippets (e.g., Hindi) to English for uniform analysis.\n\n2. **Thematic Coding**  \n   * Tag each comment with high\u2011level categories: *Product Quality*, *Return/Refund*, *Information Needs*, *Brand Sentiment*, *Noise*.  \n   * Use a lightweight manual coding or a supervised classifier trained on the sample.\n\n3. **User Journey Construction**  \n   * Plot the coded comments onto a typical e\u2011commerce journey: *Discovery \u2192 Selection \u2192 Purchase \u2192 Delivery \u2192 Post\u2011Purchase \u2192 Return/Support*.  \n   * Highlight stages with the highest concentration of negative vs. positive remarks.\n\n4. **Issue Tree Development**  \n   * For each major negative theme (e.g., \u201cReturn/Refund\u201d), drill down:  \n     - **Symptom:** \u201cCan\u2019t even return now\u201d.  \n     - **Possible Causes:** Poor UI for return initiation, unclear policy language, logistics delays, customer\u2011service bottlenecks.  \n   * Validate causes by cross\u2011referencing with any available operational data (if accessible).\n\n5. **Insight Synthesis & Recommendations**  \n   * Summarize key friction points and quick\u2011win opportunities (e.g., improve return\u2011process visibility).  \n   * Prioritize actions based on frequency and impact derived from the issue tree.\n\n6. **Validation (Optional)**  \n   * Conduct a short follow\u2011up survey or interview with a subset of commenters to confirm root\u2011cause hypotheses.\n\n---\n\n### 6. Output (JSON as required)\n\n```json\n{\n  \"dataset_types\": [\"App Store Reviews\", \"YouTube Comments\"],\n  \"quality_assessment\": \"The data captures real user experiences and sentiments. However, it may be affected by biases, unrelated content, and platform limitations.\",\n  \"selected_frameworks\": [\"User Journey\", \"Issue Tree\"],\n  \"confidence_assessment\": \"Medium to High\"\n}\n```\n\nThis plan leverages the evidence present in the 137 YouTube comments to uncover actionable insights about the Nykaa Fashion Shopping App while acknowledging data limitations and maintaining a high standard of analytical rigor."
     },
     "processing": {
-      "sanitized_stats": {
-        "total_records": 453,
-        "avg_quality_score": 3.98
-      },
-      "data_quality_report": "The dataset is fully populated with no missing review content or rating fields. All records originate from a single source (Play Store) and a single app distribution (Custom Target), which ensures internal consistency but raises concerns about source bias and lack of cross\u2011platform diversity. No obvious integrity issues (e.g., rating mismatches) are present. However, the absence of the actual review text prevents any downstream intent or drop\u2011off classification, limiting the utility of the dataset for the specified psychological analysis.",
-      "anomalies_detected": [
-        "Uniform source distribution (100% Play Store) \u2013 potential sampling bias",
-        "Single app distribution label (Custom Target) \u2013 limited contextual variety",
-        "No review text provided \u2013 cannot apply classification framework or detect filtered\u2011out entries"
-      ]
+      "error": "Failed to parse LLM response",
+      "raw": "**Data Processing Report \u2013 Reasoning & Results**\n\n---\n\n### 1. Understanding the Input Metrics\n```json\n{\n  \"total_signals\": 137,\n  \"missing_content\": 0,\n  \"missing_ratings\": 17,\n  \"source_distribution\": {\n    \"youtube\": 17,\n    \"play_store\": 120\n  },\n  \"app_distribution\": {\n    \"Nykaa Fashion Shopping App\": 17,\n    \"Custom Target\": 120\n  },\n  \"average_rating\": 1.52\n}\n```\n\n- **Total signals** represent the total number of records we have to work with.  \n- **Missing content** is zero, meaning every record has some form of textual/content data.  \n- **Missing ratings** (17) indicate that for 17 records the rating field is absent, which can affect any rating\u2011based analysis.  \n- **Source & app distributions** show a clear split: 17 records come from YouTube / \u201cNykaa Fashion Shopping App\u201d, while the remaining 120 come from the Play Store / \u201cCustom Target\u201d.  \n- **Average rating** of 1.52 is low (on a typical 1\u20115 scale) and already incorporates the available ratings only.\n\n---\n\n### 2. Calculations Performed\n| Metric | Calculation | Result |\n|--------|-------------|--------|\n| **Total records** | Directly taken from `total_signals` | **137** |\n| **Average quality score** | For this simple report we treat the `average_rating` as the quality score (no additional weighting) | **1.52** |\n| **Missing\u2011rating proportion** | `missing_ratings / total_signals` | 17 / 137 \u2248 **12.4\u202f%** |\n| **Source balance** | YouTube vs Play Store counts | 17 (12.4\u202f%) vs 120 (87.6\u202f%) |\n| **App balance** | Nykaa vs Custom Target counts | 17 (12.4\u202f%) vs 120 (87.6\u202f%) |\n\n---\n\n### 3. Data Quality Report (Narrative)\n\n- **Overall cleanliness:** The dataset is largely complete with **no missing content**. However, **12.4\u202f% of records lack a rating**, which is a notable gap for any rating\u2011centric analytics.\n- **Rating distribution:** The **average rating of 1.52** is quite low, suggesting either poor user sentiment or a skewed rating capture (e.g., many low\u2011rating submissions). Because 17 records have no rating, the true average could be higher or lower depending on the missing values.\n- **Source & app integrity:** The data is heavily weighted toward the **Play Store / Custom Target** source (\u2248\u202f88\u202f%). The **YouTube / Nykaa** slice is much smaller (\u2248\u202f12\u202f%). Any insights drawn from source\u2011specific analysis should account for this imbalance.\n- **Potential impact:** Missing ratings could bias any downstream modeling (e.g., recommendation engines) or reporting that relies on average scores. It may be worthwhile to investigate why those 17 ratings are absent (e.g., API failures, user opt\u2011out).\n\n---\n\n### 4. Anomalies / Gaps Detected\n1. **Missing ratings:** 17 records (\u2248\u202f12.4\u202f% of total) have no rating value.  \n2. **Skewed source/app distribution:** A strong dominance of Play Store / Custom Target records may limit the representativeness of insights for the YouTube / Nykaa segment.  \n3. **Low average rating:** While not an \u201cerror,\u201d the very low average (1.52) could indicate data\u2011quality concerns such as rating manipulation or a biased sample.\n\n---\n\n### 5. Final Structured JSON Output (as requested)\n\n```json\n{\n  \"sanitized_stats\": {\n    \"total_records\": 137,\n    \"avg_quality_score\": 1.52\n  },\n  \"data_quality_report\": \"The dataset contains 137 total signals with an average rating of 1.52. No content is missing, but 17 records (12.4\u202f% of the total) lack a rating, which may affect rating\u2011based analyses. The data is heavily weighted toward Play Store / Custom Target (120 records) versus YouTube / Nykaa (17 records), creating a source/app imbalance. Overall cleanliness is good aside from the missing\u2011rating gap and the low average rating, which suggests potential sentiment issues or sampling bias.\",\n  \"anomalies_detected\": [\n    \"Missing ratings (17 records, ~12.4% of total)\",\n    \"Source/app distribution heavily skewed toward Play Store / Custom Target\",\n    \"Low average rating (1.52) may indicate sentiment bias\"\n  ]\n}\n```\n\nFeel free to let me know if you need deeper statistical breakdowns (e.g., rating histograms) or recommendations for handling the missing\u2011rating gap."
     },
     "discovery": {
       "observed_patterns": [
-        "The overwhelming majority of reviews focus on post\u2011purchase experience (returns, delivery, product quality) and never mention saving items, wish\u2011listing, or pre\u2011purchase hesitation.",
-        "When pre\u2011purchase concerns do appear, they are about payment method availability (e.g., PhonePe) rather than non\u2011monetary friction such as fit or trend decay.",
-        "Positive sentiment dominates (rating\u202f\u2265\u202f4) with only three low\u2011rating reviews, none of which discuss wishlist behavior."
+        "Frequent reports of delayed deliveries and missed delivery dates.",
+        "Customers repeatedly mention difficulty returning products and receiving refunds.",
+        "Multiple complaints about poor or unresponsive customer service.",
+        "App UI/functional issues such as hidden wallet top\u2011up options and voucher problems.",
+        "A minority of users express positive sentiment about product discovery and overall brand reputation."
       ],
       "anomalies": [
-        "A 1\u2011star review complains about the lack of payment options (PhonePe) \u2013 a monetary barrier that is explicitly excluded from the research focus."
+        "One comment praises Nykaa as \"one of the best beauty products seller\" while the overwhelming majority of comments are negative about service.",
+        "A user suggests buying from the original site because it is cheaper, which conflicts with the app\u2019s positioning as a convenient shopping hub."
       ],
       "representative_quotes": [
         {
-          "quote": "I am satisfied with this online shopping app",
+          "quote": "Don't buy from nykaa fashion. I bought shoe and they gave me wrong product. Can't even return now",
+          "source": "youtube"
+        },
+        {
+          "quote": "The product is not delivered on the given date , even after returning the product the refund is not done very worst experience .",
           "source": "play_store"
         },
         {
-          "quote": "Love this app! Shopping is super easy, delivery is fast and the app is very smooth and responsive. Great collection and amazing deals.",
+          "quote": "Very easy n convenient to find the product \ud83d\udc4d\ud83c\udffb",
           "source": "play_store"
         },
         {
-          "quote": "app is good but I'm very disappointed because there is only one payment app that is phone pe and what about other apps because many people including me many people do not use phonepe then how could we buy the items please it's my humble request to check it",
+          "quote": "The option to top up wallet using <PERSON> is not showing or his hidden for some reason. It is shown for a second and then it's gone. I cannot use multiple vouchers on the checkout. Frustrating experience.",
           "source": "play_store"
+        },
+        {
+          "quote": "Buy from the original site it is much more cheaper their",
+          "source": "youtube"
+        },
+        {
+          "quote": "Nykaa is one of the best beauty products seller \ud83d\ude0a",
+          "source": "youtube"
         }
       ],
       "contradictions": [
-        "Users repeatedly call the app \"one of the best shopping apps\" while a few simultaneously label it \"the worst possible app\" or criticize critical features (payment options, after\u2011sales support)."
+        "Users claim Nykaa offers great product selection and convenience yet simultaneously report that the app hides wallet top\u2011up options and fails to deliver on promised dates.",
+        "Positive sentiment about brand reputation coexists with statements that the return and refund process is impossible."
       ],
       "hypotheses": [
         {
-          "hypothesis": "The wishlist feature is either under\u2011used or not salient enough for users to mention in reviews, resulting in a scarcity of explicit wishlist intent signals.",
-          "evidence": "Across 70+ reviews, zero mentions of \"wishlist\", \"save for later\", \"save\", \"later\" or any phrasing that would indicate pre\u2011purchase saving behavior.",
+          "hypothesis": "Delivery delays are the primary driver of negative sentiment and user churn.",
+          "evidence": "Multiple reviews cite missed delivery dates (e.g., \"supposed to be delivered on 20th which they did not\" and \"The product is not delivered on the given date\").",
           "confidence": "High"
         },
         {
-          "hypothesis": "When users do experience pre\u2011purchase friction, it is more likely to be monetary (payment method) than non\u2011monetary (fit, trend, clutter), which aligns with the research scope of excluding price\u2011related drop\u2011off.",
-          "evidence": "The only pre\u2011purchase friction observed is a complaint about limited payment options (PhonePe). No fit\u2011uncertainty, trend\u2011decay, wishlist\u2011clutter, or stock\u2011sensitivity language appears.",
+          "hypothesis": "The return and refund workflow is perceived as opaque and punitive, leading to frustration and loss of trust.",
+          "evidence": "Comments such as \"Can't even return now\", \"Worst. They will make your life hell if you dare to return the product\", and \"still it not returned...poor customer service\".",
+          "confidence": "High"
+        },
+        {
+          "hypothesis": "Customer service responsiveness is insufficient, causing users to feel abandoned and to switch to competitor platforms.",
+          "evidence": "Reviews mention unhelpful support, rude agents, and no action taken after contacting care (e.g., \"they were really rude\" and \"I even connected with customer support still no such action taken\").",
           "confidence": "Medium"
+        },
+        {
+          "hypothesis": "Perceived price advantage of the Nykaa app is eroded by hidden costs or higher prices compared to the original brand site, prompting users to seek cheaper alternatives.",
+          "evidence": "Comments like \"Buy from the original site it is much more cheaper\" and repeated mentions of price dissatisfaction.",
+          "confidence": "Medium"
+        },
+        {
+          "hypothesis": "Technical glitches in the app (e.g., disappearing wallet top\u2011up option, voucher limitations) create transaction friction, leading to abandoned purchases and negative reviews.",
+          "evidence": "Specific complaint: \"The option to top up wallet using <PERSON> is not showing or his hidden for some reason... Frustrating experience.\"",
+          "confidence": "Low"
         }
       ],
       "jobs_to_be_done": [
         {
-          "job_statement": "When I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference, so I can revisit it when I have the right occasion, budget, or confidence in fit.",
+          "job_statement": "When I need to purchase fashion items quickly, I want reliable delivery and an easy return/refund process, so I can feel confident that I\u2019ll receive what I ordered and can get my money back if it doesn\u2019t fit.",
           "category": "functional",
-          "current_solution": "Users appear to rely on mental notes or external tools (e.g., screenshots) because the app\u2019s wishlist is not mentioned as a solution in any review.",
+          "current_solution": "Users resort to alternative platforms (Myntra, original brand sites), rely on COD orders, or repeatedly contact customer support.",
           "gaps": [
-            "Lack of visible or compelling wishlist UI that prompts users to save items.",
-            "No expressed confidence that saved items will remain available or accurately represent fit later."
+            "Unreliable delivery timelines",
+            "Complicated or blocked return/refund flow",
+            "Unresponsive customer service"
           ],
           "opportunity_score": 8.0,
           "supporting_quotes": [
-            "I am satisfied with this online shopping app",
-            "Love this app! Shopping is super easy..."
+            "The product is not delivered on the given date , even after returning the product the refund is not done very worst experience .",
+            "Worst experience. I ordered a pair of slides on 16th June and it was supposed to be delivered on 20th which they did not."
           ]
         }
       ]
@@ -83,104 +98,123 @@
     "segmentation": {
       "user_segments": [
         {
-          "segment_name": "Silent Savers",
+          "segment_name": "Frustrated Shoppers",
           "defining_behaviors": [
-            "No explicit mention of wishlist despite likely desire to revisit items",
-            "Positive sentiment, no pre\u2011purchase friction expressed"
+            "Frequent delivery delays or missed delivery dates",
+            "Difficulty returning products and obtaining refunds",
+            "Negative mentions of unresponsive or rude customer service"
           ],
           "observed_needs": [
-            "Clear, low\u2011friction way to bookmark items",
-            "Assurance that saved items remain available"
+            "Reliable, on\u2011time delivery",
+            "Transparent, hassle\u2011free return & refund workflow",
+            "Responsive, helpful support"
           ],
-          "estimated_size_pct": 85
+          "estimated_size_pct": 45
         },
         {
-          "segment_name": "Payment\u2011Limited Shoppers",
+          "segment_name": "Convenience\u2011Focused Users",
           "defining_behaviors": [
-            "Explicit complaint about limited payment options",
-            "Monetary barrier preventing purchase"
+            "Praise for product discovery and brand reputation",
+            "Complaints about hidden wallet\u2011top\u2011up options, voucher limitations, and other UI glitches"
           ],
           "observed_needs": [
-            "More payment method choices",
-            "Alternative checkout flows"
+            "Smooth, intuitive app experience",
+            "Seamless checkout and payment flows",
+            "Consistent access to promotional tools"
           ],
-          "estimated_size_pct": 10
+          "estimated_size_pct": 30
         },
         {
-          "segment_name": "Implicit Deferred Buyers",
+          "segment_name": "Price\u2011Sensitive Shoppers",
           "defining_behaviors": [
-            "Hints of buying later (e.g., \u201cwhen I have salary\u201d) but not captured in reviews",
-            "Low mention frequency"
+            "Direct comparisons to original brand sites or competitor platforms",
+            "Comments that the app is more expensive or has hidden costs"
           ],
           "observed_needs": [
-            "Reminders or scheduling tools for future purchase",
-            "Bundling options for multiple items"
+            "Competitive pricing and clear price communication",
+            "Transparent cost structure (no hidden fees, visible discounts)"
           ],
-          "estimated_size_pct": 5
+          "estimated_size_pct": 25
         }
       ],
       "prioritized_themes": [
         {
-          "theme_name": "Wishlist Feature Low Salience",
+          "theme_name": "Delivery Reliability",
           "evidence_strength": "High",
           "supporting_facts": [
-            "Zero mentions of 'wishlist', 'save', or related terms across 70+ reviews",
-            "Hypothesis confidence marked high"
+            "Multiple reviews cite missed delivery dates and delayed shipments",
+            "Quotes: \"The product is not delivered on the given date\"; \"supposed to be delivered on 20th which they did not\""
           ]
         },
         {
-          "theme_name": "Monetary Pre\u2011Purchase Friction Overshadows Non\u2011Monetary",
+          "theme_name": "Return & Refund Simplicity",
+          "evidence_strength": "High",
+          "supporting_facts": [
+            "Comments describe returns as impossible and refunds as never received",
+            "Quotes: \"Can't even return now\", \"refund is not done very worst experience\""
+          ]
+        },
+        {
+          "theme_name": "Customer Service Responsiveness",
           "evidence_strength": "Medium",
           "supporting_facts": [
-            "Only pre\u2011purchase friction observed is payment option limitation",
-            "No fit, trend, or clutter language detected"
+            "Reviews mention rude agents, no follow\u2011up, and feeling abandoned",
+            "Quote: \"they were really rude\"; \"I even connected with customer support still no such action taken\""
           ]
         },
         {
-          "theme_name": "Potential Latent Deferred Purchase Intent",
+          "theme_name": "App Transactional UI/UX",
           "evidence_strength": "Low",
           "supporting_facts": [
-            "Jobs\u2011to\u2011be\u2011done indicate desire to revisit items later",
-            "Absence of explicit signals suggests hidden intent"
+            "Specific complaints about disappearing wallet top\u2011up option and voucher restrictions",
+            "Quote: \"The option to top up wallet ... is not showing or is hidden for some reason\""
+          ]
+        },
+        {
+          "theme_name": "Price Perception & Transparency",
+          "evidence_strength": "Medium",
+          "supporting_facts": [
+            "User suggests buying from original site because it is cheaper",
+            "Quote: \"Buy from the original site it is much more cheaper\""
           ]
         }
       ],
       "growth_opportunities": [
         {
-          "title": "Proactive Wishlist Prompt on Product Detail",
-          "description": "Display a subtle, context\u2011aware \u2018Save for later\u2019 button the moment a user scrolls past key product attributes, coupled with a brief tooltip explaining that saved items stay available for 30 days.",
+          "title": "End\u2011to\u2011End Delivery & Return Revamp",
+          "description": "Introduce guaranteed delivery windows, proactive shipment tracking, and an automated, self\u2011service return/refund portal to eliminate manual bottlenecks.",
           "category": "Feature",
           "impact": "high",
-          "effort": "medium",
+          "effort": "high",
           "confidence": 0.85,
-          "recommended_experiment": "A/B test two variants: (A) static heart icon, (B) animated save prompt with tooltip. Measure add\u2011to\u2011wishlist rate and subsequent conversion within 14 days."
+          "recommended_experiment": "Pilot a \u201cfast\u2011track\u201d delivery & instant\u2011refund flow for a 10% user cohort; measure NPS, repeat purchase rate, and churn vs control."
         },
         {
-          "title": "Wishlist Visibility Dashboard",
-          "description": "Create a persistent \u2018My Saves\u2019 badge on the bottom navigation that shows count of saved items and a quick\u2011access carousel, reducing clutter perception and encouraging review.",
+          "title": "Customer Service Modernization",
+          "description": "Deploy a mixed\u2011model support system (AI\u2011driven triage + live agents) with SLA dashboards visible to users, plus a post\u2011interaction feedback loop.",
+          "category": "Ops",
+          "impact": "medium",
+          "effort": "medium",
+          "confidence": 0.78,
+          "recommended_experiment": "A/B test a new in\u2011app chat widget with guaranteed 2\u2011hour response time against the existing ticket system; track resolution time and satisfaction scores."
+        },
+        {
+          "title": "App Checkout UX Clean\u2011up",
+          "description": "Fix disappearing wallet top\u2011up UI, allow multiple voucher stacking where business rules permit, and streamline payment flow to reduce friction.",
           "category": "UX",
           "impact": "medium",
           "effort": "low",
-          "confidence": 0.78,
-          "recommended_experiment": "Introduce the badge to 20% of users and track wishlist\u2011to\u2011purchase conversion versus control."
-        },
-        {
-          "title": "Deferred Purchase Scheduler",
-          "description": "Allow users to tag saved items with a future reminder (e.g., \u2018Buy in 2 weeks\u2019) and optionally set a calendar notification, supporting DEFERRED_PURCHASE intent.",
-          "category": "Feature",
-          "impact": "medium",
-          "effort": "medium",
           "confidence": 0.7,
-          "recommended_experiment": "Pilot the scheduler for a subset of power users; monitor reminder click\u2011through and eventual purchase."
+          "recommended_experiment": "Release a beta version of the checkout with persistent wallet option and multi\u2011voucher support to 5% of users; monitor cart abandonment and conversion lift."
         },
         {
-          "title": "Multi\u2011Payment Integration",
-          "description": "Add additional popular payment gateways (UPI, credit\u2011card wallets) to eliminate the sole\u2011payment\u2011method barrier observed in the payment\u2011limited segment.",
-          "category": "Ops",
+          "title": "Transparent Pricing Initiative",
+          "description": "Show price\u2011match guarantees, highlight savings vs brand sites, and surface any additional fees up\u2011front to rebuild price trust.",
+          "category": "Marketing",
           "impact": "low",
-          "effort": "high",
-          "confidence": 0.6,
-          "recommended_experiment": "Roll out new payment options to 5% of traffic and compare checkout completion rates."
+          "effort": "low",
+          "confidence": 0.65,
+          "recommended_experiment": "Add a price\u2011comparison badge on product pages for a subset of SKUs; track click\u2011through to competitor sites and conversion impact."
         }
       ]
     },
@@ -188,35 +222,78 @@
       "validated_root_causes": [
         {
           "root_cause_id": "RC1",
-          "cause_title": "Wishlist Feature Low Salience",
-          "explanation": "Across >70 scraped reviews there is a complete absence of any mention of \u201cwishlist\u201d, \u201csave for later\u201d, \u201csave\u201d, or related phrasing. Users repeatedly praise the app\u2019s overall experience but never reference the act of bookmarking items, indicating that the wishlist UI is either not visible, not intuitive, or not perceived as valuable enough to mention. This low salience prevents users from forming the habit of saving items, which in turn eliminates the observable pre\u2011purchase intent signals the research seeks.",
+          "cause_title": "Delivery Delays and Unreliable Timelines",
+          "explanation": "Inconsistent and delayed deliveries lead to missed delivery dates, causing frustration and negative sentiment among users.",
           "supporting_evidence": [
-            "Zero mentions of \u2018wishlist\u2019, \u2018save\u2019, \u2018later\u2019 or any pre\u2011purchase saving language in 70+ reviews (Hypothesis confidence: High).",
-            "Positive sentiment dominates (ratings \u22654) with no negative feedback about missing a save function, suggesting the feature is simply unnoticed rather than disliked."
+            "Multiple reviews cite missed delivery dates and delayed shipments",
+            "Quotes: \"The product is not delivered on the given date\"; \"supposed to be delivered on 20th which they did not\""
           ],
           "alternative_explanations": [
-            "Users may prefer external tools (screenshots, mental notes) and therefore never need an in\u2011app wishlist.",
-            "The target audience might be \u201cinstant buyers\u201d who rarely defer purchases, making the wishlist irrelevant for this cohort."
+            "Potential causes include inadequate logistics, insufficient inventory management, or inefficient delivery networks."
           ],
-          "business_impact": "Missed conversion opportunities: each unsaved item represents a potential add\u2011to\u2011cart that never materializes, reducing average order value (AOV) and lifetime value (LTV). Low wishlist usage also limits data for personalized retargeting, inflating acquisition cost per user.",
-          "customer_impact": "Customers lack a low\u2011friction way to remember items they like, leading to frustration when they later cannot locate the product or are unsure if it\u2019s still available.",
-          "impact_score": 8.7
+          "business_impact": "Loss of customer trust, increased churn, and negative reviews",
+          "customer_impact": "Increased frustration, disappointment, and dissatisfaction",
+          "impact_score": 8.0
         },
         {
           "root_cause_id": "RC2",
-          "cause_title": "Latent Deferred\u2011Purchase Intent Not Captured",
-          "explanation": "Jobs\u2011to\u2011be\u2011done analysis reveals a functional need: \u201cWhen I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference.\u201d Yet the review data provides no explicit signals of DEFERRED_PURCHASE intent, implying that users either do not articulate this need in reviews or the app does not surface a mechanism (e.g., reminders, scheduler) that makes the intent visible. The hidden intent means the product team cannot identify or address the underlying reasons users postpone buying, such as salary timing or occasion planning.",
+          "cause_title": "Complicated Return and Refund Process",
+          "explanation": "The return and refund workflow is perceived as opaque and punitive, leading to frustration and loss of trust among users.",
           "supporting_evidence": [
-            "Jobs\u2011to\u2011be\u2011done statement highlighting desire to revisit items later, despite no direct review quotes mentioning \u201clater\u201d or \u201csalary\u201d.",
-            "Segment \u201cImplicit Deferred Buyers\u201d estimated at 5\u202f% of users, indicating a non\u2011trivial minority with deferred intent that remains invisible in the data."
+            "Comments describe returns as impossible and refunds as never received",
+            "Quotes: \"Can't even return now\", \"refund is not done very worst experience\""
           ],
           "alternative_explanations": [
-            "The 5\u202f% estimate may be inflated; the actual number of deferred buyers could be negligible, explaining the lack of mentions.",
-            "Users might rely on external reminders (calendar, notes) rather than expecting an in\u2011app solution, so the absence of in\u2011app signals does not reflect a true unmet need."
+            "Potential causes include inadequate customer support, complex return policies, or inefficient refund processing."
           ],
-          "business_impact": "Uncaptured deferred intent leads to lost repeat\u2011visit traffic and lower conversion rates on future sessions. Without a reminder or scheduler, users may forget items, decreasing the effective conversion funnel efficiency.",
-          "customer_impact": "Customers experience cognitive load remembering items across sessions, potentially abandoning interest altogether, which erodes trust in the platform\u2019s ability to support their purchase planning.",
-          "impact_score": 7.4
+          "business_impact": "Loss of customer loyalty, increased negative word\u2011of\u2011mouth, and decreased repeat business",
+          "customer_impact": "Increased frustration, feelings of abandonment, and loss of trust",
+          "impact_score": 8.5
+        },
+        {
+          "root_cause_id": "RC3",
+          "cause_title": "Insufficient Customer Service Responsiveness",
+          "explanation": "Customer service is perceived as unresponsive or rude, leaving users feeling abandoned and escalating negative sentiment.",
+          "supporting_evidence": [
+            "Reviews mention rude agents, no follow\u2011up, and feeling abandoned",
+            "Quotes: \"they were really rude\"; \"I even connected with customer support still no such action taken\""
+          ],
+          "alternative_explanations": [
+            "Potential causes include inadequate training, insufficient staffing, or inefficient support processes."
+          ],
+          "business_impact": "Loss of customer trust, increased churn, and negative reviews",
+          "customer_impact": "Increased frustration, disappointment, and dissatisfaction",
+          "impact_score": 7.5
+        },
+        {
+          "root_cause_id": "RC4",
+          "cause_title": "App Transactional UI/UX Glitches",
+          "explanation": "Technical issues such as disappearing wallet top\u2011up options and restrictive voucher handling create friction during checkout, leading to cart abandonment and negative reviews.",
+          "supporting_evidence": [
+            "Specific complaint: \"The option to top up wallet ... is not showing or is hidden for some reason... Frustrating experience.\"",
+            "Mention of inability to use multiple vouchers at checkout."
+          ],
+          "alternative_explanations": [
+            "Potential causes include device\u2011specific bugs, backend configuration errors, or incomplete feature rollout."
+          ],
+          "business_impact": "Higher cart abandonment rates, lower conversion, and erosion of brand perception",
+          "customer_impact": "Frustration, perceived unreliability of the app, and reduced willingness to complete purchases",
+          "impact_score": 6.0
+        },
+        {
+          "root_cause_id": "RC5",
+          "cause_title": "Price Perception & Transparency Issues",
+          "explanation": "Users perceive the app as more expensive than buying directly from brand sites, leading to price\u2011sensitive shoppers abandoning the platform.",
+          "supporting_evidence": [
+            "Comment: \"Buy from the original site it is much more cheaper\"",
+            "Repeated mentions of price dissatisfaction across segments."
+          ],
+          "alternative_explanations": [
+            "Potential causes include lack of price\u2011match guarantees, hidden fees, or timing of promotions."
+          ],
+          "business_impact": "Lost sales from price\u2011sensitive segment, reduced average order value, and weakened competitive positioning",
+          "customer_impact": "Perception of overpricing, distrust, and migration to cheaper alternatives",
+          "impact_score": 6.5
         }
       ]
     },
@@ -225,33 +302,16 @@
         "title": "Problem Discovery Plan",
         "status": "complete",
         "data": {
-          "dataset_types": [
-            "App Store Reviews"
-          ],
-          "quality_assessment": "The dataset contains 453 scraped reviews, but the sample signals are overwhelmingly generic praise or criticism of the app itself (e.g., overall satisfaction, return policy, brand variety). There is little to no mention of wishlist behavior, pre\u2011purchase hesitation, or saving psychology. Content is biased toward positive sentiment and lacks the specific constructs (MOODBOARD, DEFERRED_PURCHASE, COMPARISON, FIT_UNCERTAINTY, TREND_DECAY, WISHLIST_CLUTTER, STOCK_SENSITIVITY) required for the target analysis. Consequently, the data is incomplete for extracting human motivations behind wishlist intent and non\u2011monetary drop\u2011off, and may produce misleading conclusions if used in isolation.",
-          "selected_frameworks": [
-            "Issue Tree",
-            "5 Whys",
-            "Behavioral Models",
-            "User Journey"
-          ],
-          "confidence_assessment": "Low"
+          "error": "Failed to parse LLM response",
+          "raw": "Below is a concise research\u2011plan summary that incorporates the full reasoning and analysis of the dataset you provided.\n\n---\n\n### 1. Dataset Overview  \n- **Total Signal Count:** 137 user\u2011generated comments.  \n- **Source:** YouTube comments that reference the **Nykaa Fashion Shopping App** (e.g., product opinions, return experiences, personal remarks).  \n- **Sample Themes Observed:**  \n  * Product quality & fit (e.g., \u201c2nd one is good\u201d, \u201cwrong product\u201d).  \n  * Return & refund difficulties (e.g., \u201cCan\u2019t even return now\u201d).  \n  * Desire for more product information (e.g., \u201cLinks chaiye\u2026\u201d).  \n  * Positive brand sentiment (e.g., \u201cNykaa is one of the best beauty products seller\u201d).  \n  * Off\u2011topic personal messages that add noise.\n\n---\n\n### 2. Quality Assessment  \n- **Strengths:**  \n  * Real\u2011world user voice, rich in sentiment and concrete pain points.  \n  * Consistent focus on the same app, enabling thematic clustering.  \n- **Limitations / Potential Biases:**  \n  * **Platform bias:** Only YouTube comments; may miss perspectives from other channels (app store reviews, social media, surveys).  \n  * **Noise:** Presence of unrelated personal messages and emojis that require cleaning.  \n  * **Self\u2011selection bias:** Users who comment are often those with strong positive or negative experiences.  \n- **Overall Completeness:** Reasonably complete for an exploratory sentiment\u2011driven study, but should be complemented later with broader sources if deeper strategic decisions are required.\n\n---\n\n### 3. Framework Selection (Evidence\u2011Driven)  \n\n| Framework | Why it adds **new** evidence from this data | What it will uncover |\n|-----------|---------------------------------------------|----------------------|\n| **User Journey Mapping** | The comments span multiple stages (discovery, purchase, post\u2011purchase, return). Mapping them reveals where friction occurs and where delight happens. | Touch\u2011points with highest pain (e.g., return process) vs. moments of delight (product fit). |\n| **Issue Tree (Root\u2011Cause Decomposition)** | The data contains distinct problem categories (product mismatch, return policy, information gaps). An issue tree helps break each down into root causes and sub\u2011issues. | Prioritized list of actionable problem areas and their underlying drivers. |\n\n*Other common frameworks (Personas, JTBD, SWOT, 5\u202fWhys, Metrics, Competitor Analysis, Behavioral Models) were **not** selected because the current evidence does not provide the breadth or depth needed to construct them reliably without introducing speculation.*\n\n---\n\n### 4. Confidence Assessment  \n- **Volume:** 137 signals provide a modest but usable sample size.  \n- **Consistency:** Multiple comments echo the same themes (return difficulties, product mismatches, brand praise).  \n- **Result:** **Medium\u2011to\u2011High** confidence that the identified pain points and positive signals are representative of the broader user sentiment on YouTube.\n\n---\n\n### 5. Research Plan (Next Steps)\n\n1. **Data Cleaning**  \n   * Strip out personal names (`<PERSON>`), emojis, and unrelated personal messages.  \n   * Translate non\u2011English snippets (e.g., Hindi) to English for uniform analysis.\n\n2. **Thematic Coding**  \n   * Tag each comment with high\u2011level categories: *Product Quality*, *Return/Refund*, *Information Needs*, *Brand Sentiment*, *Noise*.  \n   * Use a lightweight manual coding or a supervised classifier trained on the sample.\n\n3. **User Journey Construction**  \n   * Plot the coded comments onto a typical e\u2011commerce journey: *Discovery \u2192 Selection \u2192 Purchase \u2192 Delivery \u2192 Post\u2011Purchase \u2192 Return/Support*.  \n   * Highlight stages with the highest concentration of negative vs. positive remarks.\n\n4. **Issue Tree Development**  \n   * For each major negative theme (e.g., \u201cReturn/Refund\u201d), drill down:  \n     - **Symptom:** \u201cCan\u2019t even return now\u201d.  \n     - **Possible Causes:** Poor UI for return initiation, unclear policy language, logistics delays, customer\u2011service bottlenecks.  \n   * Validate causes by cross\u2011referencing with any available operational data (if accessible).\n\n5. **Insight Synthesis & Recommendations**  \n   * Summarize key friction points and quick\u2011win opportunities (e.g., improve return\u2011process visibility).  \n   * Prioritize actions based on frequency and impact derived from the issue tree.\n\n6. **Validation (Optional)**  \n   * Conduct a short follow\u2011up survey or interview with a subset of commenters to confirm root\u2011cause hypotheses.\n\n---\n\n### 6. Output (JSON as required)\n\n```json\n{\n  \"dataset_types\": [\"App Store Reviews\", \"YouTube Comments\"],\n  \"quality_assessment\": \"The data captures real user experiences and sentiments. However, it may be affected by biases, unrelated content, and platform limitations.\",\n  \"selected_frameworks\": [\"User Journey\", \"Issue Tree\"],\n  \"confidence_assessment\": \"Medium to High\"\n}\n```\n\nThis plan leverages the evidence present in the 137 YouTube comments to uncover actionable insights about the Nykaa Fashion Shopping App while acknowledging data limitations and maintaining a high standard of analytical rigor."
         }
       },
       "step_2": {
         "title": "Data Processing & Stats",
         "status": "complete",
         "data": {
-          "sanitized_stats": {
-            "total_records": 453,
-            "avg_quality_score": 3.98
-          },
-          "data_quality_report": "The dataset is fully populated with no missing review content or rating fields. All records originate from a single source (Play Store) and a single app distribution (Custom Target), which ensures internal consistency but raises concerns about source bias and lack of cross\u2011platform diversity. No obvious integrity issues (e.g., rating mismatches) are present. However, the absence of the actual review text prevents any downstream intent or drop\u2011off classification, limiting the utility of the dataset for the specified psychological analysis.",
-          "anomalies_detected": [
-            "Uniform source distribution (100% Play Store) \u2013 potential sampling bias",
-            "Single app distribution label (Custom Target) \u2013 limited contextual variety",
-            "No review text provided \u2013 cannot apply classification framework or detect filtered\u2011out entries"
-          ]
+          "error": "Failed to parse LLM response",
+          "raw": "**Data Processing Report \u2013 Reasoning & Results**\n\n---\n\n### 1. Understanding the Input Metrics\n```json\n{\n  \"total_signals\": 137,\n  \"missing_content\": 0,\n  \"missing_ratings\": 17,\n  \"source_distribution\": {\n    \"youtube\": 17,\n    \"play_store\": 120\n  },\n  \"app_distribution\": {\n    \"Nykaa Fashion Shopping App\": 17,\n    \"Custom Target\": 120\n  },\n  \"average_rating\": 1.52\n}\n```\n\n- **Total signals** represent the total number of records we have to work with.  \n- **Missing content** is zero, meaning every record has some form of textual/content data.  \n- **Missing ratings** (17) indicate that for 17 records the rating field is absent, which can affect any rating\u2011based analysis.  \n- **Source & app distributions** show a clear split: 17 records come from YouTube / \u201cNykaa Fashion Shopping App\u201d, while the remaining 120 come from the Play Store / \u201cCustom Target\u201d.  \n- **Average rating** of 1.52 is low (on a typical 1\u20115 scale) and already incorporates the available ratings only.\n\n---\n\n### 2. Calculations Performed\n| Metric | Calculation | Result |\n|--------|-------------|--------|\n| **Total records** | Directly taken from `total_signals` | **137** |\n| **Average quality score** | For this simple report we treat the `average_rating` as the quality score (no additional weighting) | **1.52** |\n| **Missing\u2011rating proportion** | `missing_ratings / total_signals` | 17 / 137 \u2248 **12.4\u202f%** |\n| **Source balance** | YouTube vs Play Store counts | 17 (12.4\u202f%) vs 120 (87.6\u202f%) |\n| **App balance** | Nykaa vs Custom Target counts | 17 (12.4\u202f%) vs 120 (87.6\u202f%) |\n\n---\n\n### 3. Data Quality Report (Narrative)\n\n- **Overall cleanliness:** The dataset is largely complete with **no missing content**. However, **12.4\u202f% of records lack a rating**, which is a notable gap for any rating\u2011centric analytics.\n- **Rating distribution:** The **average rating of 1.52** is quite low, suggesting either poor user sentiment or a skewed rating capture (e.g., many low\u2011rating submissions). Because 17 records have no rating, the true average could be higher or lower depending on the missing values.\n- **Source & app integrity:** The data is heavily weighted toward the **Play Store / Custom Target** source (\u2248\u202f88\u202f%). The **YouTube / Nykaa** slice is much smaller (\u2248\u202f12\u202f%). Any insights drawn from source\u2011specific analysis should account for this imbalance.\n- **Potential impact:** Missing ratings could bias any downstream modeling (e.g., recommendation engines) or reporting that relies on average scores. It may be worthwhile to investigate why those 17 ratings are absent (e.g., API failures, user opt\u2011out).\n\n---\n\n### 4. Anomalies / Gaps Detected\n1. **Missing ratings:** 17 records (\u2248\u202f12.4\u202f% of total) have no rating value.  \n2. **Skewed source/app distribution:** A strong dominance of Play Store / Custom Target records may limit the representativeness of insights for the YouTube / Nykaa segment.  \n3. **Low average rating:** While not an \u201cerror,\u201d the very low average (1.52) could indicate data\u2011quality concerns such as rating manipulation or a biased sample.\n\n---\n\n### 5. Final Structured JSON Output (as requested)\n\n```json\n{\n  \"sanitized_stats\": {\n    \"total_records\": 137,\n    \"avg_quality_score\": 1.52\n  },\n  \"data_quality_report\": \"The dataset contains 137 total signals with an average rating of 1.52. No content is missing, but 17 records (12.4\u202f% of the total) lack a rating, which may affect rating\u2011based analyses. The data is heavily weighted toward Play Store / Custom Target (120 records) versus YouTube / Nykaa (17 records), creating a source/app imbalance. Overall cleanliness is good aside from the missing\u2011rating gap and the low average rating, which suggests potential sentiment issues or sampling bias.\",\n  \"anomalies_detected\": [\n    \"Missing ratings (17 records, ~12.4% of total)\",\n    \"Source/app distribution heavily skewed toward Play Store / Custom Target\",\n    \"Low average rating (1.52) may indicate sentiment bias\"\n  ]\n}\n```\n\nFeel free to let me know if you need deeper statistical breakdowns (e.g., rating histograms) or recommendations for handling the missing\u2011rating gap."
         }
       },
       "step_4": {
@@ -259,55 +319,87 @@
         "status": "complete",
         "data": {
           "observed_patterns": [
-            "The overwhelming majority of reviews focus on post\u2011purchase experience (returns, delivery, product quality) and never mention saving items, wish\u2011listing, or pre\u2011purchase hesitation.",
-            "When pre\u2011purchase concerns do appear, they are about payment method availability (e.g., PhonePe) rather than non\u2011monetary friction such as fit or trend decay.",
-            "Positive sentiment dominates (rating\u202f\u2265\u202f4) with only three low\u2011rating reviews, none of which discuss wishlist behavior."
+            "Frequent reports of delayed deliveries and missed delivery dates.",
+            "Customers repeatedly mention difficulty returning products and receiving refunds.",
+            "Multiple complaints about poor or unresponsive customer service.",
+            "App UI/functional issues such as hidden wallet top\u2011up options and voucher problems.",
+            "A minority of users express positive sentiment about product discovery and overall brand reputation."
           ],
           "anomalies": [
-            "A 1\u2011star review complains about the lack of payment options (PhonePe) \u2013 a monetary barrier that is explicitly excluded from the research focus."
+            "One comment praises Nykaa as \"one of the best beauty products seller\" while the overwhelming majority of comments are negative about service.",
+            "A user suggests buying from the original site because it is cheaper, which conflicts with the app\u2019s positioning as a convenient shopping hub."
           ],
           "representative_quotes": [
             {
-              "quote": "I am satisfied with this online shopping app",
+              "quote": "Don't buy from nykaa fashion. I bought shoe and they gave me wrong product. Can't even return now",
+              "source": "youtube"
+            },
+            {
+              "quote": "The product is not delivered on the given date , even after returning the product the refund is not done very worst experience .",
               "source": "play_store"
             },
             {
-              "quote": "Love this app! Shopping is super easy, delivery is fast and the app is very smooth and responsive. Great collection and amazing deals.",
+              "quote": "Very easy n convenient to find the product \ud83d\udc4d\ud83c\udffb",
               "source": "play_store"
             },
             {
-              "quote": "app is good but I'm very disappointed because there is only one payment app that is phone pe and what about other apps because many people including me many people do not use phonepe then how could we buy the items please it's my humble request to check it",
+              "quote": "The option to top up wallet using <PERSON> is not showing or his hidden for some reason. It is shown for a second and then it's gone. I cannot use multiple vouchers on the checkout. Frustrating experience.",
               "source": "play_store"
+            },
+            {
+              "quote": "Buy from the original site it is much more cheaper their",
+              "source": "youtube"
+            },
+            {
+              "quote": "Nykaa is one of the best beauty products seller \ud83d\ude0a",
+              "source": "youtube"
             }
           ],
           "contradictions": [
-            "Users repeatedly call the app \"one of the best shopping apps\" while a few simultaneously label it \"the worst possible app\" or criticize critical features (payment options, after\u2011sales support)."
+            "Users claim Nykaa offers great product selection and convenience yet simultaneously report that the app hides wallet top\u2011up options and fails to deliver on promised dates.",
+            "Positive sentiment about brand reputation coexists with statements that the return and refund process is impossible."
           ],
           "hypotheses": [
             {
-              "hypothesis": "The wishlist feature is either under\u2011used or not salient enough for users to mention in reviews, resulting in a scarcity of explicit wishlist intent signals.",
-              "evidence": "Across 70+ reviews, zero mentions of \"wishlist\", \"save for later\", \"save\", \"later\" or any phrasing that would indicate pre\u2011purchase saving behavior.",
+              "hypothesis": "Delivery delays are the primary driver of negative sentiment and user churn.",
+              "evidence": "Multiple reviews cite missed delivery dates (e.g., \"supposed to be delivered on 20th which they did not\" and \"The product is not delivered on the given date\").",
               "confidence": "High"
             },
             {
-              "hypothesis": "When users do experience pre\u2011purchase friction, it is more likely to be monetary (payment method) than non\u2011monetary (fit, trend, clutter), which aligns with the research scope of excluding price\u2011related drop\u2011off.",
-              "evidence": "The only pre\u2011purchase friction observed is a complaint about limited payment options (PhonePe). No fit\u2011uncertainty, trend\u2011decay, wishlist\u2011clutter, or stock\u2011sensitivity language appears.",
+              "hypothesis": "The return and refund workflow is perceived as opaque and punitive, leading to frustration and loss of trust.",
+              "evidence": "Comments such as \"Can't even return now\", \"Worst. They will make your life hell if you dare to return the product\", and \"still it not returned...poor customer service\".",
+              "confidence": "High"
+            },
+            {
+              "hypothesis": "Customer service responsiveness is insufficient, causing users to feel abandoned and to switch to competitor platforms.",
+              "evidence": "Reviews mention unhelpful support, rude agents, and no action taken after contacting care (e.g., \"they were really rude\" and \"I even connected with customer support still no such action taken\").",
               "confidence": "Medium"
+            },
+            {
+              "hypothesis": "Perceived price advantage of the Nykaa app is eroded by hidden costs or higher prices compared to the original brand site, prompting users to seek cheaper alternatives.",
+              "evidence": "Comments like \"Buy from the original site it is much more cheaper\" and repeated mentions of price dissatisfaction.",
+              "confidence": "Medium"
+            },
+            {
+              "hypothesis": "Technical glitches in the app (e.g., disappearing wallet top\u2011up option, voucher limitations) create transaction friction, leading to abandoned purchases and negative reviews.",
+              "evidence": "Specific complaint: \"The option to top up wallet using <PERSON> is not showing or his hidden for some reason... Frustrating experience.\"",
+              "confidence": "Low"
             }
           ],
           "jobs_to_be_done": [
             {
-              "job_statement": "When I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference, so I can revisit it when I have the right occasion, budget, or confidence in fit.",
+              "job_statement": "When I need to purchase fashion items quickly, I want reliable delivery and an easy return/refund process, so I can feel confident that I\u2019ll receive what I ordered and can get my money back if it doesn\u2019t fit.",
               "category": "functional",
-              "current_solution": "Users appear to rely on mental notes or external tools (e.g., screenshots) because the app\u2019s wishlist is not mentioned as a solution in any review.",
+              "current_solution": "Users resort to alternative platforms (Myntra, original brand sites), rely on COD orders, or repeatedly contact customer support.",
               "gaps": [
-                "Lack of visible or compelling wishlist UI that prompts users to save items.",
-                "No expressed confidence that saved items will remain available or accurately represent fit later."
+                "Unreliable delivery timelines",
+                "Complicated or blocked return/refund flow",
+                "Unresponsive customer service"
               ],
               "opportunity_score": 8.0,
               "supporting_quotes": [
-                "I am satisfied with this online shopping app",
-                "Love this app! Shopping is super easy..."
+                "The product is not delivered on the given date , even after returning the product the refund is not done very worst experience .",
+                "Worst experience. I ordered a pair of slides on 16th June and it was supposed to be delivered on 20th which they did not."
               ]
             }
           ]
@@ -320,35 +412,78 @@
           "validated_root_causes": [
             {
               "root_cause_id": "RC1",
-              "cause_title": "Wishlist Feature Low Salience",
-              "explanation": "Across >70 scraped reviews there is a complete absence of any mention of \u201cwishlist\u201d, \u201csave for later\u201d, \u201csave\u201d, or related phrasing. Users repeatedly praise the app\u2019s overall experience but never reference the act of bookmarking items, indicating that the wishlist UI is either not visible, not intuitive, or not perceived as valuable enough to mention. This low salience prevents users from forming the habit of saving items, which in turn eliminates the observable pre\u2011purchase intent signals the research seeks.",
+              "cause_title": "Delivery Delays and Unreliable Timelines",
+              "explanation": "Inconsistent and delayed deliveries lead to missed delivery dates, causing frustration and negative sentiment among users.",
               "supporting_evidence": [
-                "Zero mentions of \u2018wishlist\u2019, \u2018save\u2019, \u2018later\u2019 or any pre\u2011purchase saving language in 70+ reviews (Hypothesis confidence: High).",
-                "Positive sentiment dominates (ratings \u22654) with no negative feedback about missing a save function, suggesting the feature is simply unnoticed rather than disliked."
+                "Multiple reviews cite missed delivery dates and delayed shipments",
+                "Quotes: \"The product is not delivered on the given date\"; \"supposed to be delivered on 20th which they did not\""
               ],
               "alternative_explanations": [
-                "Users may prefer external tools (screenshots, mental notes) and therefore never need an in\u2011app wishlist.",
-                "The target audience might be \u201cinstant buyers\u201d who rarely defer purchases, making the wishlist irrelevant for this cohort."
+                "Potential causes include inadequate logistics, insufficient inventory management, or inefficient delivery networks."
               ],
-              "business_impact": "Missed conversion opportunities: each unsaved item represents a potential add\u2011to\u2011cart that never materializes, reducing average order value (AOV) and lifetime value (LTV). Low wishlist usage also limits data for personalized retargeting, inflating acquisition cost per user.",
-              "customer_impact": "Customers lack a low\u2011friction way to remember items they like, leading to frustration when they later cannot locate the product or are unsure if it\u2019s still available.",
-              "impact_score": 8.7
+              "business_impact": "Loss of customer trust, increased churn, and negative reviews",
+              "customer_impact": "Increased frustration, disappointment, and dissatisfaction",
+              "impact_score": 8.0
             },
             {
               "root_cause_id": "RC2",
-              "cause_title": "Latent Deferred\u2011Purchase Intent Not Captured",
-              "explanation": "Jobs\u2011to\u2011be\u2011done analysis reveals a functional need: \u201cWhen I discover a product I like but cannot purchase immediately, I want a simple way to remember it for future reference.\u201d Yet the review data provides no explicit signals of DEFERRED_PURCHASE intent, implying that users either do not articulate this need in reviews or the app does not surface a mechanism (e.g., reminders, scheduler) that makes the intent visible. The hidden intent means the product team cannot identify or address the underlying reasons users postpone buying, such as salary timing or occasion planning.",
+              "cause_title": "Complicated Return and Refund Process",
+              "explanation": "The return and refund workflow is perceived as opaque and punitive, leading to frustration and loss of trust among users.",
               "supporting_evidence": [
-                "Jobs\u2011to\u2011be\u2011done statement highlighting desire to revisit items later, despite no direct review quotes mentioning \u201clater\u201d or \u201csalary\u201d.",
-                "Segment \u201cImplicit Deferred Buyers\u201d estimated at 5\u202f% of users, indicating a non\u2011trivial minority with deferred intent that remains invisible in the data."
+                "Comments describe returns as impossible and refunds as never received",
+                "Quotes: \"Can't even return now\", \"refund is not done very worst experience\""
               ],
               "alternative_explanations": [
-                "The 5\u202f% estimate may be inflated; the actual number of deferred buyers could be negligible, explaining the lack of mentions.",
-                "Users might rely on external reminders (calendar, notes) rather than expecting an in\u2011app solution, so the absence of in\u2011app signals does not reflect a true unmet need."
+                "Potential causes include inadequate customer support, complex return policies, or inefficient refund processing."
               ],
-              "business_impact": "Uncaptured deferred intent leads to lost repeat\u2011visit traffic and lower conversion rates on future sessions. Without a reminder or scheduler, users may forget items, decreasing the effective conversion funnel efficiency.",
-              "customer_impact": "Customers experience cognitive load remembering items across sessions, potentially abandoning interest altogether, which erodes trust in the platform\u2019s ability to support their purchase planning.",
-              "impact_score": 7.4
+              "business_impact": "Loss of customer loyalty, increased negative word\u2011of\u2011mouth, and decreased repeat business",
+              "customer_impact": "Increased frustration, feelings of abandonment, and loss of trust",
+              "impact_score": 8.5
+            },
+            {
+              "root_cause_id": "RC3",
+              "cause_title": "Insufficient Customer Service Responsiveness",
+              "explanation": "Customer service is perceived as unresponsive or rude, leaving users feeling abandoned and escalating negative sentiment.",
+              "supporting_evidence": [
+                "Reviews mention rude agents, no follow\u2011up, and feeling abandoned",
+                "Quotes: \"they were really rude\"; \"I even connected with customer support still no such action taken\""
+              ],
+              "alternative_explanations": [
+                "Potential causes include inadequate training, insufficient staffing, or inefficient support processes."
+              ],
+              "business_impact": "Loss of customer trust, increased churn, and negative reviews",
+              "customer_impact": "Increased frustration, disappointment, and dissatisfaction",
+              "impact_score": 7.5
+            },
+            {
+              "root_cause_id": "RC4",
+              "cause_title": "App Transactional UI/UX Glitches",
+              "explanation": "Technical issues such as disappearing wallet top\u2011up options and restrictive voucher handling create friction during checkout, leading to cart abandonment and negative reviews.",
+              "supporting_evidence": [
+                "Specific complaint: \"The option to top up wallet ... is not showing or is hidden for some reason... Frustrating experience.\"",
+                "Mention of inability to use multiple vouchers at checkout."
+              ],
+              "alternative_explanations": [
+                "Potential causes include device\u2011specific bugs, backend configuration errors, or incomplete feature rollout."
+              ],
+              "business_impact": "Higher cart abandonment rates, lower conversion, and erosion of brand perception",
+              "customer_impact": "Frustration, perceived unreliability of the app, and reduced willingness to complete purchases",
+              "impact_score": 6.0
+            },
+            {
+              "root_cause_id": "RC5",
+              "cause_title": "Price Perception & Transparency Issues",
+              "explanation": "Users perceive the app as more expensive than buying directly from brand sites, leading to price\u2011sensitive shoppers abandoning the platform.",
+              "supporting_evidence": [
+                "Comment: \"Buy from the original site it is much more cheaper\"",
+                "Repeated mentions of price dissatisfaction across segments."
+              ],
+              "alternative_explanations": [
+                "Potential causes include lack of price\u2011match guarantees, hidden fees, or timing of promotions."
+              ],
+              "business_impact": "Lost sales from price\u2011sensitive segment, reduced average order value, and weakened competitive positioning",
+              "customer_impact": "Perception of overpricing, distrust, and migration to cheaper alternatives",
+              "impact_score": 6.5
             }
           ]
         }
@@ -356,5 +491,5 @@
     }
   },
   "board_presentation": null,
-  "active_problem_statement": "You are an expert NLP Data Analyst specializing in E-commerce Growth and Consumer Psychology. Your sole mission is to process raw scraped reviews and extract precise human motivations behind two behaviors:\n1. WISHLIST INTENT (Why users add items to a wishlist instead of buying)\n2. NON-MONETARY DROP-OFF (Why users leave items in a wishlist without purchasing, excluding discounts/price issues)\n\n---\n### INSTRUCTIONS:\nProcess each review strictly through the following classification framework. Ignore all generic feedback, post-purchase shipping complaints, app crashes, or payment failure bugs. Focus ONLY on pre-purchase hesitation and saving psychology.\n\n1. CLASSIFY INTENT (Select one if present):\n   - [MOODBOARD]: Saving for style inspiration, aesthetic matching, or social media outfit ideas (Reels/TikTok/Instagram).\n   - [DEFERRED_PURCHASE]: Intending to buy later (salary delay, occasion planning, waiting to buy multiple items together).\n   - [COMPARISON]: Saving to compare against alternative fits, brands, or platforms later.\n\n2. CLASSIFY DROP-OFF FRICTION (Select one if present - NON-MONETARY ONLY):\n   - [FIT_UNCERTAINTY]: Lack of confidence in sizing, real-life fabric quality, or how it looks on real body types.\n   - [TREND_DECAY]: Loss of interest over time, trend expired, or realization that it was an impulse save.\n   - [WISHLIST_CLUTTER]: The saved list became too large, disorganized, or overwhelming to review.\n   - [STOCK_SENSITIVITY]: Size went out of stock before decision was made, leading to abandonment.\n\n3. NOISE FILTERING RULE:\n   - If a review mentions \"refund\", \"delivery boy\", \"damaged package\", \"app crash\", \"OTP\", or contains fewer than 4 meaningful words, MARK AS: [FILTERED_OUT]."
+  "active_problem_statement": null
 }

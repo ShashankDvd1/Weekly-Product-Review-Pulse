@@ -38,7 +38,7 @@ def ensure_list(val) -> list[str]:
     return [str(val)]
 
 
-JTBD_SYSTEM_PROMPT = """You are an expert in the Jobs-To-Be-Done (JTBD) framework, specifically applied to Quick Commerce (10-minute delivery apps like Zepto, Blinkit, Swiggy Instamart).
+JTBD_SYSTEM_PROMPT = """You are an expert in the Jobs-To-Be-Done (JTBD) framework, specifically applied to the target product/domain under review.
 
 You analyze consumer signals to extract the real JOBS users are trying to get done — not features they want, but outcomes they desire.
 
@@ -90,7 +90,7 @@ def analyze_jtbd(
 
     chunk = "\n\n".join(signal_texts)
 
-    prompt = f"""Analyze these consumer signals from quick commerce users and extract {num_jobs} Jobs-To-Be-Done.
+    prompt = f"""Analyze these consumer signals from users and extract {num_jobs} Jobs-To-Be-Done.
 
 For each job, provide:
 - "job_statement": In the format "When [situation], I want to [motivation], so I can [outcome]"

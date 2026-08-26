@@ -318,6 +318,7 @@ class FullPipelineRequest(BaseModel):
     reddit_subreddits: list[str] = Field(default_factory=list)
     reddit_search_terms: list[str] = Field(default_factory=list)
     problem_statement: Optional[str] = None
+    keywords: Optional[str] = None
 
 
 class DashboardOverview(BaseModel):

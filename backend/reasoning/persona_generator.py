@@ -37,7 +37,7 @@ def ensure_list(val) -> list[str]:
     return [str(val)]
 
 
-PERSONA_SYSTEM_PROMPT = """You are a Senior UX Researcher specializing in Quick Commerce consumer behavior.
+PERSONA_SYSTEM_PROMPT = """You are a Senior UX Researcher specializing in consumer behavior.
 
 You create rich, evidence-based user personas from customer signals (app reviews, Reddit discussions).
 
@@ -46,7 +46,7 @@ Your personas are NOT generic marketing stereotypes. They are behavioral archety
 Each persona should capture:
 1. A vivid, specific behavioral profile (not demographics)
 2. Concrete shopping habits and routines
-3. Specific motivations (why they use quick commerce)
+3. Specific motivations (why they use the product)
 4. Specific barriers (what stops them from exploring new categories)
 5. Category preferences and avoidances
 
@@ -100,15 +100,15 @@ def generate_personas(
 
     prob_stmt_block = f"\nTARGET PROBLEM STATEMENT / STRATEGIC FOCUS:\n{problem_statement}\n" if problem_statement else ""
 
-    prompt = f"""Based on these {len(sample)} consumer signals from quick commerce users, generate exactly {num_personas} distinct user personas.
+    prompt = f"""Based on these {len(sample)} consumer signals from users, generate exactly {num_personas} distinct user personas.
 {prob_stmt_block}
-These personas should represent DIFFERENT behavioral archetypes — users who use quick commerce apps differently.
+These personas should represent DIFFERENT behavioral archetypes — users who use the app differently.
 
 For each persona, provide:
-- "name": A memorable archetype name (e.g., "The Pantry Stocker", "The Impulse Snacker", "The Curious Explorer")
+- "name": A memorable archetype name (e.g., "The Routine Buyer", "The Impulse Shopper", "The Curious Explorer")
 - "description": 3-4 sentence behavioral profile
-- "shopping_habits": How and when they use quick commerce (specific routines, frequencies)
-- "motivations": List of 3-5 specific reasons they use these apps
+- "shopping_habits": How and when they use the app (specific routines, frequencies)
+- "motivations": List of 3-5 specific reasons they use the app
 - "barriers": List of 3-5 specific things that prevent them from exploring new categories
 - "preferred_categories": Categories they regularly buy from
 - "avoided_categories": Categories they never/rarely buy from

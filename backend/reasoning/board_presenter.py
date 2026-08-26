@@ -20,7 +20,7 @@ Synthesize the provided Strategy Deep Dive results into exactly 10 slides follow
    - A core customer behavioral finding or friction point.
    - Direct quantitative metrics or qualitative quote evidence.
    - The direct strategic implication or product recommendation.
-5. Determine the quick-commerce brand from data and set brand metadata.
+5. Determine the target brand/product from data and set brand metadata.
 6. ANTI-HALLUCINATION: Preserve all statistics, percentages, and user quotes EXACTLY as they appear in the input.
 7. Return ONLY a valid JSON object. No markdown backticks. No text outside the JSON.
 
@@ -354,8 +354,8 @@ Return exactly this JSON (slides 1-5 only):
 {
   "presentation_title": "...",
   "subtitle": "...",
-  "presentation_theme": "Blinkit Yellow | Zepto Purple | Swiggy Orange",
-  "app_name": "Blinkit | Zepto | Swiggy Instamart",
+  "presentation_theme": "Theme matching target app",
+  "app_name": "Target App Name",
   "primary_color": "#hex",
   "secondary_color": "#hex",
   "slides": [
@@ -365,11 +365,11 @@ Return exactly this JSON (slides 1-5 only):
       "bullets": ["detailed bullet 1", "detailed bullet 2", "detailed bullet 3"],
       "speaker_notes": "presenter notes",
       "market_gap_table": [
-        {"platform": "Blinkit", "offer": "...", "missing": "..."},
-        {"platform": "Zepto", "offer": "...", "missing": "..."},
-        {"platform": "Swiggy Instamart", "offer": "...", "missing": "..."},
-        {"platform": "BigBasket", "offer": "...", "missing": "..."},
-        {"platform": "Amazon Fresh", "offer": "...", "missing": "..."}
+        {"platform": "Target App Name", "offer": "...", "missing": "..."},
+        {"platform": "Competitor A", "offer": "...", "missing": "..."},
+        {"platform": "Competitor B", "offer": "...", "missing": "..."},
+        {"platform": "Competitor C", "offer": "...", "missing": "..."},
+        {"platform": "Competitor D", "offer": "...", "missing": "..."}
       ],
       "why_solve_first": ["Reason 1", "Reason 2", "Reason 3"],
       "stats": [{"label": "...", "value": "..."}, {"label": "...", "value": "..."}, {"label": "...", "value": "..."}]
@@ -441,10 +441,10 @@ Return exactly this JSON (slides 6-10 only):
       "bullets": ["detailed bullet 1", "detailed bullet 2"],
       "speaker_notes": "presenter notes",
       "solutions": [
-        {"id": "S1", "name": "Full Homepage Redesign", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S2", "name": "Push Notification Campaign", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S3", "name": "Category Badges without Authenticity Seals", "status": "REJECTED", "description": "...", "feedback": "..."},
-        {"id": "S4", "name": "Contextual In-Cart Cross-Sell Hub with Brand Badging", "status": "CHOSEN", "description": "...", "feedback": "..."}
+        {"id": "S1", "name": "Basic UI Refactor", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S2", "name": "Broad Notification Campaign", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S3", "name": "Simple Badges without Validation", "status": "REJECTED", "description": "...", "feedback": "..."},
+        {"id": "S4", "name": "Chosen Solution Concept", "status": "CHOSEN", "description": "...", "feedback": "..."}
       ],
       "vs_comparison": [
         {"against": "S1", "justification": "..."},
@@ -617,14 +617,29 @@ def synthesize_board_presentation(strategy_data: dict) -> dict:
 
 
 def _detect_brand(strategy_data: dict) -> tuple[str, str, str]:
-    """Detect brand name and colors from strategy data."""
+    """Detect brand name and colors dynamically from strategy data."""
+    app_name = "Target Platform"
+    steps = strategy_data.get("steps", {})
+    
     raw_str = json.dumps(strategy_data).lower()
     if "zepto" in raw_str:
         return "Zepto", "#5c2c90", "#e28743"
     elif "swiggy" in raw_str or "instamart" in raw_str:
         return "Swiggy Instamart", "#fc8019", "#8a3ab9"
-    else:
+    elif "blinkit" in raw_str:
         return "Blinkit", "#ffc20e", "#3182ce"
+        
+    for step in steps.values():
+        data = step.get("data", {})
+        if isinstance(data, dict) and data.get("app_name"):
+            app_name = data.get("app_name")
+            break
+            
+    import hashlib
+    h = hashlib.md5(app_name.encode('utf-8')).hexdigest()
+    primary = f"#{h[:6]}"
+    secondary = f"#{h[6:12]}"
+    return app_name, primary, secondary
 
 
 def create_fallback_presentation(strategy_data: dict) -> dict:
@@ -785,116 +800,116 @@ def create_fallback_presentation(strategy_data: dict) -> dict:
                 "S1 (Full Homepage Redesign) was rejected because homepage redesigns take 3-6 months and carry high risk of disrupting the existing grocery conversion funnel — the primary revenue source.",
                 "S4 is a cart-layer intervention that requires zero homepage changes, ships in 6 weeks, and delivers personalised trust signals precisely when users have maximum purchase intent."
             ],
-            "speaker_notes": "Solution comparison slides must be falsifiable. Each rejection needs a reason, not just a preference. The audience should agree with each rejection before endorsing the chosen path.",
-            "solutions": [
-                {"id": "S1", "name": "Full Homepage Redesign", "status": "REJECTED", "description": "Restructure the home screen to prominently feature non-grocery category carousels and hero banners.", "feedback": "High engineering effort (3-6 months), high risk of disrupting core grocery conversion funnel. Banner blindness research shows homepage carousels are ignored after 2-3 sessions."},
-                {"id": "S2", "name": "Push Notification Discovery Campaign", "status": "REJECTED", "description": "Send personalised category exploration push notifications based on purchase history to drive app re-engagement.", "feedback": "Low session-time relevance — users see notifications outside of checkout intent. Open rates for category exploration pushes average <6% in Indian quick commerce."},
-                {"id": "S3", "name": "Category Badges without Authenticity Guarantee", "status": "REJECTED", "description": "Add 'New Category' badges to non-grocery SKUs without a full brand origin verification system.", "feedback": "Addresses visibility but not the trust barrier. Review data shows 42% of non-grocery hesitation is authenticity-driven — badges without verified origin guarantees will not convert Cautious Explorers."},
-                {"id": "S4", "name": "Contextual In-Cart Cross-Sell Hub + Brand-Assured Badging", "status": "CHOSEN", "description": "A dismissible drawer inside the checkout cart surfacing 3 contextually relevant non-grocery items from verified brand partners, with origin seals and doorstep-return guarantees displayed inline.", "feedback": "Addresses both trust and visibility; intercepts at peak intent; ships in 6 weeks; designed to be dismissed if unwanted — protecting core UX."}
+            "title": "S4 - Chosen Solution - is the only approach that solves trust and visibility simultaneously",
+            "headline": "Three alternatives rejected; S4 uniquely addresses visibility and trust in-session.",
+            "bullets": [
+                "S1 (Homepage redesign) was rejected due to high effort and risk of disrupting core flows.",
+                "S4 is a contextual intervention that ships in 6 weeks and delivers trust signals during active sessions."
             ],
+            "speaker_notes": "Solution comparison slides must justify the chosen solution while clearly rejecting alternatives.",
+            "solutions": solutions,
             "vs_comparison": [
-                {"against": "S1", "justification": "S4 ships in 6 weeks vs S1's 3-6 months and carries zero disruption risk to the core grocery funnel — the primary revenue driver."},
-                {"against": "S2", "justification": "S4 triggers during active checkout session (peak intent) vs S2's out-of-session notification timing, resulting in 3-5x higher conversion likelihood."},
-                {"against": "S3", "justification": "S4 pairs visibility with verified origin guarantees — directly removing the trust barrier identified in 42% of review data, which S3 cannot address."}
+                {"against": "S1", "justification": "S4 ships in 6 weeks vs 3-6 months and carries zero risk to the core flow."},
+                {"against": "S2", "justification": "S4 triggers during active session (peak intent) vs out-of-session push notifications."},
+                {"against": "S3", "justification": "S4 pairs visibility with verified trust signals, which S3 lacks."}
             ]
         },
         {
             "slide_number": 7,
             "type": "mvp_spec",
-            "title": "Three screens, zero new navigation — the MVP delivers category exploration inside the existing checkout flow",
-            "headline": "The MVP is scoped to 3 cart-layer screens that ship in 6 weeks with no homepage changes required.",
+            "title": "Three screens, zero new navigation — the MVP delivers exploration inside the flow",
+            "headline": "The MVP is scoped to 3 inline screens that ship in 6 weeks with no homepage changes.",
             "bullets": [
-                "Screen 1 (In-Cart Recommendation Drawer) surfaces 3 brand-verified, cart-contextual product suggestions as a bottom sheet — dismissible, frequency-capped, and personalised to the user's existing basket composition.",
-                "Screen 2 (Product Trust Card) shows brand origin verification, seller rating, and one-tap 'Doorstep Return' guarantee inline — removing the authenticity barrier without sending users to a separate product detail page.",
-                "Screen 3 (Post-Checkout Explore Nudge) displays one personalised new-category prompt at order confirmation, capturing residual exploration intent with zero checkout friction."
+                "Screen 1 (Contextual Recommendation Drawer) surfaces suggestions dynamically based on active session.",
+                "Screen 2 (Trust Verification Card) displays verified signals inline, removing trust barriers.",
+                "Screen 3 (Confirmation Nudge) captures residual user intent post-flow completion."
             ],
-            "speaker_notes": "Screen mapping should answer 'where does this live in the existing app?' for each engineering reviewer. Prototype links make this real.",
+            "speaker_notes": "Demonstrate that the MVP is tightly scoped and fits seamlessly into the existing app structure.",
             "screens": [
-                {"name": "In-Cart Recommendation Drawer", "spec": "Dismissible bottom sheet inside cart view; shows 3 brand-verified items contextually matched to cart composition; frequency-capped to 3x per week per user; one-tap 'Add & Checkout' CTA."},
-                {"name": "Product Trust Card", "spec": "Inline trust panel showing Brand Origin badge, Seller Verification Score (1-5), and 'Doorstep Return' guarantee link — visible without leaving the cart surface."},
-                {"name": "Post-Checkout Category Nudge", "spec": "Single personalised category suggestion shown on the order confirmation screen; one-tap 'Explore [Category]' CTA; tracks impressions vs. clicks separately from cart drawer CTR."}
+                {"name": "Contextual Recommendation Drawer", "spec": "Dismissible inline component surfacing relevant options matched to current context."},
+                {"name": "Trust Verification Card", "spec": "Panel showing validation signals, ratings, and guarantees without leaving the flow."},
+                {"name": "Post-Flow Nudge", "spec": "Personalized prompt shown on confirmation screen to encourage discovery."}
             ],
-            "trust_cues": ["Brand Origin Verification Badge", "Seller Authenticity Score (1-5)", "Doorstep Return Guarantee", "100% Original Seal"]
+            "trust_cues": ["Validation Badge", "Seller Verification Score", "Satisfaction Guarantee", "100% Original Seal"]
         },
         {
             "slide_number": 8,
             "type": "data_flow_edges",
-            "title": "The recommendation engine runs entirely on existing cart and purchase data — no new data infrastructure required",
-            "headline": "Two pipeline components drive the system; four edge cases are pre-mitigated at the design stage.",
+            "title": "Recommendation engine runs on existing session data",
+            "headline": "Two backend components drive the system; four edge cases are pre-mitigated.",
             "bullets": [
-                "The Review Intelligence Pipeline processes Play Store, App Store, and Reddit signals through the quality filter, groups category barriers by theme, and feeds the recommendation scoring model — running fully asynchronously without impacting checkout latency.",
-                "The Cross-Sell Engine maps active cart composition to a category adjacency graph, scores candidate SKUs by trust rating + margin + stock depth, and renders the top 3 suggestions in <100ms."
+                "The Review Intelligence Pipeline processes signals asynchronously without impacting core latency.",
+                "The Recommendation Engine maps session intent to adjacency graphs in <100ms."
             ],
-            "speaker_notes": "Technical reviewers need to see that edge cases are pre-thought, not discovered post-launch. Walk through E1 (cold start) in detail — it's the most common objection.",
+            "speaker_notes": "Explain how the backend flow is lightweight and mitigates edge cases like cold start.",
             "data_flow": {
-                "review_engine": "Play Store + App Store reviews crawled → Quality filter removes spam → NLP groups category barrier themes → Barrier signals feed recommendation scoring model → Model updated weekly via batch job",
-                "product_engine": "Active cart composition captured → Category adjacency graph traversed → Candidate SKUs scored by trust + margin + stock depth → Top 3 rendered in cart drawer via <100ms API call"
+                "review_engine": "User feedback crawling → Quality filtering → Theme categorization → Recommendation scoring updates",
+                "product_engine": "Active session context captured → Intent graph traversal → Candidate options scored → Top results rendered"
             },
             "nudges": [
-                "Frequency cap: recommendation drawer shown max 3x per week per user to prevent fatigue",
-                "Relevance floor: items scoring <0.6 on contextual relevance score are suppressed from suggestions",
-                "Trust floor: only SKUs with Seller Verification Score ≥4.0 are eligible for recommendation"
+                "Frequency cap: recommendations shown maximum 3x per week to avoid fatigue",
+                "Relevance floor: options scoring below relevance threshold are suppressed",
+                "Trust floor: only verified options with high satisfaction scores are surfaced"
             ],
             "edge_cases": [
-                {"id": "E1", "title": "Cold start — new accounts with <3 orders", "mitigation": "Fall back to city-level bestseller list in the target category; exclude trust-sensitive SKUs until purchase history accumulates."},
-                {"id": "E2", "title": "Recommended SKU out of stock at local dark store", "mitigation": "Real-time inventory check at drawer render time; suppress SKUs with <3 units at user's nearest dark store."},
-                {"id": "E3", "title": "User dismisses drawer repeatedly", "mitigation": "After 3 consecutive dismissals, suspend drawer for 14 days; log dismissal signal to reduce future intrusive recommendations."},
-                {"id": "E4", "title": "Authenticity dispute post-purchase", "mitigation": "Doorstep return policy applies to all recommended SKUs; brand origin dispute triggers automated escalation to Seller Trust team within 4 hours."}
+                {"id": "E1", "title": "Cold start — new accounts with no history", "mitigation": "Fall back to popular options list; exclude trust-sensitive suggestions until behavior history accumulates."},
+                {"id": "E2", "title": "Option temporarily unavailable", "mitigation": "Real-time availability check at render time; suppress unavailable items dynamically."},
+                {"id": "E3", "title": "User dismisses recommendations repeatedly", "mitigation": "After 3 dismissals, suspend the drawer for 14 days; log signal to adjust future recommendations."},
+                {"id": "E4", "title": "Friction dispute post-action", "mitigation": "Doorstep resolution policy applies; auto-escalate complaints to Trust team within 4 hours."}
             ]
         },
         {
             "slide_number": 9,
             "type": "metrics_indicators",
-            "title": "North Star: Monthly Cross-Category Basket Penetration — from 12% to 25% in 90 days",
-            "headline": "Four leading indicators signal whether we are on track before the 90-day North Star measurement window closes.",
+            "title": "North Star: Cross-Feature Adoption Rate — from 12% to 25% in 90 days",
+            "headline": "Four leading indicators signal progress before the 90-day North Star window closes.",
             "bullets": [
-                "The North Star (% of MAUs with at least one non-grocery purchase per month) directly measures the strategic goal — raising category breadth — and cannot be gamed by improving grocery metrics alone.",
-                "Leading indicator 1 (Drawer CTR >18%) proves users find recommendations relevant enough to engage; if below target within 14 days, recommendation copy and SKU selection must be revised immediately."
+                "The North Star directly measures the strategic goal of basket/feature adoption breadth.",
+                "Leading indicator 1 (Drawer CTR >18%) proves users find suggestions relevant enough to click."
             ],
-            "speaker_notes": "North Star metrics must be non-gameable. Explain to reviewers why AOV or GMV are insufficient — they can increase without any category exploration happening.",
+            "speaker_notes": "Detail the metrics framework. Focus on the non-gameable North Star metric.",
             "north_star": {
-                "name": "Monthly Cross-Category Basket Penetration Rate",
-                "definition": "Percentage of Monthly Active Customers who place at least one order containing a product from a newly explored category (a category with zero prior purchases in the last 90 days)",
-                "target": "12% → 25% within 90 days of full launch",
-                "why": "This metric is impossible to improve without actual category exploration occurring — it cannot be inflated by grocery GMV growth or AOV improvements alone.",
-                "stalls_action": "If metric is flat after 30 days: audit recommendation relevance scores, expand eligible SKU catalog, and escalate trust barrier via in-app survey."
+                "name": "Cross-Feature Adoption Rate",
+                "definition": "Percentage of Monthly Active Users who engage with at least one new feature/category per month",
+                "target": "12% → 25% within 90 days of launch",
+                "why": "Ensures true expansion of feature usage across the user base.",
+                "stalls_action": "If adoption is flat after 30 days: audit relevance scores, expand options catalog, and conduct surveys."
             },
             "leading_indicators": [
-                {"name": "In-Cart Drawer Click-Through Rate", "target": ">18%", "proves": "Users find recommendations relevant enough to engage with", "below_target_action": "Rewrite recommendation copy; test 2-item vs. 3-item drawer layout; audit SKU relevance scoring model."},
-                {"name": "Cross-Category Add-to-Cart Rate", "target": ">8%", "proves": "Clicks are converting to genuine purchase intent, not just curiosity", "below_target_action": "Strengthen trust badge visibility on the product card; add price comparison vs. competitor to reduce hesitation."},
-                {"name": "7-Day Repeat Purchase in New Category", "target": ">15%", "proves": "First-time category purchase is converting to habit, not a one-off event", "below_target_action": "Deploy a targeted 7-day re-engagement push notification for new-category buyers with a 10% repeat discount."},
-                {"name": "Monthly Category Breadth Uplift", "target": "+30% categories per MAU", "proves": "The system is expanding basket breadth across the user base, not just for a niche power user segment", "below_target_action": "Widen eligible SKU catalog to include mid-confidence SKUs; test nudge placement on post-checkout screen."}
+                {"name": "Inline Drawer Click-Through Rate", "target": ">18%", "proves": "Users find recommendations relevant enough to engage with", "below_target_action": "Rewrite recommendation copy; adjust layout; audit relevance scoring model."},
+                {"name": "Cross-Feature Engagement Rate", "target": ">8%", "proves": "Clicks convert to active user interactions, not just curiosity", "below_target_action": "Strengthen trust badge visibility; optimize value proposition presentation."},
+                {"name": "7-Day Repeat Feature Usage", "target": ">15%", "proves": "First-time usage converts to habit and repeat routine", "below_target_action": "Deploy targeted re-engagement messages; offer contextual guides."},
+                {"name": "Monthly Feature Breadth Uplift", "target": "+30%", "proves": "Expanding usage across the entire platform's features", "below_target_action": "Widen eligible options catalog; optimize nudge placements."}
             ]
         },
         {
             "slide_number": 10,
             "type": "failure_mitigations",
-            "title": "Three guardrails ensure the system is safe to launch without risking core grocery experience",
-            "headline": "Proactive design-stage mitigations cover every critical failure mode; guardrail thresholds trigger automatic rollback.",
+            "title": "Guardrails ensure system is safe to launch without risking core experience",
+            "headline": "Proactive design mitigations cover critical failures; guardrail thresholds trigger automatic rollback.",
             "bullets": [
-                "The highest severity failure (CRIT) — authenticity disputes triggering return rate spikes — is mitigated by restricting recommendations to SKUs from brand-verified partners with Seller Score ≥4.0, combined with a doorstep return guarantee that activates within 4 hours of a dispute.",
-                "A circuit-breaker rule activates automatic rollback if cart abandonment rate increases by >2 percentage points in any 7-day window — ensuring the cross-sell surface never degrades the core checkout experience.",
-                "All three guardrail thresholds (return rate, latency, support tickets) are monitored in real-time on the existing analytics dashboard — no new monitoring infrastructure required."
+                "Authenticity or friction disputes are handled by strict seller filters and doorstep resolution.",
+                "A circuit-breaker rule pauses the intervention if core flow abandonment increases by >2%."
             ],
-            "speaker_notes": "Failure mode slides must show reviewers that you have thought beyond the happy path. Walk through the CRIT case in detail — it's the one that will be raised as an objection.",
+            "speaker_notes": "Close the presentation by showing that we fail-safe, protecting the core experience at all times.",
             "failures": [
-                {"risk": "Recommended SKU authenticity disputes drive return rate spike", "handling": "Only recommend SKUs from brand-verified partners (Seller Score ≥4.0); doorstep return activated within 4 hours of dispute; auto-suppress SKU after 2 authenticity complaints.", "severity": "CRIT"},
-                {"risk": "Recommendation drawer increases cart checkout latency", "handling": "Drawer renders asynchronously after cart page load; recommendation API has 150ms timeout with fallback to static popular items list; monitored via P99 latency dashboard.", "severity": "HIGH"},
-                {"risk": "Users find the drawer intrusive, causing checkout abandonment", "handling": "Frequency cap set to 3 impressions/week; drawer is fully dismissible; if cart abandonment rate increases >2pp in any 7-day window, drawer is auto-paused pending review.", "severity": "HIGH"},
-                {"risk": "Recommendation algorithm surfaces irrelevant items (e.g., baby food to single users)", "handling": "Relevance floor score of 0.6 applied before any SKU is eligible; weekly model retraining on click + purchase feedback; daily human audit of lowest-scored recommendations.", "severity": "MED"}
+                {"risk": "Option quality disputes drive complaint spikes", "handling": "Only recommend highly rated/verified options; auto-suppress options after repeat complaints.", "severity": "CRIT"},
+                {"risk": "Recommendation drawer increases checkout load latency", "handling": "Render asynchronously after main page load; API timeout with popular items fallback.", "severity": "HIGH"},
+                {"risk": "Users find the intervention intrusive, causing abandonment", "handling": "Set strict frequency caps; allow easy dismissal; auto-pause drawer if abandonment spikes.", "severity": "HIGH"},
+                {"risk": "Recommendation algorithm surfaces irrelevant items", "handling": "Apply high relevance floor score; daily human audit of lowest-scored recommendations.", "severity": "MED"}
             ],
             "guardrails": [
-                {"name": "Doorstep Return Rate", "threshold": "< 4%", "purpose": "Keep reverse logistics cost within unit economics tolerances — exceeding 4% erodes gross margin on recommended items."},
-                {"name": "Cart Page P99 Load Latency", "threshold": "< +200ms increase", "purpose": "Ensure recommendation computation does not slow the checkout flow — grocery users are time-sensitive."},
-                {"name": "Unsolicited Customer Support Tickets", "threshold": "< 1% increase vs. baseline", "purpose": "Ensure recommendation copy and trust signals are clear enough that users don't need support to understand what they are being shown."}
+                {"name": "Dispute Rate", "threshold": "< 4%", "purpose": "Keep support costs within limits to protect gross margin."},
+                {"name": "Page P99 Load Latency", "threshold": "< +200ms increase", "purpose": "Ensure recommendation computation does not slow the user flow."},
+                {"name": "Support Ticket Increase", "threshold": "< 1% increase", "purpose": "Ensure intervention messaging is clear enough to prevent user confusion."}
             ],
-            "closing_message": f"This system is designed to fail safely: every failure mode has a pre-agreed threshold that triggers automatic mitigation, ensuring the {app_name} core grocery experience is never compromised by the category exploration layer."
+            "closing_message": f"This system is designed to fail safely: every failure mode has a pre-agreed threshold that triggers automatic mitigation, ensuring the {app_name} core experience is never compromised."
         }
     ]
 
     return {
-        "presentation_title": f"{app_name} Category Exploration — Strategic Board Deck",
-        "subtitle": "Unlocking Cross-Category Basket Penetration via Contextual Discovery",
+        "presentation_title": f"{app_name} Product Strategy — Strategic Board Deck",
+        "subtitle": "Unlocking Feature Adoption via Contextual Discovery",
         "presentation_theme": f"{app_name} Premium Theme",
         "app_name": app_name,
         "primary_color": primary_color,

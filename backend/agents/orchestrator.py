@@ -169,7 +169,7 @@ class PipelineOrchestrator:
                     unified_id=f"cached-sig-{idx}",
                     source=DataSource.PLAY_STORE if idx % 2 == 0 else DataSource.REDDIT,
                     source_id=f"src-{idx}",
-                    app_name="Blinkit",
+                    app_name="Target App",
                     content="Cached verified user review signal.",
                     rating=1 if st == SentimentLabel.NEGATIVE else (5 if st == SentimentLabel.POSITIVE else 3),
                     sentiment_score=score,
@@ -177,6 +177,8 @@ class PipelineOrchestrator:
                     word_count=10
                 ))
             self.signals = reconstructed
+
+        apps_list = list(set(s.app_name.lower() for s in self.signals if s.app_name)) if self.signals else ["target_app"]
 
         # 1. Map Hypotheses
         self.hypotheses = []
@@ -233,7 +235,7 @@ class PipelineOrchestrator:
                     confidence=0.8,
                     confidence_level=ConfidenceLevel.HIGH,
                     supporting_quotes=t_raw.get("supporting_facts", []),
-                    apps_affected=["zepto", "blinkit", "swiggy_instamart"]
+                    apps_affected=apps_list
                 ))
             except Exception as e:
                 logger.error(f"Failed to map Theme: {e}")
@@ -251,7 +253,7 @@ class PipelineOrchestrator:
                     barriers=[],
                     preferred_categories=[],
                     avoided_categories=[],
-                    apps_used=["zepto", "blinkit", "swiggy_instamart"],
+                    apps_used=apps_list,
                     signal_count=int(float(p_raw.get("estimated_size_pct", 30))),
                     representative_quotes=[],
                     core_friction=p_raw.get("core_friction", p_raw.get("observed_needs", ["Friction during category exploration"])[0] if p_raw.get("observed_needs") else "Habitual repetition barrier")
@@ -287,14 +289,14 @@ class PipelineOrchestrator:
             try:
                 self.barriers.append(CategoryBarrier(
                     barrier_id=f"B{i+1}",
-                    category="Quick Commerce",
+                    category=b_raw.get("category", "General Product Category"),
                     barrier_type=BarrierType.TRUST,
                     description=b_raw.get("explanation", ""),
                     signal_count=len(b_raw.get("supporting_evidence", [])),
                     confidence=float(b_raw.get("impact_score", 8.0)) / 10.0,
                     confidence_level=ConfidenceLevel.HIGH,
                     recommended_intervention=b_raw.get("cause_title", ""),
-                    apps_affected=["zepto", "blinkit", "swiggy_instamart"],
+                    apps_affected=apps_list,
                     name=b_raw.get("cause_title", b_raw.get("explanation", "")[:50] + "..."),
                     mitigation_strategy=b_raw.get("business_impact", b_raw.get("explanation", ""))
                 ))
@@ -585,6 +587,7 @@ class PipelineOrchestrator:
         reddit_subreddits: list[str] = None,
         reddit_search_terms: list[str] = None,
         problem_statement: str = None,
+        keywords: str = None,
     ) -> list[UnifiedSignal]:
         """
         Collect data, deduplicate, and run the Intelligent Review Quality Filter.
@@ -790,6 +793,25 @@ class PipelineOrchestrator:
                 except Exception as e:
                     self._log_progress(f"  ❌ YouTube error: {str(e)[:100]}")
             
+            if keywords:
+                if isinstance(keywords, str):
+                    keyword_list = [k.strip().lower() for k in keywords.split(",") if k.strip()]
+                elif isinstance(keywords, list):
+                    keyword_list = [k.strip().lower() for k in keywords if k.strip()]
+                else:
+                    keyword_list = []
+                
+                if keyword_list:
+                    self._log_progress(f"🔍 Filtering {len(batch_signals)} collected signals for keywords: {keyword_list}...")
+                    filtered_batch = []
+                    for sig in batch_signals:
+                        content_lower = sig.content.lower()
+                        title_lower = (sig.title or "").lower()
+                        if any(kw in content_lower or kw in title_lower for kw in keyword_list):
+                            filtered_batch.append(sig)
+                    batch_signals = filtered_batch
+                    self._log_progress(f"✅ Filtered down to {len(batch_signals)} signals matching keywords.")
+
             all_signals.extend(batch_signals)
             
             # 1. Deduplicate first
@@ -971,6 +993,7 @@ class PipelineOrchestrator:
                 reddit_subreddits=request.reddit_subreddits,
                 reddit_search_terms=request.reddit_search_terms,
                 problem_statement=request.problem_statement,
+                keywords=request.keywords,
             )
 
             if not self.signals:

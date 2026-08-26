@@ -77,14 +77,14 @@ def validate_quotes(quotes: list[str], signals: list[UnifiedSignal]) -> list[str
 
 
 
-BEHAVIOR_SYSTEM_PROMPT = f"""You are a Senior Product Manager at a Quick Commerce company (like Zepto, Blinkit, or Swiggy Instamart).
+BEHAVIOR_SYSTEM_PROMPT = f"""You are a Senior Product Manager and User Researcher.
 
-Your expertise is in understanding consumer behavior — specifically WHY users behave the way they do when using quick commerce apps.
+Your expertise is in understanding consumer behavior — specifically WHY users behave the way they do when using the target app.
 
-You analyze customer signals (app reviews, Reddit discussions) to detect:
-1. Shopping habits and routines (why do users always buy the same things?)
-2. Category exploration barriers (why don't users explore new categories?)
-3. Purchase motivations (what triggers a purchase?)
+You analyze customer signals (app reviews, Reddit discussions, YouTube comments) to detect:
+1. Shopping habits and routines
+2. Experience barriers and friction points
+3. Purchase motivations
 4. Emotional patterns (trust, frustration, delight, anxiety)
 5. Habit loops (trigger → action → reward patterns)
 
@@ -154,7 +154,7 @@ def _prepare_signals_for_llm(signals: list[UnifiedSignal], max_tokens: int = 300
 
 def detect_themes(
     signals: list[UnifiedSignal],
-    context: str = "quick commerce category exploration behavior",
+    context: str = "user experience and product interactions",
 ) -> list[Theme]:
     """
     Detect themes from consumer signals using LLM analysis.
@@ -279,7 +279,7 @@ def detect_category_barriers(
     def analyze_barrier_chunk(chunk):
         problem_context = f"The specific problem to focus on is: {problem_statement}" if problem_statement else f"The question: Why do users keep buying from familiar categories (Grocery, Snacks, Dairy) but avoid exploring: {categories_str}?"
         
-        prompt = f"""Analyze these consumer signals to identify CATEGORY EXPLORATION BARRIERS in quick commerce apps.
+        prompt = f"""Analyze these consumer signals to identify experience barriers and friction points based on the target problem.
 
 {problem_context}
 

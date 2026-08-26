@@ -21,7 +21,7 @@ from core.prompts import ANTI_HALLUCINATION_RULES
 logger = logging.getLogger(__name__)
 
 
-OPPORTUNITY_SYSTEM_PROMPT = """You are a VP of Product at a Quick Commerce startup.
+OPPORTUNITY_SYSTEM_PROMPT = """You are a VP of Product.
 
 You synthesize consumer behavior analysis (themes, barriers, personas, jobs-to-be-done) into concrete PRODUCT OPPORTUNITIES that can be prioritized and built.
 
@@ -78,7 +78,7 @@ def identify_opportunities(
         for j in jobs[:8]
     ])
 
-    prompt = f"""Based on the following consumer behavior analysis for quick commerce apps, identify the TOP {num_opportunities} product opportunities.
+    prompt = f"""Based on the following consumer behavior analysis, identify the TOP {num_opportunities} product opportunities.
 
 ## THEMES DETECTED
 {themes_summary}
