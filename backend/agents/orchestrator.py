@@ -693,25 +693,25 @@ class PipelineOrchestrator:
                 app_name = "Custom Target"
                 if play_store_package:
                     try:
-                        self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package}...")
-                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=60)
+                        self._log_progress(f"📱 Collecting Play Store reviews for custom package: {play_store_package} (with keyword filtering)...")
+                        df_play = fetch_play_store_reviews(play_store_package, current_from_date, current_to_date, max_reviews=60, keywords=keywords)
                         if not df_play.empty:
                             normalized = normalize_play_store_reviews(df_play, app_name, play_store_package)
                             batch_signals.extend(normalized)
-                            self._log_progress(f"  ✅ {len(normalized)} custom Play Store reviews")
+                            self._log_progress(f"  ✅ {len(normalized)} keyword-matching custom Play Store reviews")
                     except Exception as e:
                         self._log_progress(f"  ❌ Play Store error for {play_store_package}: {str(e)[:100]}")
 
                 if app_store_id:
                     try:
-                        self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id}...")
-                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=5)
+                        self._log_progress(f"🍎 Collecting App Store reviews for custom ID: {app_store_id} (with keyword filtering)...")
+                        df_app = fetch_app_store_reviews(app_store_id, current_from_date, current_to_date, max_pages=5, keywords=keywords)
                         if not df_app.empty:
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id)
                             batch_signals.extend(normalized)
-                            self._log_progress(f"  ✅ {len(normalized)} custom App Store reviews")
+                            self._log_progress(f"  ✅ {len(normalized)} keyword-matching custom App Store reviews")
                         else:
-                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for custom ID: {app_store_id}")
+                            self._log_progress(f"  ⚠️ 0 App Store reviews matching keywords found in date range for custom ID: {app_store_id}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_store_id}: {str(e)[:100]}")
 
@@ -726,39 +726,40 @@ class PipelineOrchestrator:
                     app_store_id_reg = app_config["app_store_id"]
 
                     try:
-                        self._log_progress(f"📱 Collecting Play Store reviews for {app_name}...")
-                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=60)
+                        self._log_progress(f"📱 Collecting Play Store reviews for {app_name} (with keyword filtering)...")
+                        df_play = fetch_play_store_reviews(package, current_from_date, current_to_date, max_reviews=60, keywords=keywords)
                         if not df_play.empty:
                             normalized = normalize_play_store_reviews(df_play, app_name, package)
                             batch_signals.extend(normalized)
-                            self._log_progress(f"  ✅ {len(normalized)} Play Store reviews for {app_name}")
+                            self._log_progress(f"  ✅ {len(normalized)} keyword-matching Play Store reviews for {app_name}")
                     except Exception as e:
                         self._log_progress(f"  ❌ Play Store error for {app_name}: {str(e)[:100]}")
 
                     try:
-                        self._log_progress(f"🍎 Collecting App Store reviews for {app_name}...")
-                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=1)
+                        self._log_progress(f"🍎 Collecting App Store reviews for {app_name} (with keyword filtering)...")
+                        df_app = fetch_app_store_reviews(app_store_id_reg, current_from_date, current_to_date, max_pages=5, keywords=keywords)
                         if not df_app.empty:
                             normalized = normalize_app_store_reviews(df_app, app_name, app_store_id_reg)
                             batch_signals.extend(normalized)
-                            self._log_progress(f"  ✅ {len(normalized)} App Store reviews for {app_name}")
+                            self._log_progress(f"  ✅ {len(normalized)} keyword-matching App Store reviews for {app_name}")
                         else:
-                            self._log_progress(f"  ⚠️ 0 App Store reviews found in selected date range for {app_name}")
+                            self._log_progress(f"  ⚠️ 0 App Store reviews matching keywords found in date range for {app_name}")
                     except Exception as e:
                         self._log_progress(f"  ❌ App Store error for {app_name}: {str(e)[:100]}")
 
             # 3. Reddit Ingestion
             if include_reddit:
                 try:
-                    self._log_progress(f"🔴 Collecting Reddit discussions...")
+                    self._log_progress(f"🔴 Collecting Reddit discussions (with keyword filtering)...")
                     reddit_signals = collect_reddit_data(
                         subreddits=reddit_subreddits,
                         search_terms=reddit_search_terms,
+                        keywords=keywords,
                     )
                     if reddit_signals:
                         normalized = normalize_reddit_data(reddit_signals)
                         batch_signals.extend(normalized)
-                        self._log_progress(f"  ✅ {len(normalized)} Reddit signals collected")
+                        self._log_progress(f"  ✅ {len(normalized)} keyword-matching Reddit signals collected")
                 except Exception as e:
                     self._log_progress(f"  ❌ Reddit error: {str(e)[:100]}")
             
@@ -777,10 +778,8 @@ class PipelineOrchestrator:
                                 details = play_app(play_store_package)
                                 title = details.get("title", "")
                                 if title:
-                                    # Clean non-ASCII and split by common separators
                                     title_clean = title.encode('ascii', 'ignore').decode('ascii')
                                     friendly = re.split(r'[:\-\(|~–—]', title_clean)[0].strip()
-                                    # Remove extra spaces
                                     friendly = " ".join(friendly.split())
                             except Exception as e:
                                 logger.error(f"Failed to fetch app title for YouTube query: {e}")
@@ -801,94 +800,36 @@ class PipelineOrchestrator:
                             friendly = play_store_package
                         
                         if friendly:
-                            self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{friendly}'...")
-                            yt_signals = collect_youtube_data(friendly, max_comments=30)
+                            self._log_progress(f"🎥 Collecting YouTube comments for custom app: '{friendly}' (with keyword filtering)...")
+                            yt_signals = collect_youtube_data(friendly, max_comments=30, keywords=keywords)
                             if yt_signals:
                                 normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
                                 batch_signals.extend(normalized)
-                                self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected for {friendly}")
+                                self._log_progress(f"  ✅ {len(normalized)} keyword-matching YouTube comments collected for {friendly}")
 
                     elif apps:
                         for app_key in apps:
                             app_config = QUICK_COMMERCE_APPS.get(app_key)
                             friendly = app_config["name"] if app_config else app_key
-                            self._log_progress(f"🎥 Collecting YouTube comments for catalog app: '{friendly}'...")
-                            yt_signals = collect_youtube_data(friendly, max_comments=30)
+                            self._log_progress(f"🎥 Collecting YouTube comments for catalog app: '{friendly}' (with keyword filtering)...")
+                            yt_signals = collect_youtube_data(friendly, max_comments=30, keywords=keywords)
                             if yt_signals:
                                 normalized = normalize_youtube_data(yt_signals, default_app_name=friendly)
                                 batch_signals.extend(normalized)
-                                self._log_progress(f"  ✅ {len(normalized)} YouTube comments collected for {friendly}")
+                                self._log_progress(f"  ✅ {len(normalized)} keyword-matching YouTube comments collected for {friendly}")
                 except Exception as e:
                     self._log_progress(f"  ❌ YouTube error: {str(e)[:100]}")
             
             if keywords:
-                import re as _re
-                
-                # ── Smart keyword extraction ──
-                # The user may paste structured input with numbering, quoted phrases, 
-                # and category headers. We need to extract individual search terms.
-                raw_kw_input = keywords if isinstance(keywords, str) else ", ".join(keywords)
-                
-                # Step 1: Extract quoted phrases first (e.g. "size guide", "fit issue")
-                quoted_phrases = _re.findall(r'"([^"]+)"', raw_kw_input)
-                
-                # Step 2: Remove quoted phrases, numbering, and category headers from the remaining text
-                remaining = _re.sub(r'"[^"]*"', ' ', raw_kw_input)           # remove quoted blocks
-                remaining = _re.sub(r'\d+\.\s*', ' ', remaining)              # remove "1. ", "2. " etc.
-                remaining = _re.sub(r'[&|/\\()\[\]{}]', ' ', remaining)       # remove special chars
-                
-                # Step 3: Split remaining text by commas, newlines, and common delimiters
-                raw_tokens = _re.split(r'[,\n;]+', remaining)
-                
-                # Step 4: Clean and collect all terms (min 2 chars to avoid noise)
-                all_terms = []
-                for phrase in quoted_phrases:
-                    clean = phrase.strip().lower()
-                    if len(clean) >= 2:
-                        all_terms.append(clean)
-                
-                for token in raw_tokens:
-                    clean = token.strip().lower()
-                    # Skip generic category labels and very short tokens
-                    if len(clean) >= 3 and clean not in {
-                        'fit', 'sizing', 'quality', 'uncertainty', 'friction',
-                        'management', 'hesitation', 'intent', 'decay', 'logistics',
-                        'non-monetary', 'roadblocks', 'post-wishlist', 'ui', 'ux'
-                    }:
-                        # Split multi-word tokens into sub-phrases if they are long category titles
-                        if len(clean.split()) > 4:
-                            # These are likely category headers, extract individual meaningful words
-                            words = [w for w in clean.split() if len(w) >= 4]
-                            all_terms.extend(words)
-                        else:
-                            all_terms.append(clean)
-                
-                # Deduplicate while preserving order
-                seen = set()
-                keyword_list = []
-                for t in all_terms:
-                    if t not in seen:
-                        seen.add(t)
-                        keyword_list.append(t)
-                
-                if keyword_list:
-                    # Determine match threshold: require ANY 1 term match for broad relevance
-                    # This is intentionally relaxed — the downstream semantic pre-filter and
-                    # quality filter will apply stricter relevance scoring.
-                    min_matches = 1
-                    
-                    self._log_progress(f"🔍 Filtering {len(batch_signals)} collected signals using {len(keyword_list)} extracted terms (match≥{min_matches})...")
-                    self._log_progress(f"   📋 Sample terms: {keyword_list[:15]}{'...' if len(keyword_list) > 15 else ''}")
-                    filtered_batch = []
-                    for sig in batch_signals:
-                        content_lower = sig.content.lower()
-                        title_lower = (sig.title or "").lower()
-                        combined = content_lower + " " + title_lower
-                        match_count = sum(1 for kw in keyword_list if kw in combined)
-                        if match_count >= min_matches:
-                            filtered_batch.append(sig)
+                from core.keyword_matcher import extract_keyword_terms, matches_keywords
+                kw_terms = extract_keyword_terms(keywords)
+                if kw_terms:
+                    filtered_batch = [
+                        sig for sig in batch_signals 
+                        if matches_keywords(sig.content + " " + (sig.title or ""), kw_terms)
+                    ]
                     batch_signals = filtered_batch
-                    self._log_progress(f"✅ Filtered down to {len(batch_signals)} signals matching keywords.")
+                    self._log_progress(f"🔍 Scrapers delivered {len(batch_signals)} signals matching keywords.")
 
             all_signals.extend(batch_signals)
             

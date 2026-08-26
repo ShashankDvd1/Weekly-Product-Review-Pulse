@@ -1,12 +1,21 @@
+from typing import Optional, Union, List
 import requests
 import pandas as pd
 from datetime import datetime
 import feedparser
+from core.keyword_matcher import extract_keyword_terms, matches_keywords
 
-def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: str = 'in', max_pages: int = 10) -> pd.DataFrame:
+def fetch_app_store_reviews(
+    app_id: str, 
+    from_date: str, 
+    to_date: str, 
+    country: str = 'in', 
+    max_pages: int = 10,
+    keywords: Optional[Union[str, List[str]]] = None
+) -> pd.DataFrame:
     """
     Fetches reviews from the Apple App Store using the iTunes XML RSS feed.
-    max_pages: iTunes RSS only allows up to 10 pages (500 reviews total).
+    If keywords are provided, filters reviews during scraping.
     """
     try:
         from_dt = datetime.strptime(from_date, "%Y-%m-%d")
@@ -14,6 +23,7 @@ def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: 
     except ValueError:
         raise ValueError("Dates must be in YYYY-MM-DD format")
 
+    kw_terms = extract_keyword_terms(keywords)
     all_reviews = []
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -64,6 +74,10 @@ def fetch_app_store_reviews(app_id: str, from_date: str, to_date: str, country: 
                 except ValueError:
                     continue
                 
+                # Check keyword filter directly
+                if kw_terms and not matches_keywords(review_text, kw_terms):
+                    continue
+
                 all_reviews.append({
                     'userName': author,
                     'content': review_text,

@@ -211,6 +211,9 @@ def _extract_comments(
             _extract_comments(replies, comments, parent_post_id, max_comments, depth + 1)
 
 
+from typing import Optional, Union, List
+from core.keyword_matcher import extract_keyword_terms, matches_keywords
+
 def collect_reddit_data(
     subreddits: Optional[list[str]] = None,
     search_terms: Optional[list[str]] = None,
@@ -218,27 +221,21 @@ def collect_reddit_data(
     include_comments: bool = True,
     min_score: int = REDDIT_MIN_SCORE,
     min_word_count: int = REDDIT_MIN_WORD_COUNT,
+    keywords: Optional[Union[str, List[str]]] = None,
 ) -> list[dict]:
     """
-    Collect Reddit posts and comments about quick commerce.
-
-    This is the main entry point for Reddit data collection.
-
-    Args:
-        subreddits: List of subreddit names to search
-        search_terms: Search queries to use
-        time_filter: Reddit time filter (day, week, month, year, all)
-        include_comments: Whether to also fetch top comments from each post
-        min_score: Minimum upvote score threshold
-        min_word_count: Minimum word count for useful signals
-
-    Returns:
-        List of post/comment dicts (already filtered)
+    Collect Reddit posts and comments matching search terms or user keywords.
     """
+    kw_terms = extract_keyword_terms(keywords)
+    
     if subreddits is None:
         subreddits = REDDIT_DEFAULT_SUBREDDITS
+        
     if search_terms is None:
-        search_terms = REDDIT_SEARCH_TERMS_QUICK_COMMERCE
+        if kw_terms:
+            search_terms = kw_terms[:5]  # Use top keywords directly as Reddit search terms
+        else:
+            search_terms = REDDIT_SEARCH_TERMS_QUICK_COMMERCE
 
     all_signals = []
     seen_ids = set()
@@ -254,6 +251,10 @@ def collect_reddit_data(
                     continue
                 seen_ids.add(pid)
 
+                # Apply keyword filter
+                if kw_terms and not matches_keywords(post["content"], kw_terms):
+                    continue
+
                 # Apply filters
                 word_count = len(post["content"].split())
                 if post["score"] >= min_score and word_count >= min_word_count:
@@ -268,6 +269,9 @@ def collect_reddit_data(
                         if cid in seen_ids:
                             continue
                         seen_ids.add(cid)
+
+                        if kw_terms and not matches_keywords(comment["content"], kw_terms):
+                            continue
 
                         c_word_count = len(comment["content"].split())
                         if comment["score"] >= min_score and c_word_count >= min_word_count:
