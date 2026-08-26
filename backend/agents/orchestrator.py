@@ -134,6 +134,10 @@ class PipelineOrchestrator:
         except Exception as pce:
             logger.error(f"Failed to load pipeline cache: {pce}")
 
+        # Ensure barriers and personas are mapped from strategy deep dive if available and empty
+        if self.strategy_deep_dive and (not self.barriers or not self.personas):
+            self._map_phase_1_outputs_to_dashboard()
+
     def _map_phase_1_outputs_to_dashboard(self):
         """Maps Phase 1 agent outputs to dashboard variables."""
         if not self.strategy_deep_dive:

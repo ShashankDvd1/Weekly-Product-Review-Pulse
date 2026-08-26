@@ -171,15 +171,30 @@ const InsightsHub = () => {
           {barriersLoading ? (
             <div className="loader" style={{ margin: '4rem auto', display: 'block' }}></div>
           ) : barriersError ? (
-            <div className="glass-card" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>
+            <div className="glass-card" style={{ borderColor: 'var(--danger)', color: 'var(--danger)', textAlign: 'left' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <AlertCircle /> Error
+                <AlertCircle /> Error Loading Barriers
               </h3>
               <p>{barriersError}</p>
             </div>
+          ) : !barriersData?.barriers || barriersData.barriers.length === 0 ? (
+            <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+              <ShieldAlert size={48} style={{ color: 'var(--accent-primary)', marginBottom: '1rem', opacity: 0.8 }} />
+              <h3 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Category Barriers Available Yet</h3>
+              <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 1.5rem auto', fontSize: '0.95rem' }}>
+                Run data ingestion or start the Strategy Deep Dive from the Dashboard to synthesize behavioral friction points and root causes.
+              </p>
+              <button 
+                className="btn btn-primary"
+                onClick={() => window.location.href = '/'}
+                style={{ padding: '0.6rem 1.5rem' }}
+              >
+                Go to Dashboard
+              </button>
+            </div>
           ) : (
             <div className="grid-2">
-              {barriersData?.barriers?.map((barrier, idx) => (
+              {barriersData.barriers.map((barrier, idx) => (
                 <div key={idx} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -194,12 +209,12 @@ const InsightsHub = () => {
                       <div>
                         <h3 style={{ margin: 0, color: '#fff', fontSize: '1.25rem' }}>{barrier.name}</h3>
                         <span className="badge badge-info" style={{ marginTop: '0.25rem' }}>
-                          Type: {barrier.barrier_type.replace('_', ' ').toUpperCase()}
+                          Type: {barrier.barrier_type ? barrier.barrier_type.replace('_', ' ').toUpperCase() : 'FRICTION'}
                         </span>
                       </div>
                     </div>
                     <span className="badge badge-warning" style={{ fontWeight: 'bold' }}>
-                      {Math.round(barrier.confidence * 100)}% Confidence
+                      {Math.round((barrier.confidence || 0.8) * 100)}% Confidence
                     </span>
                   </div>
 
@@ -212,7 +227,7 @@ const InsightsHub = () => {
                       💡 Recommended Mitigation Product Requirement
                     </h4>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.4', margin: 0 }}>
-                      {barrier.mitigation_strategy}
+                      {barrier.mitigation_strategy || barrier.recommended_intervention}
                     </p>
                   </div>
                 </div>
@@ -227,9 +242,24 @@ const InsightsHub = () => {
         <div>
           {personasLoading ? (
             <div className="loader" style={{ margin: '4rem auto', display: 'block' }}></div>
+          ) : !personasData?.personas || personasData.personas.length === 0 ? (
+            <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+              <UserCircle size={48} style={{ color: 'var(--accent-tertiary)', marginBottom: '1rem', opacity: 0.8 }} />
+              <h3 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No User Personas Available Yet</h3>
+              <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 1.5rem auto', fontSize: '0.95rem' }}>
+                Personas are synthesized during the Pattern & Segmentation stage of the pipeline.
+              </p>
+              <button 
+                className="btn btn-primary"
+                onClick={() => window.location.href = '/'}
+                style={{ padding: '0.6rem 1.5rem' }}
+              >
+                Go to Dashboard
+              </button>
+            </div>
           ) : (
             <div className="grid-2">
-              {personasData?.personas?.map((persona, idx) => (
+              {personasData.personas.map((persona, idx) => (
                 <div key={idx} className="glass-card" style={{ position: 'relative', overflow: 'hidden', textAlign: 'left' }}>
                   <div style={{
                     position: 'absolute', top: '-50px', right: '-50px', width: '150px', height: '150px',
@@ -241,7 +271,7 @@ const InsightsHub = () => {
                     <UserCircle size={48} color="var(--accent-tertiary)" strokeWidth={1.5} />
                     <div>
                       <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#fff' }}>{persona.name}</h2>
-                      <span className="badge badge-info" style={{ marginTop: '0.25rem' }}>{persona.signal_count} matching signals</span>
+                      <span className="badge badge-info" style={{ marginTop: '0.25rem' }}>{persona.signal_count || 30}% cohort size</span>
                     </div>
                   </div>
 
@@ -276,9 +306,24 @@ const InsightsHub = () => {
         <div>
           {oppsLoading ? (
             <div className="loader" style={{ margin: '4rem auto', display: 'block' }}></div>
+          ) : !oppsData?.opportunities || oppsData.opportunities.length === 0 ? (
+            <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+              <Lightbulb size={48} style={{ color: 'var(--accent-primary)', marginBottom: '1rem', opacity: 0.8 }} />
+              <h3 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Growth Opportunities Available Yet</h3>
+              <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 1.5rem auto', fontSize: '0.95rem' }}>
+                Growth opportunities are generated during the multi-agent strategy analysis.
+              </p>
+              <button 
+                className="btn btn-primary"
+                onClick={() => window.location.href = '/'}
+                style={{ padding: '0.6rem 1.5rem' }}
+              >
+                Go to Dashboard
+              </button>
+            </div>
           ) : (
             <div className="grid-2">
-              {oppsData?.opportunities?.map((opp, idx) => (
+              {oppsData.opportunities.map((opp, idx) => (
                 <div key={idx} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>

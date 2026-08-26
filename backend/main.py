@@ -169,6 +169,8 @@ def analyze_all():
 def get_themes():
     """Get detected themes."""
     orchestrator = get_orchestrator()
+    if not orchestrator.themes and orchestrator.strategy_deep_dive:
+        orchestrator._map_phase_1_outputs_to_dashboard()
     return {
         "themes": [t.model_dump() for t in orchestrator.themes],
         "count": len(orchestrator.themes),
@@ -179,6 +181,8 @@ def get_themes():
 def get_barriers():
     """Get detected category exploration barriers."""
     orchestrator = get_orchestrator()
+    if not orchestrator.barriers and orchestrator.strategy_deep_dive:
+        orchestrator._map_phase_1_outputs_to_dashboard()
     return {
         "barriers": [b.model_dump() for b in orchestrator.barriers],
         "count": len(orchestrator.barriers),
@@ -189,6 +193,8 @@ def get_barriers():
 def get_personas():
     """Get generated personas."""
     orchestrator = get_orchestrator()
+    if not orchestrator.personas and orchestrator.strategy_deep_dive:
+        orchestrator._map_phase_1_outputs_to_dashboard()
     return {
         "personas": [p.model_dump() for p in orchestrator.personas],
         "count": len(orchestrator.personas),
@@ -199,6 +205,8 @@ def get_personas():
 def get_jtbd():
     """Get Jobs-To-Be-Done analysis."""
     orchestrator = get_orchestrator()
+    if not orchestrator.jobs and orchestrator.strategy_deep_dive:
+        orchestrator._map_phase_1_outputs_to_dashboard()
     return {
         "jobs": [j.model_dump() for j in orchestrator.jobs],
         "count": len(orchestrator.jobs),
@@ -209,6 +217,8 @@ def get_jtbd():
 def get_opportunities():
     """Get growth opportunities."""
     orchestrator = get_orchestrator()
+    if not orchestrator.opportunities and orchestrator.strategy_deep_dive:
+        orchestrator._map_phase_1_outputs_to_dashboard()
     return {
         "opportunities": [o.model_dump() for o in orchestrator.opportunities],
         "count": len(orchestrator.opportunities),

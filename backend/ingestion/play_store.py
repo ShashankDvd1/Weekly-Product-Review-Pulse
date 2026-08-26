@@ -15,8 +15,8 @@ def fetch_play_store_reviews(
 ) -> pd.DataFrame:
     """
     Fetches reviews from the Google Play Store for a given package name.
-    If keywords are provided, filters reviews during scraping and continues
-    fetching until enough keyword-matching reviews are collected.
+    Uses continuation token pagination to rapidly scan through thousands of reviews
+    and collect reviews that match the target date range and user keywords.
     """
     try:
         from_dt = datetime.strptime(from_date, "%Y-%m-%d")
@@ -25,55 +25,53 @@ def fetch_play_store_reviews(
         raise ValueError("Dates must be in YYYY-MM-DD format")
 
     kw_terms = extract_keyword_terms(keywords)
-    target_matching_count = 150 if kw_terms else max_reviews
-
-    current_count = max_reviews
-    all_results = []
+    target_count = 150 if kw_terms else max_reviews
     
-    while True:
-        results, _ = reviews(
-            package_name,
-            lang=lang,
-            country=country,
-            sort=Sort.NEWEST,
-            count=current_count
-        )
+    all_matching_reviews = []
+    token = None
+    max_pages = 30  # Scans up to 6,000 reviews
+    
+    for _ in range(max_pages):
+        try:
+            results, token = reviews(
+                package_name,
+                lang=lang,
+                country=country,
+                sort=Sort.NEWEST,
+                count=200,
+                continuation_token=token
+            )
+        except Exception:
+            break
+            
         if not results:
             break
             
-        all_results = results
-        
-        # Check how many matching reviews we have in the current date range
-        matching_count = 0
         for r in results:
-            if r['at'] >= from_dt and r['at'] <= to_dt:
+            review_at = r.get('at')
+            if not review_at:
+                continue
+                
+            # Check date range
+            if from_dt <= review_at <= to_dt:
                 if not kw_terms or matches_keywords(r.get('content', ''), kw_terms):
-                    matching_count += 1
-                    
-        # Stop if we found enough matching reviews, or if we passed from_dt,
-        # or if we hit the maximum catalog / safety limit
-        if matching_count >= target_matching_count or results[-1]['at'] < from_dt or len(results) < current_count or current_count >= 3000:
+                    all_matching_reviews.append({
+                        'userName': r.get('userName', 'Anonymous'),
+                        'content': r.get('content', ''),
+                        'score': r.get('score', 3),
+                        'at': review_at
+                    })
+                    if len(all_matching_reviews) >= target_count:
+                        break
+                        
+        if len(all_matching_reviews) >= target_count or not token:
             break
             
-        current_count += 500
+        # If the oldest review in this batch is already older than from_dt, stop
+        if results and results[-1].get('at') and results[-1]['at'] < from_dt and len(all_matching_reviews) >= 30:
+            break
 
-    if not all_results:
+    if not all_matching_reviews:
         return pd.DataFrame()
 
-    df = pd.DataFrame(all_results)
-    
-    # Filter by date range
-    df['at'] = pd.to_datetime(df['at'])
-    mask = (df['at'] >= from_dt) & (df['at'] <= to_dt)
-    filtered_df = df.loc[mask]
-    
-    # Fallback to recent data if filtered_df is empty due to date boundary
-    if filtered_df.empty and len(all_results) >= max_reviews and all_results[-1]['at'] > to_dt:
-        filtered_df = df
-
-    # Filter by keywords directly in scraper
-    if kw_terms and not filtered_df.empty:
-        kw_mask = filtered_df['content'].apply(lambda x: matches_keywords(str(x), kw_terms))
-        filtered_df = filtered_df.loc[kw_mask]
-
-    return filtered_df[['userName', 'content', 'score', 'at']]
+    return pd.DataFrame(all_matching_reviews)[['userName', 'content', 'score', 'at']]

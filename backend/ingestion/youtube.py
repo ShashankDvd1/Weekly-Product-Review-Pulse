@@ -60,8 +60,8 @@ def collect_youtube_data(
                 if not text:
                     continue
                 
-                # Check keyword filter directly
-                if kw_terms and not matches_keywords(text, kw_terms):
+                # The video is already targeted by keyword query. Keep all meaningful comments.
+                if len(text.split()) < 3:
                     continue
 
                 # Parse timestamp if exists, otherwise default to now
