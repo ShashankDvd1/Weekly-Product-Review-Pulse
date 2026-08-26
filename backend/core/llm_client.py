@@ -179,32 +179,56 @@ class LLMClient:
         raise RuntimeError("LLM call failed after all retries")
 
     def _parse_json(self, raw: str) -> dict:
-        """Helper to robustly parse JSON from LLM outputs into a dict."""
+        """Helper to robustly parse JSON from LLM outputs into a dict, handling reasoning text and code blocks."""
         if not raw or not isinstance(raw, str):
             return {}
         cleaned = raw.strip()
         
-        # Strip thinking blocks from reasoning models (e.g. <think>...</think>)
         import re
+        # Strip thinking blocks from reasoning models (e.g. <think>...</think>)
         cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
         if "<think>" in cleaned:
             cleaned = cleaned.split("<think>")[0].strip()
-        
-        if cleaned.startswith("```"):
-            lines = cleaned.splitlines()
-            if lines and lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].startswith("```"):
-                lines = lines[:-1]
-            cleaned = "\n".join(lines).strip()
 
+        # 1. Try markdown code block extraction anywhere in the output
+        json_blocks = re.findall(r"```(?:json)?\s*([\s\S]*?)\s*```", cleaned)
+        for block in json_blocks:
+            try:
+                parsed = json.loads(block.strip())
+                if isinstance(parsed, dict):
+                    return parsed
+                elif isinstance(parsed, list):
+                    return {"items": parsed}
+            except Exception:
+                pass
+
+        # 2. Try outermost JSON object brackets { ... }
+        first_brace = cleaned.find("{")
+        last_brace = cleaned.rfind("}")
+        if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+            candidate = cleaned[first_brace:last_brace + 1]
+            try:
+                parsed = json.loads(candidate)
+                if isinstance(parsed, dict):
+                    return parsed
+            except Exception:
+                pass
+
+        # 3. Try outermost JSON array brackets [ ... ]
+        first_bracket = cleaned.find("[")
+        last_bracket = cleaned.rfind("]")
+        if first_bracket != -1 and last_bracket != -1 and last_bracket > first_bracket:
+            candidate = cleaned[first_bracket:last_bracket + 1]
+            try:
+                parsed = json.loads(candidate)
+                if isinstance(parsed, list):
+                    return {"items": parsed}
+            except Exception:
+                pass
+
+        # 4. Direct parse attempt
         try:
             parsed = json.loads(cleaned)
-            if isinstance(parsed, str):
-                try:
-                    parsed = json.loads(parsed)
-                except Exception:
-                    pass
             if isinstance(parsed, dict):
                 return parsed
             elif isinstance(parsed, list):

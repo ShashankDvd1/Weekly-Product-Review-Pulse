@@ -10,12 +10,12 @@ class ResearchDiscoveryAgent(BaseAgent):
         """
         Extract patterns, anomalies, and customer quotes from the dataset without proposing solutions.
         """
-        # Select up to 60 high-relevance signals with concise content
+        # Select up to 35 high-relevance signals with concise snippets to stay within LLM token limits
         sample_signals = []
-        for s in signals[:60]:
+        for s in signals[:35]:
             clean_content = (s.content or "").strip()
-            if len(clean_content) > 200:
-                clean_content = clean_content[:200] + "..."
+            if len(clean_content) > 150:
+                clean_content = clean_content[:150] + "..."
             sample_signals.append({
                 "source": s.source.value,
                 "app": s.app_name,

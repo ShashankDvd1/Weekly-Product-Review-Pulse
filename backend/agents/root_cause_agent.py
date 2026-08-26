@@ -47,12 +47,24 @@ Return strictly a JSON object with this schema:
   ]
 }
 """
-        user_prompt = f"""
-Discovery Data:
-{json.dumps(discovery_data, indent=2)}
+        # Keep inputs compact to stay within payload limits
+        disc_summary = {
+            "patterns": discovery_data.get("observed_patterns", [])[:6],
+            "hypotheses": discovery_data.get("hypotheses", [])[:4],
+            "quotes": discovery_data.get("representative_quotes", [])[:4],
+            "jtbd": discovery_data.get("jobs_to_be_done", [])[:3]
+        }
+        seg_summary = {
+            "user_segments": segmentation_data.get("user_segments", [])[:4],
+            "themes": segmentation_data.get("prioritized_themes", [])[:4]
+        }
 
-Segmentation Data:
-{json.dumps(segmentation_data, indent=2)}
+        user_prompt = f"""
+Discovery Summary:
+{json.dumps(disc_summary, indent=2)}
+
+Segmentation Summary:
+{json.dumps(seg_summary, indent=2)}
 """
         if problem_statement:
             user_prompt += f"\nTarget Strategic Problem: {problem_statement}\n"
