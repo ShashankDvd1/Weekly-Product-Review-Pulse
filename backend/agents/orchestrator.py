@@ -1077,6 +1077,11 @@ class PipelineOrchestrator:
         from output.evidence_builder import (
             compute_source_distribution, compute_sentiment_summary,
         )
+
+        # Auto-ensure Phase 1 mapping if strategy deep dive data exists but in-memory lists are empty
+        if self.strategy_deep_dive and (not self.personas or not self.barriers or not self.themes):
+            self._map_phase_1_outputs_to_dashboard()
+
         dates = []
         for s in self.signals:
             if s.date:
@@ -1092,7 +1097,15 @@ class PipelineOrchestrator:
         min_date = min(dates).strftime("%Y-%m-%d") if dates else None
         max_date = max(dates).strftime("%Y-%m-%d") if dates else None
 
-        client = get_llm_client()
+        cum_tokens = 0
+        api_limits = {}
+        try:
+            client = get_llm_client()
+            cum_tokens = getattr(client, "cumulative_tokens_used", 0)
+            api_limits = getattr(client, "last_api_limits", {})
+        except Exception:
+            pass
+
         return {
             "total_signals": len(self.signals),
             "signals_by_source": compute_source_distribution(self.signals),
@@ -1102,18 +1115,18 @@ class PipelineOrchestrator:
             },
             "sentiment_summary": compute_sentiment_summary(self.signals),
             "top_themes": [
-                {"title": t.title, "sentiment": t.sentiment.value, "confidence": t.confidence, "mentions": t.mention_count}
+                {"title": t.title, "sentiment": getattr(t.sentiment, 'value', str(t.sentiment)), "confidence": t.confidence, "mentions": t.mention_count}
                 for t in self.themes[:5]
             ],
             "top_barriers": [
-                {"category": b.category, "type": b.barrier_type.value, "confidence": b.confidence}
+                {"category": b.category, "type": getattr(b.barrier_type, 'value', str(b.barrier_type)), "confidence": b.confidence}
                 for b in self.barriers[:5]
             ],
             "personas_count": len(self.personas),
             "opportunities_count": len(self.opportunities),
             "token_usage": {
-                "cumulative_tokens_used": getattr(client, "cumulative_tokens_used", 0),
-                "last_api_limits": getattr(client, "last_api_limits", {})
+                "cumulative_tokens_used": cum_tokens,
+                "last_api_limits": api_limits
             },
             "date_range": {"from_date": min_date, "to_date": max_date},
             "status": self._status,

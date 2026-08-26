@@ -873,22 +873,30 @@ const Dashboard = () => {
         }
       }
 
-      // 2. Fetch dashboard telemetry
-      const response = await fetch(`${getBackendUrl()}/api/v2/dashboard/overview`);
-      if (response.ok) {
-        const result = await response.json();
-        setDashboardData(result);
-      }
-
-      // 3. Fetch strategy deep dive data
+      // 2. Fetch strategy deep dive data
       const stratRes = await fetch(`${getBackendUrl()}/api/v2/reports/strategy-deep-dive`);
+      let stratData = null;
       if (stratRes.ok) {
-        const stratData = await stratRes.json();
+        stratData = await stratRes.json();
         setStrategyStatus(stratData.status);
         setStrategyLogs(stratData.logs || []);
         setCompletedSteps(stratData.completed_steps || 0);
         if (stratData.result) setStrategyData(stratData.result);
         if (stratData.board_presentation) setBoardPresentation(stratData.board_presentation);
+      }
+
+      // 3. Fetch dashboard telemetry
+      const response = await fetch(`${getBackendUrl()}/api/v2/dashboard/overview`);
+      if (response.ok) {
+        const result = await response.json();
+        // Sync personas and opportunities count from strategy deep dive if available
+        if (stratData?.result?.segmentation?.user_segments?.length && (!result.personas_count || result.personas_count === 0)) {
+          result.personas_count = stratData.result.segmentation.user_segments.length;
+        }
+        if (stratData?.result?.segmentation?.growth_opportunities?.length && (!result.opportunities_count || result.opportunities_count === 0)) {
+          result.opportunities_count = stratData.result.segmentation.growth_opportunities.length;
+        }
+        setDashboardData(result);
       }
     } catch (err) {
       setError(err.message);
