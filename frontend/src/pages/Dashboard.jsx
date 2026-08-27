@@ -896,6 +896,18 @@ const Dashboard = () => {
         if (stratData?.result?.segmentation?.growth_opportunities?.length && (!result.opportunities_count || result.opportunities_count === 0)) {
           result.opportunities_count = stratData.result.segmentation.growth_opportunities.length;
         }
+
+        // Auto-restore input parameters from last run session
+        if (result.input_params) {
+          if (result.input_params.problem_statement) setProblemStatement(result.input_params.problem_statement);
+          if (result.input_params.keywords) setKeywords(result.input_params.keywords);
+          if (result.input_params.app_name) setAppName(result.input_params.app_name);
+          if (result.input_params.custom_package_name) setCustomPackageName(result.input_params.custom_package_name);
+          if (result.input_params.custom_app_store_id) setCustomAppStoreId(result.input_params.custom_app_store_id);
+          if (result.input_params.from_date) setFromDate(result.input_params.from_date);
+          if (result.input_params.to_date) setToDate(result.input_params.to_date);
+        }
+
         setDashboardData(result);
       }
     } catch (err) {
@@ -904,6 +916,24 @@ const Dashboard = () => {
       setLoading(false);
     }
   }
+
+  const handleClearCache = async () => {
+    if (!window.confirm("Are you sure you want to clear the previous session data and start completely fresh?")) return;
+    try {
+      await fetch(`${getBackendUrl()}/api/v2/cache/clear`, { method: 'POST' });
+      setDashboardData(null);
+      setStrategyData(null);
+      setBoardPresentation(null);
+      setPipelineLogs([]);
+      setPipelineStatus('idle');
+      setStrategyLogs([]);
+      setStrategyStatus('idle');
+      setCompletedSteps(0);
+      alert("Session cache cleared! You can now start a brand new research session.");
+    } catch (err) {
+      console.error("Failed to clear cache:", err);
+    }
+  };
 
   async function fetchCaseStudyData() {
     try {
@@ -1292,9 +1322,34 @@ const Dashboard = () => {
           
           {/* Controls Panel */}
           <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem', textAlign: 'left' }}>
-            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontSize: '1.1rem' }}>
-              <Layers size={18} color="var(--accent-primary)" /> Pipeline Configuration Controls
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontSize: '1.1rem' }}>
+                <Layers size={18} color="var(--accent-primary)" /> Pipeline Configuration Controls
+              </h3>
+              {dashboardData?.has_cached_session && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.75rem', background: 'rgba(59, 130, 246, 0.15)', color: '#93c5fd', padding: '0.25rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(59, 130, 246, 0.3)', fontWeight: '600' }}>
+                    ⚡ Session Restored ({dashboardData.last_updated ? new Date(dashboardData.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Active Cache'})
+                  </span>
+                  <button
+                    onClick={handleClearCache}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: '#fca5a5',
+                      padding: '0.25rem 0.6rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: '600'
+                    }}
+                    title="Clear cached session to start with empty inputs"
+                  >
+                    Clear Session
+                  </button>
+                </div>
+              )}
+            </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
               

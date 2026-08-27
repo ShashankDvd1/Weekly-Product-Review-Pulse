@@ -66,6 +66,8 @@ class PipelineOrchestrator:
         self.strategy_total_steps = 9
         self._status = "idle"
         self._progress = []
+        self.input_params = {}
+        self.last_updated = None
 
         # Load cached strategy deep dive if available
         try:
@@ -79,6 +81,9 @@ class PipelineOrchestrator:
                     self.board_presentation = data.get("board_presentation")
                     self.mvp_workspace_prd = data.get("mvp_workspace_prd")
                     self.active_problem_statement = data.get("active_problem_statement")
+                    self.last_updated = data.get("last_updated")
+                    if data.get("input_params"):
+                        self.input_params.update(data.get("input_params"))
                     
                     # Check status
                     if self.strategy_deep_dive and self.board_presentation:
@@ -130,6 +135,10 @@ class PipelineOrchestrator:
                     
                     self._status = pc.get("status", "complete")
                     self._progress = pc.get("progress", [])
+                    if pc.get("last_updated"):
+                        self.last_updated = pc.get("last_updated")
+                    if pc.get("input_params"):
+                        self.input_params.update(pc.get("input_params"))
                     logger.info("Successfully loaded ingestion pipeline cache.")
         except Exception as pce:
             logger.error(f"Failed to load pipeline cache: {pce}")
@@ -416,7 +425,10 @@ class PipelineOrchestrator:
                 json.dump({
                     "strategy_deep_dive": self.strategy_deep_dive,
                     "board_presentation": self.board_presentation,
-                    "active_problem_statement": self.active_problem_statement
+                    "mvp_workspace_prd": self.mvp_workspace_prd,
+                    "active_problem_statement": self.active_problem_statement,
+                    "input_params": self.input_params,
+                    "last_updated": datetime.now().isoformat()
                 }, f, indent=2)
             logger.info("Saved Phase 1 strategy deep dive data to strategy_cache.json")
         except Exception as ce:
@@ -539,7 +551,9 @@ class PipelineOrchestrator:
                         "strategy_deep_dive": self.strategy_deep_dive,
                         "board_presentation": self.board_presentation,
                         "mvp_workspace_prd": self.mvp_workspace_prd,
-                        "active_problem_statement": self.active_problem_statement
+                        "active_problem_statement": self.active_problem_statement,
+                        "input_params": self.input_params,
+                        "last_updated": datetime.now().isoformat()
                     }, f, indent=2)
             except Exception as ce:
                 logger.error(f"Failed to save strategy cache: {ce}")
@@ -580,7 +594,9 @@ class PipelineOrchestrator:
                     "strategy_deep_dive": self.strategy_deep_dive,
                     "board_presentation": self.board_presentation,
                     "mvp_workspace_prd": self.mvp_workspace_prd,
-                    "active_problem_statement": self.active_problem_statement
+                    "active_problem_statement": self.active_problem_statement,
+                    "input_params": self.input_params,
+                    "last_updated": datetime.now().isoformat()
                 }, f, indent=2)
             logger.info("Successfully updated strategy_cache.json with re-synthesized outputs.")
         except Exception as ce:
@@ -970,9 +986,12 @@ class PipelineOrchestrator:
         
         # Save pipeline results to local file cache
         try:
+            self.last_updated = datetime.now().isoformat()
             cache_data = {
                 "status": self._status,
                 "progress": self._progress,
+                "last_updated": self.last_updated,
+                "input_params": self.input_params,
                 "signals": [s.model_dump(mode='json') for s in self.signals],
                 "themes": [t.model_dump(mode='json') for t in self.themes],
                 "barriers": [b.model_dump(mode='json') for b in self.barriers],
@@ -1000,6 +1019,22 @@ class PipelineOrchestrator:
         """
         if request is None:
             request = FullPipelineRequest()
+
+        # Record inputs for session persistence
+        self.input_params = {
+            "app_name": request.apps[0] if request.apps else "Myntra",
+            "apps": request.apps,
+            "problem_statement": request.problem_statement,
+            "keywords": request.keywords,
+            "custom_package_name": request.play_store_package,
+            "custom_app_store_id": request.app_store_id,
+            "from_date": request.from_date,
+            "to_date": request.to_date,
+            "include_reddit": request.include_reddit,
+            "include_youtube": request.include_youtube,
+            "reddit_subreddits": request.reddit_subreddits,
+            "reddit_search_terms": request.reddit_search_terms
+        }
 
         # Reset LLM client fallback state for a fresh execution
         try:
@@ -1070,6 +1105,9 @@ class PipelineOrchestrator:
             "interview_script": self.interview_script.model_dump() if self.interview_script else None,
             "executive_summary": self.executive_summary.model_dump() if self.executive_summary else None,
             "collection_results": [c.model_dump() for c in self.collection_results],
+            "input_params": self.input_params,
+            "has_cached_session": bool(self.signals or self.personas or self.strategy_deep_dive),
+            "last_updated": self.last_updated or datetime.now().isoformat(),
         }
 
     def get_dashboard_overview(self) -> dict:
@@ -1130,8 +1168,43 @@ class PipelineOrchestrator:
             },
             "date_range": {"from_date": min_date, "to_date": max_date},
             "status": self._status,
-            "last_updated": datetime.now().isoformat(),
+            "has_cached_session": bool(self.signals or self.personas or self.strategy_deep_dive),
+            "last_updated": self.last_updated or datetime.now().isoformat(),
+            "input_params": self.input_params,
         }
+
+    def clear_cache(self):
+        """Clears all in-memory state and deletes cache files to start completely fresh."""
+        import os
+        for fname in ["pipeline_cache.json", "strategy_cache.json"]:
+            path = os.path.join("data", fname)
+            if os.path.exists(path):
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
+        self.signals = []
+        self.themes = []
+        self.barriers = []
+        self.personas = []
+        self.jobs = []
+        self.opportunities = []
+        self.hypotheses = []
+        self.interview_script = None
+        self.executive_summary = None
+        self.collection_results = []
+        self.strategy_deep_dive = None
+        self.board_presentation = None
+        self.mvp_workspace_prd = None
+        self.active_problem_statement = None
+        self.strategy_status = "idle"
+        self.strategy_logs = []
+        self.strategy_completed_steps = 0
+        self._status = "idle"
+        self._progress = []
+        self.input_params = {}
+        self.last_updated = None
+        logger.info("Cleared all pipeline and strategy caches.")
 
 
 # Module-level singleton

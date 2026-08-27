@@ -123,7 +123,26 @@ def get_pipeline_status():
     return {
         "status": orchestrator.status,
         "progress": orchestrator.progress,
+        "has_cached_session": bool(orchestrator.signals or orchestrator.personas or orchestrator.strategy_deep_dive),
+        "last_updated": getattr(orchestrator, "last_updated", None),
+        "input_params": getattr(orchestrator, "input_params", {}),
     }
+
+
+@app.post("/api/v2/cache/clear")
+@app.delete("/api/v2/cache/clear")
+def clear_all_caches():
+    """Clear all session cache data to start fresh."""
+    try:
+        orchestrator = get_orchestrator()
+        orchestrator.clear_cache()
+        return {
+            "status": "success",
+            "message": "All session and pipeline caches cleared successfully."
+        }
+    except Exception as e:
+        logger.exception("Failed to clear cache")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Collection Endpoints ─────────────────────
