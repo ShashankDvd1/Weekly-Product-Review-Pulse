@@ -12,7 +12,7 @@ const MyPicksMVP = () => {
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const prototypeUrl = isLocal 
     ? 'http://localhost:5175' 
-    : 'https://weekly-product-review-pulse-my-picks-mvp.vercel.app';
+    : window.location.origin + '/mypicks-mvp/index.html';
 
   return (
     <div className="mypicks-mvp-container">
