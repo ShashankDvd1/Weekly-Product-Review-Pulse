@@ -9,6 +9,11 @@ const MyPicksMVP = () => {
     setIframeKey(prev => prev + 1);
   };
 
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const prototypeUrl = isLocal 
+    ? 'http://localhost:5175' 
+    : 'https://weekly-product-review-pulse-my-picks-mvp.vercel.app';
+
   return (
     <div className="mypicks-mvp-container">
       <div className="page-header">
@@ -81,7 +86,7 @@ const MyPicksMVP = () => {
 
             <div className="quick-actions">
               <a 
-                href="http://localhost:5175" 
+                href={prototypeUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -106,11 +111,11 @@ const MyPicksMVP = () => {
             <div className="phone-screen">
               <iframe
                 key={iframeKey}
-                src="http://localhost:5175"
+                src={prototypeUrl}
                 title="My Picks MVP Phone Preview"
                 className="phone-iframe"
                 sandbox="allow-scripts allow-same-origin allow-forms"
-                onError={() => console.error("Failed to load iframe. Is dev server running on port 5175?")}
+                onError={() => console.error("Failed to load iframe.")}
               />
             </div>
             
