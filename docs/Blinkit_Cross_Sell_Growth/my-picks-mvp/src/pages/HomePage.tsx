@@ -22,9 +22,18 @@ const BANNER_CATEGORIES = [
 ]
 
 export default function HomePage({ onProductClick, onViewMyPicks, onAddToBag }: Props) {
-  const { getContextualProduct, addToWishlist, analytics } = useAppStore()
+  const { wishlist, addToWishlist, analytics } = useAppStore()
   const [intentSheet, setIntentSheet] = useState<string | null>(null)
-  const contextual = getContextualProduct()
+
+  const wishlistItemsWithIntent = wishlist.filter(item => item.intent !== null)
+  const sortedWishlistItems = [...wishlistItemsWithIntent].sort((a, b) => {
+    const priority = ['BUY_SOON', 'WAITING_FOR_PRICE', 'COMPARING', 'JUST_SAVING']
+    const aIndex = priority.indexOf(a.intent || '')
+    const bIndex = priority.indexOf(b.intent || '')
+    const aVal = aIndex === -1 ? 99 : aIndex
+    const bVal = bIndex === -1 ? 99 : bIndex
+    return aVal - bVal
+  })
 
   const handleProductClick = (productId: string) => {
     onProductClick(productId)
@@ -90,15 +99,31 @@ export default function HomePage({ onProductClick, onViewMyPicks, onAddToBag }: 
         </div>
       </div>
 
-      {/* My Picks Contextual Re-entry */}
-      {contextual && (
+      {/* My Picks Contextual Re-entry Slider */}
+      {sortedWishlistItems.length > 0 && (
         <div className="mt-5">
-          <ContextualReentryCard
-            product={contextual.product}
-            intent={contextual.item.intent!}
-            onAddToBag={() => onAddToBag(contextual.product.id)}
-            onViewMyPicks={onViewMyPicks}
-          />
+          <div className="px-4 mb-2 flex items-center justify-between">
+            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">My Picks</span>
+            <button onClick={onViewMyPicks} className="text-xs text-pink-600 font-semibold hover:underline">
+              View all ({sortedWishlistItems.length})
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto px-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth">
+            {sortedWishlistItems.map(item => {
+              const product = PRODUCTS.find(p => p.id === item.productId)
+              if (!product) return null
+              return (
+                <div key={item.productId} className="w-[85vw] max-w-[340px] flex-shrink-0 snap-center transition-transform duration-200 active:scale-[0.99] animate-slide-in">
+                  <ContextualReentryCard
+                    product={product}
+                    intent={item.intent!}
+                    onAddToBag={() => onAddToBag(product.id)}
+                    onViewMyPicks={onViewMyPicks}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 
