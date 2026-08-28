@@ -4,8 +4,8 @@ import {
   Users, 
   Award,
   Table,
-  Brain,
-  BarChart3
+  BarChart3,
+  Smartphone
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -15,6 +15,7 @@ const Sidebar = () => {
     { path: '/insights', label: 'Consumer Insights', icon: <Users size={20} /> },
     { path: '/signals', label: 'Signals Database', icon: <Table size={20} /> },
     { path: '/review', label: 'Review Board', icon: <Award size={20} /> },
+    { path: '/mypicks', label: 'Myntra My Picks', icon: <Smartphone size={20} /> },
   ];
 
   return (
