@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function IntentBottomSheet({ productId, onClose, mode = 'save' }: Props) {
-  const { setIntent, clearIntent, logEvent } = useAppStore()
+  const { setIntent, logEvent, categories } = useAppStore()
   const [selected, setSelected] = useState<Intent | null>(null)
   const [closing, setClosing] = useState(false)
 
@@ -29,8 +29,6 @@ export default function IntentBottomSheet({ productId, onClose, mode = 'save' }:
     setSelected(intent)
     setTimeout(() => dismiss(intent), 350)
   }
-
-  const intents: Intent[] = ['BUY_SOON', 'WAITING_FOR_PRICE', 'COMPARING', 'JUST_SAVING']
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => dismiss()}>
@@ -57,14 +55,13 @@ export default function IntentBottomSheet({ productId, onClose, mode = 'save' }:
         <p className="text-sm text-gray-500 mb-4">Tell us once so we can make your Wishlist more useful.</p>
 
         {/* Intent Cards */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {intents.map(intent => {
-            const meta = INTENT_META[intent]
-            const isSelected = selected === intent
+        <div className="grid grid-cols-2 gap-2 mb-4 max-h-[220px] overflow-y-auto pr-1">
+          {categories.map(c => {
+            const isSelected = selected === c.id
             return (
               <button
-                key={intent}
-                onClick={() => handleSelect(intent)}
+                key={c.id}
+                onClick={() => handleSelect(c.id)}
                 className={`relative text-left rounded-xl border-2 p-3 transition-all duration-150 active:scale-95 ${
                   isSelected
                     ? 'border-pink-500 bg-pink-50 shadow-sm'
@@ -74,9 +71,9 @@ export default function IntentBottomSheet({ productId, onClose, mode = 'save' }:
                 {isSelected && (
                   <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs">✓</div>
                 )}
-                <span className="text-xl">{meta.emoji}</span>
-                <p className="font-semibold text-sm text-gray-900 mt-1">{meta.label}</p>
-                <p className="text-xs text-gray-500 leading-tight mt-0.5">{meta.description}</p>
+                <span className="text-xl">{c.emoji}</span>
+                <p className="font-semibold text-sm text-gray-900 mt-1">{c.label}</p>
+                <p className="text-xs text-gray-500 leading-tight mt-0.5">{c.description}</p>
               </button>
             )
           })}

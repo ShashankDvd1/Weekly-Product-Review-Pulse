@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function ProductDetailPage({ product, onBack, onAddToBag, fromContextual }: Props) {
-  const { isWishlisted, addToWishlist, removeFromWishlist, getWishlistItem, logEvent } = useAppStore()
+  const { isWishlisted, addToWishlist, removeFromWishlist, getWishlistItem, logEvent, categories } = useAppStore()
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [showIntentSheet, setShowIntentSheet] = useState(false)
   const [intentMode, setIntentMode] = useState<'save' | 'change'>('save')
@@ -23,7 +23,7 @@ export default function ProductDetailPage({ product, onBack, onAddToBag, fromCon
 
   const wishlisted = isWishlisted(product.id)
   const wishlistItem = getWishlistItem(product.id)
-  const intentMeta = wishlistItem?.intent ? INTENT_META[wishlistItem.intent] : null
+  const intentMeta = wishlistItem?.intent ? categories.find(c => c.id === wishlistItem.intent) : null
 
   const images = [product.image]
 

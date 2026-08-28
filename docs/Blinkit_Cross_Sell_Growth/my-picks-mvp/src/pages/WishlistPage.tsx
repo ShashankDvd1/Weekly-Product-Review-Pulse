@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { Heart, Star } from 'lucide-react'
+import { Heart, Star, Plus, Edit2, Trash2 } from 'lucide-react'
 import { PRODUCTS } from '../data/products'
 import { useAppStore } from '../state/StoreContext'
 import type { Intent, WishlistItem } from '../types'
-import { INTENT_META } from '../types'
 import IntentBottomSheet from '../components/IntentBottomSheet'
 import Toast from '../components/Toast'
 
@@ -14,26 +13,19 @@ interface Props {
 
 type IntentFilter = 'all' | Intent
 
-const INTENT_TABS: { id: IntentFilter; label: string; emoji?: string }[] = [
-  { id: 'all', label: 'Recently Added' },
-  { id: 'BUY_SOON', label: 'Buy Soon', emoji: '🔥' },
-  { id: 'WAITING_FOR_PRICE', label: 'Price Drop', emoji: '💰' },
-  { id: 'COMPARING', label: 'Comparing', emoji: '👀' },
-  { id: 'JUST_SAVING', label: 'Just Saving', emoji: '✨' },
-]
-
-const INTENT_DESCRIPTIONS: Record<Intent, string> = {
-  BUY_SOON: "Items you told us you may want to buy soon.",
-  WAITING_FOR_PRICE: "Items you're keeping an eye on before buying.",
-  COMPARING: "Products you're considering alongside other options.",
-  JUST_SAVING: "Styles you're keeping for inspiration or later.",
-}
-
 export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
-  const { wishlist, removeFromWishlist } = useAppStore()
+  const { wishlist, removeFromWishlist, categories, addCategory, editCategory, deleteCategory } = useAppStore()
   const [activeFilter, setActiveFilter] = useState<IntentFilter>('all')
   const [intentSheet, setIntentSheet] = useState<{ productId: string; mode: 'save' | 'change' } | null>(null)
   const [toast, setToast] = useState<{ intent: Intent; mode: 'added' | 'updated' } | null>(null)
+  
+  // Category Modal State
+  const [catModal, setCatModal] = useState<{ id?: string; emoji: string; label: string; description: string } | null>(null)
+
+  const tabs = [
+    { id: 'all' as IntentFilter, label: 'Recently Added' },
+    ...categories.map(c => ({ id: c.id as IntentFilter, label: c.label, emoji: c.emoji }))
+  ]
 
   const filteredItems: WishlistItem[] = wishlist
     .filter((item: WishlistItem) => {
@@ -64,7 +56,27 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
     }
   }
 
-  if (wishlist.length === 0) {
+  const selectedCategory = categories.find(c => c.id === activeFilter)
+
+  const handleSaveCategory = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!catModal) return
+    if (catModal.id) {
+      editCategory(catModal.id, catModal.emoji || '✨', catModal.label, catModal.description)
+    } else {
+      addCategory(catModal.emoji || '✨', catModal.label, catModal.description)
+    }
+    setCatModal(null)
+  }
+
+  const handleDeleteCategory = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this custom category? Saved items will be moved back to standard wishlist.")) {
+      deleteCategory(id)
+      setActiveFilter('all')
+    }
+  }
+
+  if (wishlist.length === 0 && categories.length === 4) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] px-8 text-center pb-20">
         <Heart size={52} className="text-gray-200 mb-4" />
@@ -86,9 +98,9 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
           <span className="text-xs text-gray-400">{wishlist.length} items</span>
         </div>
 
-        {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mt-2" style={{ scrollbarWidth: 'none' }}>
-          {INTENT_TABS.map(tab => {
+        {/* Filter chips & Add button */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mt-2 no-scrollbar">
+          {tabs.map(tab => {
             const count = getCount(tab.id)
             const isActive = activeFilter === tab.id
             return (
@@ -109,16 +121,42 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
               </button>
             )
           })}
+          
+          <button
+            onClick={() => setCatModal({ emoji: '✨', label: '', description: '' })}
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border border-dashed border-gray-300 text-gray-400 hover:border-pink-500 hover:text-pink-600 bg-white"
+            title="Create Custom Category"
+          >
+            <Plus size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Context banner for specific intent */}
-      {activeFilter !== 'all' && (
-        <div className={`mx-4 mt-3 p-3 rounded-xl border ${INTENT_META[activeFilter].bg}`}>
-          <p className={`text-xs font-semibold ${INTENT_META[activeFilter].color}`}>
-            {INTENT_META[activeFilter].emoji} {INTENT_META[activeFilter].label}
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">{INTENT_DESCRIPTIONS[activeFilter]}</p>
+      {/* Context banner / controls for selected category */}
+      {selectedCategory && (
+        <div className={`mx-4 mt-3 p-3 rounded-xl border flex items-center justify-between gap-3 ${selectedCategory.bg || 'bg-pink-50 border-pink-200'}`}>
+          <div className="flex-1">
+            <p className={`text-xs font-bold ${selectedCategory.color || 'text-pink-600'}`}>
+              {selectedCategory.emoji} {selectedCategory.label}
+            </p>
+            <p className="text-[11px] text-gray-500 mt-0.5">{selectedCategory.description}</p>
+          </div>
+          {selectedCategory.isCustom && (
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                onClick={() => setCatModal({ id: selectedCategory.id, emoji: selectedCategory.emoji, label: selectedCategory.label, description: selectedCategory.description })}
+                className="w-7 h-7 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-500 hover:text-pink-600 shadow-sm"
+              >
+                <Edit2 size={12} />
+              </button>
+              <button
+                onClick={() => handleDeleteCategory(selectedCategory.id)}
+                className="w-7 h-7 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-500 hover:text-red-600 shadow-sm"
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -126,7 +164,7 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
       {filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
           <span className="text-4xl mb-3">
-            {activeFilter !== 'all' ? INTENT_META[activeFilter].emoji : '🛍️'}
+            {selectedCategory ? selectedCategory.emoji : '🛍️'}
           </span>
           <p className="text-sm font-semibold text-gray-600">Nothing here yet.</p>
           <p className="text-xs text-gray-400 mt-1">Save an item and tell us what you're saving it for.</p>
@@ -136,7 +174,7 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
           {filteredItems.map((item: WishlistItem) => {
             const product = PRODUCTS.find(p => p.id === item.productId)
             if (!product) return null
-            const intentMeta = item.intent ? INTENT_META[item.intent] : null
+            const intentMeta = item.intent ? categories.find(c => c.id === item.intent) : null
             const savedDaysAgo = Math.floor((Date.now() - new Date(item.savedAt).getTime()) / 86400000)
 
             return (
@@ -200,6 +238,74 @@ export default function WishlistPage({ onProductClick, onAddToBag }: Props) {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Category Creation / Edit Modal */}
+      {catModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setCatModal(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+          <form 
+            onSubmit={handleSaveCategory}
+            className="relative bg-white rounded-2xl w-full max-w-sm p-5 shadow-2xl flex flex-col gap-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="font-bold text-lg text-gray-900">
+              {catModal.id ? 'Edit Category' : 'Create Custom Category'}
+            </h3>
+            
+            <div className="flex gap-2.5">
+              <div className="flex flex-col gap-1 w-14">
+                <label className="text-[10px] text-gray-400 font-bold uppercase">Emoji</label>
+                <input 
+                  type="text" 
+                  value={catModal.emoji}
+                  onChange={e => setCatModal({ ...catModal, emoji: e.target.value })}
+                  maxLength={2}
+                  className="border border-gray-200 rounded-xl p-2 text-center text-xl bg-gray-50"
+                  required
+                />
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <label className="text-[10px] text-gray-400 font-bold uppercase">Name / Label</label>
+                <input 
+                  type="text" 
+                  value={catModal.label}
+                  onChange={e => setCatModal({ ...catModal, label: e.target.value })}
+                  placeholder="e.g. Winter Wear"
+                  className="border border-gray-200 rounded-xl p-2 text-sm bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-gray-400 font-bold uppercase">Description / Intent</label>
+              <textarea 
+                value={catModal.description}
+                onChange={e => setCatModal({ ...catModal, description: e.target.value })}
+                placeholder="Why are you saving items to this category?"
+                className="border border-gray-200 rounded-xl p-2 text-sm bg-gray-50 resize-none h-20"
+                required
+              />
+            </div>
+
+            <div className="flex gap-2 mt-2">
+              <button 
+                type="button"
+                onClick={() => setCatModal(null)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-500 font-semibold text-xs"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="flex-1 py-2.5 rounded-xl bg-pink-600 text-white font-semibold text-xs hover:bg-pink-700"
+              >
+                Save
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

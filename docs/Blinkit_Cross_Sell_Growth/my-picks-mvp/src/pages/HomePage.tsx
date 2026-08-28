@@ -116,6 +116,7 @@ export default function HomePage({ onProductClick, onViewMyPicks, onAddToBag }: 
               key={product.id}
               product={product}
               onClick={() => handleProductClick(product.id)}
+              onHeartSave={setIntentSheet}
             />
           ))}
         </div>

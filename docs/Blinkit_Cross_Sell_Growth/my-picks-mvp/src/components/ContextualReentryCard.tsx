@@ -1,17 +1,18 @@
 import React from 'react'
 import { ChevronRight, ShoppingBag } from 'lucide-react'
 import { Product } from '../types'
-import { INTENT_META } from '../types'
+import { useAppStore } from '../state/StoreContext'
 
 interface Props {
   product: Product
-  intent: keyof typeof INTENT_META
+  intent: string
   onAddToBag: () => void
   onViewMyPicks: () => void
 }
 
 export default function ContextualReentryCard({ product, intent, onAddToBag, onViewMyPicks }: Props) {
-  const meta = INTENT_META[intent]
+  const { categories } = useAppStore()
+  const meta = categories.find(c => c.id === intent) || { emoji: '🔥', label: intent, short: intent, bg: 'bg-orange-50 border-orange-200', color: 'text-orange-600' }
 
   return (
     <div className="mx-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

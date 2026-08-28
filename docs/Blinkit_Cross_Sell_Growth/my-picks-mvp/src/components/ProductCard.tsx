@@ -9,13 +9,14 @@ interface Props {
   onClick: () => void
   showAddToBag?: boolean
   onAddToBag?: () => void
+  onHeartSave?: (productId: string) => void
 }
 
-export default function ProductCard({ product, onClick, showAddToBag, onAddToBag }: Props) {
-  const { isWishlisted, addToWishlist, removeFromWishlist, getWishlistItem } = useAppStore()
+export default function ProductCard({ product, onClick, showAddToBag, onAddToBag, onHeartSave }: Props) {
+  const { isWishlisted, addToWishlist, removeFromWishlist, getWishlistItem, categories } = useAppStore()
   const wishlisted = isWishlisted(product.id)
   const wishlistItem = getWishlistItem(product.id)
-  const intentMeta = wishlistItem?.intent ? INTENT_META[wishlistItem.intent] : null
+  const intentMeta = wishlistItem?.intent ? categories.find(c => c.id === wishlistItem.intent) : null
 
   const handleHeartClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -23,7 +24,9 @@ export default function ProductCard({ product, onClick, showAddToBag, onAddToBag
       removeFromWishlist(product.id)
     } else {
       addToWishlist(product.id)
-      // Let parent handle intent sheet if needed
+      if (onHeartSave) {
+        onHeartSave(product.id)
+      }
     }
   }
 

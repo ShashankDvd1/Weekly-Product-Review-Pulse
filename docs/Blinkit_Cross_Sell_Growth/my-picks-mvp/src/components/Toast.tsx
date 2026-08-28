@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Intent, INTENT_META } from '../types'
+import { Intent } from '../types'
+
+import { useAppStore } from '../state/StoreContext'
 
 interface Props {
   intent: Intent
@@ -7,8 +9,9 @@ interface Props {
 }
 
 export default function Toast({ intent, mode = 'added' }: Props) {
+  const { categories } = useAppStore()
   const [visible, setVisible] = useState(true)
-  const meta = INTENT_META[intent]
+  const meta = categories.find(c => c.id === intent) || { emoji: '✨', label: intent }
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(false), 2800)

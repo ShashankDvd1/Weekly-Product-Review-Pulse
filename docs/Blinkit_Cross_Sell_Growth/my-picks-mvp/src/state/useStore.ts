@@ -2,10 +2,14 @@ import { useState, useCallback } from 'react'
 import type { WishlistItem, CartItem, Intent, AnalyticsEvent } from '../types'
 import { DEMO_WISHLIST, PRODUCTS } from '../data/products'
 
+import { DEFAULT_CATEGORIES } from '../types'
+import type { Category } from '../types'
+
 const WISHLIST_KEY = 'my_picks_wishlist'
 const CART_KEY = 'my_picks_cart'
 const EVENTS_KEY = 'my_picks_events'
 const SIM_DATE_KEY = 'my_picks_sim_date_offset'
+const CATEGORIES_KEY = 'my_picks_categories'
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -26,6 +30,14 @@ export function useStore() {
   const [cart, setCartState] = useState<CartItem[]>(() => load<CartItem[]>(CART_KEY, []))
   const [events, setEvents] = useState<AnalyticsEvent[]>(() => load<AnalyticsEvent[]>(EVENTS_KEY, []))
   const [simDateOffsetDays, setSimDateOffsetDays] = useState<number>(() => load<number>(SIM_DATE_KEY, 0))
+  const [categories, setCategoriesState] = useState<Category[]>(() =>
+    load<Category[]>(CATEGORIES_KEY, DEFAULT_CATEGORIES)
+  )
+
+  const setCategories = useCallback((items: Category[]) => {
+    setCategoriesState(items)
+    save(CATEGORIES_KEY, items)
+  }, [])
 
   const setWishlist = useCallback((items: WishlistItem[] | ((prev: WishlistItem[]) => WishlistItem[])) => {
     setWishlistState(prev => {
@@ -140,14 +152,35 @@ export function useStore() {
     events,
   }
 
+  const addCategory = useCallback((emoji: string, label: string, description: string) => {
+    const id = 'CUSTOM_' + Date.now()
+    const newCat: Category = {
+      id, emoji, label, short: label, description,
+      color: 'text-pink-600', bg: 'bg-pink-50 border-pink-200',
+      isCustom: true
+    }
+    setCategories([...categories, newCat])
+    logEvent('CATEGORY_CREATED', undefined, id)
+  }, [categories, setCategories, logEvent])
+
+  const editCategory = useCallback((id: string, emoji: string, label: string, description: string) => {
+    setCategories(categories.map(c => c.id === id ? { ...c, emoji, label, short: label, description } : c))
+  }, [categories, setCategories])
+
+  const deleteCategory = useCallback((id: string) => {
+    setCategories(categories.filter(c => c.id !== id))
+    setWishlist(prev => prev.map(w => w.intent === id ? { ...w, intent: null } : w))
+  }, [categories, setCategories, setWishlist])
+
   // Demo controls
   const resetDemo = useCallback(() => {
     setWishlist(DEMO_WISHLIST)
     setCart([])
     setEvents([])
+    setCategories(DEFAULT_CATEGORIES)
     setSimDateOffsetDays(0)
     save(SIM_DATE_KEY, 0)
-  }, [setWishlist, setCart])
+  }, [setWishlist, setCart, setCategories])
 
   const simulatePlus30Days = useCallback(() => {
     const newOffset = simDateOffsetDays + 30
@@ -164,13 +197,14 @@ export function useStore() {
   }, [wishlist, setWishlist])
 
   return {
-    wishlist, cart, analytics, simDateOffsetDays,
+    wishlist, cart, analytics, simDateOffsetDays, categories,
     addToWishlist, removeFromWishlist, setIntent, clearIntent,
     isWishlisted, getWishlistItem,
     addToCart, removeFromCart, placeOrder,
     getContextualProduct,
     logEvent,
     resetDemo, simulatePlus30Days, setAllBuySoon,
+    addCategory, editCategory, deleteCategory,
   }
 }
 
