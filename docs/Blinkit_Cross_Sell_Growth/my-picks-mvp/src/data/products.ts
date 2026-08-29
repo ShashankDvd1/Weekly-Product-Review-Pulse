@@ -91,7 +91,7 @@ export const PRODUCTS: Product[] = [
     discount: 44,
     rating: 4.3,
     ratingsCount: 8900,
-    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&h=500&fit=crop',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
   },
   {
@@ -130,7 +130,7 @@ export const PRODUCTS: Product[] = [
     discount: 40,
     rating: 4.7,
     ratingsCount: 610,
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4a0028?w=400&h=500&fit=crop',
+    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=500&fit=crop',
     sizes: ['XS', 'S', 'M', 'L'],
   },
 ]
