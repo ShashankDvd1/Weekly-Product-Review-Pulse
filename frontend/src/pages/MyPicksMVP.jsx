@@ -114,7 +114,6 @@ const MyPicksMVP = () => {
                 src={prototypeUrl}
                 title="My Picks MVP Phone Preview"
                 className="phone-iframe"
-                sandbox="allow-scripts allow-same-origin allow-forms"
                 onError={() => console.error("Failed to load iframe.")}
               />
             </div>
