@@ -43,7 +43,7 @@ export default function ProductCard({ product, onClick, showAddToBag, onAddToBag
           className="w-full h-full object-cover"
           loading="lazy"
           onError={(e) => {
-            ;(e.target as HTMLImageElement).src = `https://via.placeholder.com/300x400/f3f4f6/9ca3af?text=${encodeURIComponent(product.brand)}`
+            ;(e.target as HTMLImageElement).src = `https://placehold.co/300x400/f3f4f6/9ca3af?text=${encodeURIComponent(product.brand)}`
           }}
         />
         {/* Discount badge */}

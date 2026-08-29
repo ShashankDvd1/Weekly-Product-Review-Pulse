@@ -82,7 +82,7 @@ export default function CartPage({ onBack, onContinueShopping }: Props) {
                 alt={product.name}
                 className="w-20 h-24 object-cover rounded-xl bg-gray-100 flex-shrink-0"
                 onError={(e) => {
-                  ;(e.target as HTMLImageElement).src = `https://via.placeholder.com/80x96/f3f4f6/9ca3af?text=${encodeURIComponent(product.brand[0])}`
+                  ;(e.target as HTMLImageElement).src = `https://placehold.co/80x96/f3f4f6/9ca3af?text=${encodeURIComponent(product.brand[0])}`
                 }}
               />
               <div className="flex-1 flex flex-col justify-between">

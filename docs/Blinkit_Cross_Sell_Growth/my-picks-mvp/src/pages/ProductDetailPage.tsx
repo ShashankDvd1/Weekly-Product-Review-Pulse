@@ -86,7 +86,7 @@ export default function ProductDetailPage({ product, onBack, onAddToBag, fromCon
           alt={product.name}
           className="w-full h-full object-cover"
           onError={(e) => {
-            ;(e.target as HTMLImageElement).src = `https://via.placeholder.com/400x500/f3f4f6/9ca3af?text=${encodeURIComponent(product.name)}`
+            ;(e.target as HTMLImageElement).src = `https://placehold.co/400x500/f3f4f6/9ca3af?text=${encodeURIComponent(product.name)}`
           }}
         />
         {/* Discount badge */}
