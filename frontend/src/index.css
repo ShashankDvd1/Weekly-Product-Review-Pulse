@@ -181,3 +181,44 @@ h1, h2, h3, h4, h5, h6 {
 .input-error { border-color: var(--danger) !important; }
 .loader { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive Layout Media Queries */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin-top: 60px; /* Space for mobile top bar */
+  }
+
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Make sure tables or scroll areas inside cards don't break page width */
+  .glass-panel {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  /* Responsive tab headers or switchers */
+  .glass-panel[style*="flex"] {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
