@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard';
 import InsightsHub from './pages/InsightsHub';
 import SignalsHub from './pages/SignalsHub';
 import ReviewHub from './pages/ReviewHub';
-import MyPicksMVP from './pages/MyPicksMVP';
+import ProjectCatalystMVP from './pages/ProjectCatalystMVP';
 
 function App() {
   return (
@@ -20,7 +20,8 @@ function App() {
           <Route path="insights" element={<InsightsHub />} />
           <Route path="signals" element={<SignalsHub />} />
           <Route path="review" element={<ReviewHub />} />
-          <Route path="mypicks" element={<MyPicksMVP />} />
+          <Route path="project-catalyst" element={<ProjectCatalystMVP />} />
+          <Route path="mypicks" element={<ProjectCatalystMVP />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
