@@ -586,181 +586,27 @@ const ProjectCatalystMVP = () => {
     : null;
 
   return (
-    <div className="project-catalyst-container">
-      {/* Top Header */}
-      <div className="page-header">
-        <div className="header-left">
-          <div className="badge-pill">
-            <Zap size={14} className="icon-pulse" /> Zero-Friction Re-engagement Engine
-          </div>
-          <h1 className="page-title text-gradient">Myntra Project Catalyst — Full MVP App (16+ Items)</h1>
-          <p className="page-subtitle">
-            Autonomous product experiment converting dormant wishlists into high-converting transactions without monetary discounts.
-          </p>
-        </div>
-        <div className="header-actions">
-          <button className="btn btn-secondary reset-btn" onClick={handleReset}>
-            <RotateCcw size={14} /> Reset State
+    <div className="project-catalyst-container standalone-mobile-view">
+      {/* Centered Mobile Device Viewport */}
+      <div className="phone-preview-panel">
+        
+        {/* Floating Reset Button for Desktop */}
+        <div className="desktop-controls-bar">
+          <button className="btn-floating-reset" onClick={handleReset} title="Reset Prototype State">
+            <RotateCcw size={13} /> Reset Demo State
           </button>
         </div>
-      </div>
 
-      {/* Main Grid */}
-      <div className="catalyst-grid">
-        
-        {/* Left Column: Strategy & Live Telemetry Inspector */}
-        <div className="strategy-column">
-          
-          {/* Strategy Framework */}
-          <div className="strategy-panel glass-panel">
-            <div className="panel-header">
-              <Sparkles size={18} className="icon-pink" />
-              <h3>The 3-Step Zero-Friction Architecture</h3>
-            </div>
+        <div className="phone-wrapper">
+          {/* Phone Hardware Shell */}
+          <div className="phone-speaker-cutout"></div>
+          <div className="phone-camera-lens"></div>
+          <div className="phone-volume-btn volume-up"></div>
+          <div className="phone-volume-btn volume-down"></div>
+          <div className="phone-power-btn"></div>
 
-            <div className="panel-body">
-              <div className="strategy-steps">
-                {/* Step 1 */}
-                <div 
-                  className={`step-card ${activeTab === 'home' ? 'step-active' : ''}`}
-                  onClick={() => { setActiveTab('home'); setSelectedProductForPDP(null); }}
-                >
-                  <div className="step-num">1</div>
-                  <div className="step-info">
-                    <div className="step-title-row">
-                      <h5>Implicit Context Capture</h5>
-                      <span className="step-tag tag-blue">Home Feed</span>
-                    </div>
-                    <p>
-                      Users tap the heart icon on any item. Telemetry instantly records the active variant (e.g. <strong>Size M</strong>) from scroll depth and acknowledges via a subtle 2s toast. Zero modal interruption.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div 
-                  className={`step-card ${activeTab === 'wishlist' ? 'step-active' : ''}`}
-                  onClick={() => { setActiveTab('wishlist'); setSelectedProductForPDP(null); }}
-                >
-                  <div className="step-num">2</div>
-                  <div className="step-info">
-                    <div className="step-title-row">
-                      <h5>The Decision Card</h5>
-                      <span className="step-tag tag-purple">Wishlist Surface</span>
-                    </div>
-                    <p>
-                      Replaces dead thumbnail grids with actionable Decision Cards. Features <strong>Fit Consensus badges</strong>, return guarantees, and a 1-tap checkout CTA.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div 
-                  className={`step-card ${activeTab === 'bag' ? 'step-active' : ''}`}
-                  onClick={() => { setActiveTab('bag'); setSelectedProductForPDP(null); }}
-                >
-                  <div className="step-num">3</div>
-                  <div className="step-info">
-                    <div className="step-title-row">
-                      <h5>Cart Utility Bridge</h5>
-                      <span className="step-tag tag-green">Pre-Checkout Surface</span>
-                    </div>
-                    <p>
-                      Dynamically detects when cart subtotal is near the <strong>₹2,500 Free Shipping</strong> threshold. Injects a 1-tap bridge to add the saved item and save ₹99 delivery fees.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Interactive Test Walkthrough */}
-              <div className="quick-test-guide">
-                <h4>🧪 Comprehensive Test Guide (All Edge Cases)</h4>
-                <ol className="walkthrough-list">
-                  <li>
-                    <strong>Test 1 (Catalog & Search):</strong> Scroll through all 16 products in the phone frame. Use the search bar or filter pills (Shirts, Jackets, Footwear) to filter items.
-                  </li>
-                  <li>
-                    <strong>Test 2 (Implicit Saves):</strong> Tap the <strong>Heart (♡)</strong> on multiple items. Notice the instant toast and live telemetry cache updates.
-                  </li>
-                  <li>
-                    <strong>Test 3 (Categories Tab):</strong> Tap the <strong>Categories (🗂️)</strong> tab in the bottom bar. Browse subcategories and tap any to filter the feed!
-                  </li>
-                  <li>
-                    <strong>Test 4 (Decision Cards):</strong> Tap <strong>Wishlist (❤️)</strong>. See Decision Cards for all saved items with 1-tap Add to Bag CTAs.
-                  </li>
-                  <li>
-                    <strong>Test 5 (Cart Bridge & Coupons):</strong> Tap <strong>Bag (🛍️)</strong>. Test the <strong>Cart Bridge banner</strong>, coupon toggle (`MYNTRA200`), and quantity (+/-) controls!
-                  </li>
-                </ol>
-              </div>
-            </div>
-          </div>
-
-          {/* Telemetry Inspector */}
-          <div className="telemetry-panel glass-panel">
-            <div className="panel-header">
-              <Database size={16} className="icon-cyan" />
-              <h3>Client-Side Store & Pipeline Telemetry</h3>
-            </div>
-            <div className="telemetry-body">
-              <div className="telemetry-grid">
-                <div className="telemetry-card">
-                  <span className="telemetry-label">Wishlist Cache (Zustand)</span>
-                  <span className={`telemetry-metric ${wishlistCount > 0 ? 'text-pink' : 'text-muted'}`}>
-                    {wishlistCount} Item(s) Locked
-                  </span>
-                </div>
-                <div className="telemetry-card">
-                  <span className="telemetry-label">Cart Subtotal</span>
-                  <span className="telemetry-metric text-cyan">₹{bagSubtotal}</span>
-                </div>
-                <div className="telemetry-card">
-                  <span className="telemetry-label">Free Delivery Status</span>
-                  <span className={`telemetry-metric ${isFreeDeliveryUnlocked ? 'text-green' : 'text-orange'}`}>
-                    {isFreeDeliveryUnlocked ? '✓ FREE DELIVERED' : `Shortfall: ₹${Math.max(0, FREE_DELIVERY_THRESHOLD - bagSubtotal)}`}
-                  </span>
-                </div>
-                <div className="telemetry-card">
-                  <span className="telemetry-label">Cart Bridge Math</span>
-                  <span className="telemetry-metric text-green">
-                    {bestBridgeItem && !isFreeDeliveryUnlocked ? `⚡ ACTIVE (Item: ₹${bestBridgeItem.price})` : 'IDLE'}
-                  </span>
-                </div>
-              </div>
-
-              {telemetryLogs.length > 0 && (
-                <div className="telemetry-feed">
-                  <div className="feed-header">⚡ Live Telemetry Event Stream:</div>
-                  <div className="feed-list">
-                    {telemetryLogs.map((log, idx) => (
-                      <div key={idx} className="feed-item">
-                        <div className="feed-meta">
-                          <span className="feed-event">{log.event}</span>
-                          <span className="feed-time">{log.timestamp}</span>
-                        </div>
-                        <pre>{JSON.stringify(log.payload, null, 2)}</pre>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-        </div>
-
-        {/* Right Column: Simulated Myntra Native Mobile App */}
-        <div className="phone-preview-panel">
-          <div className="phone-wrapper">
-            {/* Phone Hardware Shell */}
-            <div className="phone-speaker-cutout"></div>
-            <div className="phone-camera-lens"></div>
-            <div className="phone-volume-btn volume-up"></div>
-            <div className="phone-volume-btn volume-down"></div>
-            <div className="phone-power-btn"></div>
-
-            {/* Screen Viewport */}
-            <div className="phone-screen">
+          {/* Screen Viewport */}
+          <div className="phone-screen">
               <div className="mobile-app">
                 
                 {/* iOS Top Status Bar */}
@@ -1526,8 +1372,7 @@ const ProjectCatalystMVP = () => {
         </div>
 
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default ProjectCatalystMVP;
