@@ -1,8 +1,8 @@
 /* ========================================================= */
-/* PROJECT CATALYST MVP — MOBILE-ONLY & RESPONSIVE APP VIEW  */
+/* INTENT SENSE MVP — MOBILE-ONLY & RESPONSIVE APP VIEW      */
 /* ========================================================= */
 
-.project-catalyst-container.standalone-mobile-view {
+.intent-sense-container.standalone-mobile-view {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1894,7 +1894,7 @@
 /* 📱 MOBILE BROWSER VIEW COMPATIBILITY (RESPONSIVE OVERRIDE)*/
 /* ========================================================= */
 @media (max-width: 600px) {
-  .project-catalyst-container.standalone-mobile-view {
+  .intent-sense-container.standalone-mobile-view {
     padding: 0 !important;
     margin: 0 !important;
     width: 100vw !important;

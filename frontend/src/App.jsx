@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard';
 import InsightsHub from './pages/InsightsHub';
 import SignalsHub from './pages/SignalsHub';
 import ReviewHub from './pages/ReviewHub';
-import ProjectCatalystMVP from './pages/ProjectCatalystMVP';
+import IntentSenseMVP from './pages/IntentSenseMVP';
 
 function App() {
   return (
@@ -20,8 +20,9 @@ function App() {
           <Route path="insights" element={<InsightsHub />} />
           <Route path="signals" element={<SignalsHub />} />
           <Route path="review" element={<ReviewHub />} />
-          <Route path="project-catalyst" element={<ProjectCatalystMVP />} />
-          <Route path="mypicks" element={<ProjectCatalystMVP />} />
+          <Route path="intent-sense" element={<IntentSenseMVP />} />
+          <Route path="project-catalyst" element={<IntentSenseMVP />} />
+          <Route path="mypicks" element={<IntentSenseMVP />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

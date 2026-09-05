@@ -32,7 +32,7 @@ import {
   Grid,
   Filter
 } from 'lucide-react';
-import './ProjectCatalystMVP.css';
+import './IntentSenseMVP.css';
 
 // 16+ Curated High-Fidelity Myntra Fashion Products
 const ALL_PRODUCTS = [
@@ -371,7 +371,7 @@ const CATEGORIES_DATA = [
 
 const FILTER_PILLS = ['All', 'Shirts', 'Jackets', 'T-Shirts', 'Jeans', 'Footwear', 'Women'];
 
-const ProjectCatalystMVP = () => {
+const IntentSenseMVP = () => {
   // Navigation & UI state
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'categories' | 'wishlist' | 'bag'
   const [selectedFilter, setSelectedFilter] = useState('All');
@@ -586,7 +586,7 @@ const ProjectCatalystMVP = () => {
     : null;
 
   return (
-    <div className="project-catalyst-container standalone-mobile-view">
+    <div className="intent-sense-container standalone-mobile-view">
       {/* Centered Mobile Device Viewport */}
       <div className="phone-preview-panel">
         
@@ -865,7 +865,7 @@ const ProjectCatalystMVP = () => {
                   )}
 
                   {/* ================================================= */}
-                  {/* TAB 3: WISHLIST (PROJECT CATALYST DECISION CARDS)  */}
+                  {/* TAB 3: WISHLIST (INTENT SENSE DECISION CARDS)     */}
                   {/* ================================================= */}
                   {activeTab === 'wishlist' && (
                     <div className="wishlist-view">
@@ -1375,4 +1375,4 @@ const ProjectCatalystMVP = () => {
     );
   };
 
-export default ProjectCatalystMVP;
+export default IntentSenseMVP;
