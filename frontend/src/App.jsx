@@ -21,8 +21,8 @@ function App() {
           <Route path="signals" element={<SignalsHub />} />
           <Route path="review" element={<ReviewHub />} />
           <Route path="intent-sense" element={<IntentSenseMVP />} />
-          <Route path="project-catalyst" element={<IntentSenseMVP />} />
-          <Route path="mypicks" element={<IntentSenseMVP />} />
+          <Route path="project-catalyst" element={<Navigate to="/intent-sense" replace />} />
+          <Route path="mypicks" element={<Navigate to="/intent-sense" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
